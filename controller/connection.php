@@ -4,8 +4,6 @@ $user = "root";   // your MySQL username
 $pass = "";       // your MySQL password
 $db   = "ailpo";
 
-$conn = new mysqli($host, $user, $pass, $db);
-
 try {
     $conn = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
 
