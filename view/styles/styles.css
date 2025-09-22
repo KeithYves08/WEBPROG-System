@@ -133,14 +133,14 @@ login-form {
     box-shadow:0 2px 2px 1px rgba(0,0,0,0.05);
     /* transition:border-color .18s, background .25s; */
 }
-.login-form input[type=email],
+.login-form input[type=text],
 .login-form input[type=password] {
     padding-left:50px; 
     background-repeat:no-repeat;
     background-position:16px center;
     background-size:22px 22px;
 }
-.login-form input[type=email] {
+.login-form input[type=text] {
     background-image:
         linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)),
         url('../assets/mail.webp');
