@@ -1,5 +1,4 @@
 <?php
-// Load database credentials from environment variables
 $host = "localhost";
 $user = "root";
 $pass = ""; 
