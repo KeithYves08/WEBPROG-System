@@ -287,7 +287,6 @@ html, body { width:100% !important; overflow-x:hidden !important; }
 
   .login-title,
   .login-subtitle{ text-align:center !important; }
-  .login-form{ align-items:center !important; }
   .login-form{ align-items:stretch !important; gap:14px !important; }
   .login-form input{
     width:100% !important; max-width:none !important; padding:14px 12px 14px 48px !important; font-size:.9rem !important;
