@@ -29,30 +29,6 @@ $user = getUserInfo();
         .logout-btn:hover {
             background: #f2c500;
         }
-        .dashboard-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .stat-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }
-        .stat-card h3 {
-            margin: 0 0 10px 0;
-            color: #35408e;
-            font-size: 1rem;
-        }
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #ffd41c;
-            margin: 0;
-        }
     </style>
 </head>
 <body>
@@ -100,21 +76,70 @@ $user = getUserInfo();
 
         <main class="main-content">
             <div class="main-white-container">
-                <h2>Dashboard</h2>
-                <p>Welcome to the AILPO System Dashboard, <?php echo htmlspecialchars($user['username']); ?>!</p>
-                
-                <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <h3>Active Projects</h3>
-                        <p class="stat-number">0</p>
+                <div class="dashboard-content">
+                    <div class="yellow-stats">
+                        <div class="stat-item">
+                            <div class="stat-content">
+                                <div class="stat-number">--</div>
+                                <div class="stat-label">Total Projects</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-content">
+                                <div class="stat-number">--</div>
+                                <div class="stat-label">Industry Partners</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-content">
+                                <div class="stat-number">--</div>
+                                <div class="stat-label">Placement Rate</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-content">
+                                <div class="stat-number">--</div>
+                                <div class="stat-label">Students Placed</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Partnerships</h3>
-                        <p class="stat-number">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Archived Projects</h3>
-                        <p class="stat-number">0</p>
+
+                    <div class="content-layout">
+                        <div class="left-section">
+                            <div class="active-projects-section">
+                                <div class="active-proj-label">Active Projects</div>
+                                <div class="projects-content">
+                                    <!-- Active projects content will go here -->
+                                    <button class="view-details-btn">View Details</button>
+                                </div>
+                            </div>
+                            <div class="view-all-container">
+                                <button class="view-all-btn">VIEW ALL</button>
+                            </div>
+                        </div>
+
+                        <div class="right-section">
+                            <div class="monthly-projs-container">
+                                <div class="chart-header">Monthly Projects</div>
+                                <div class="chart-content">
+                                    <!-- Chart content goes here -->
+                                </div>
+                            </div>
+
+                            <div class="bottom-row">
+                                <div class="progress-chart-container">
+                                    <div class="chart-header">Project Progress Overview</div>
+                                    <div class="chart-content">
+                                        <!-- Chart content goes here -->
+                                    </div>
+                                </div>
+
+                                <div class="action-buttons">
+                                    <button class="view-calendar-btn">VIEW CALENDAR</button>
+                                    <button class="add-project-btn">+ ADD PROJECT</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
