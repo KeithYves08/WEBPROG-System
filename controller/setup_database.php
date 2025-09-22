@@ -1,8 +1,11 @@
 <?php
-$host = 'localhost';
-$user = 'root';
-$pass = '';
+$host = getenv('DB_HOST');
+$user = getenv('DB_USER');
+$pass = getenv('DB_PASS');
 
+if ($host === false || $user === false || $pass === false) {
+    die("❌ Error: Database credentials are not set in environment variables (DB_HOST, DB_USER, DB_PASS).");
+}
 try {
     $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
