@@ -1,8 +1,9 @@
 <?php
-$host = 'localhost';
-$user = 'root';    
-$pass = '';            
-$db = 'ailpo';  
+// Load database credentials from environment variables
+$host = getenv('DB_HOST');
+$user = getenv('DB_USER');
+$pass = getenv('DB_PASS');
+$db = getenv('DB_NAME');
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
