@@ -8,9 +8,11 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
 
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    echo "Connected successfully";
 } catch (PDOException $e){
     error_log("Database connection failed: " . $e->getMessage());
-    echo "Connection failed. Please try again later.";
+    http_response_code(500);
+    // Optionally, display a static error page:
+    // include __DIR__ . '/../public/error.html';
+    exit;
 }
 ?>
