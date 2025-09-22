@@ -177,8 +177,8 @@ body {
     box-shadow:0 4px 10px -2px rgba(0,0,0,0.25);
     transition:background .2s, transform .15s;
     display:block;
-    margin:4px auto 0 !important; /* center horizontally */
-    text-align:center;
+    /* margin:4px auto 0 !important;  center horizontally - removed as redundant */
+    /* text-align:center;  removed as redundant */
 }
 .login-btn:hover {
     background:#f2c500;
