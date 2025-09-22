@@ -102,7 +102,6 @@ $user = getUserInfo();
             <div class="main-white-container">
                 <h2>Dashboard</h2>
                 <p>Welcome to the AILPO System Dashboard, <?php echo htmlspecialchars($user['username']); ?>!</p>
-                <p>Logged in as: <?php echo htmlspecialchars($user['username']); ?></p>
                 
                 <div class="dashboard-stats">
                     <div class="stat-card">
