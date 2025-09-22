@@ -1,5 +1,28 @@
 <?php
 session_start();
+
+// Check for flash messages
+$flash_error = '';
+$flash_success = '';
+
+if (isset($_SESSION['flash_error'])) {
+    $flash_error = $_SESSION['flash_error'];
+    unset($_SESSION['flash_error']);
+}
+
+if (isset($_SESSION['flash_success'])) {
+    $flash_success = $_SESSION['flash_success'];
+    unset($_SESSION['flash_success']);
+}
+
+// Handle logout and timeout messages
+if (isset($_GET['logout']) && $_GET['logout'] === 'success') {
+    $flash_success = 'You have been successfully logged out.';
+}
+
+if (isset($_GET['timeout']) && $_GET['timeout'] === '1') {
+    $flash_error = 'Your session has expired. Please login again.';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,6 +32,7 @@ session_start();
     <meta name="description" content="AILPO System">
     <title>AILPO - Login</title>
     <link rel="stylesheet" href="view/styles/styles.css">
+    <link rel="stylesheet" href="view/styles/flash-messages.css">
 </head>
 <body>
     <header class="site-header">
@@ -28,6 +52,20 @@ session_start();
                 <h2 class="login-title">Hello Admin!</h2>
                 <div class="login-underline"></div>
                 <p class="login-subtitle">Welcome back.</p>
+                
+                <?php if ($flash_error): ?>
+                    <div class="flash-message flash-error">
+                        <span class="flash-icon">⚠</span>
+                        <?php echo htmlspecialchars($flash_error); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if ($flash_success): ?>
+                    <div class="flash-message flash-success">
+                        <span class="flash-icon">✓</span>
+                        <?php echo htmlspecialchars($flash_success); ?>
+                    </div>
+                <?php endif; ?>
       
                 <form class="login-form" action="controller/login.php" method="POST" autocomplete="on">
                     <div class="form-field">

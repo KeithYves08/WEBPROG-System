@@ -19,6 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     //validation
     if (empty($username) || empty($password)) {
+        $_SESSION['flash_error'] = "Please fill in all fields.";
         header("Location: ../index.php");
         exit();
     }
@@ -42,12 +43,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
         } else {
             //login failed
+            $_SESSION['flash_error'] = "Invalid username or password. Please try again.";
             header("Location: ../index.php");
             exit();
         }
         
     } catch (PDOException $e) {
         error_log("Login error: " . $e->getMessage());
+        $_SESSION['flash_error'] = "A system error occurred. Please try again later.";
         header("Location: ../index.php");
         exit();
     }
