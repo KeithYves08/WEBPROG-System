@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check for flash messages
+//check for flash messages
 $flash_error = '';
 $flash_success = '';
 
@@ -15,7 +15,7 @@ if (isset($_SESSION['flash_success'])) {
     unset($_SESSION['flash_success']);
 }
 
-// Handle logout and timeout messages
+//handle logout and timeout messages
 if (isset($_GET['logout']) && $_GET['logout'] === 'success') {
     $flash_success = 'You have been successfully logged out.';
 }

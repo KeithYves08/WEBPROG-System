@@ -4,7 +4,7 @@
   	<meta charset="utf-8">
   	<meta name="viewport" content="initial-scale=1, width=device-width"> 	
   	<title>AILPO</title>
-    <link rel="stylesheet" href="../view/styles/archived.css"> 	
+    <link rel="stylesheet" href="../view/styles/partnership.css"> 	
 </head>
 <body>
 	<header class="site-header">
@@ -18,27 +18,27 @@
     <div class="dash-layout">
         <aside class="sidebar">
             <nav class="nav">
-                <a class="nav-item" href="./dashboard.html">
+                <a class="nav-item" href="./dashboard.php">
                     <span class="nav-icon icon-dashboard"></span>
                     <span class="nav-label">Dashboard</span>
                 </a>
-                <a class="nav-item is-active" href="./archived.html">
+                <a class="nav-item" href="./archived.php">
                     <span class="nav-icon icon-archived"></span>
                     <span class="nav-label">Archived Projects</span>
                 </a>
-                <a class="nav-item" href="./partnership.html">
+                <a class="nav-item is-active" href="./partnership.php">
                     <span class="nav-icon icon-score"></span>
                     <span class="nav-label">Partnership Score</span>
                 </a>
-                <a class="nav-item" href="#">
+                <a class="nav-item" href="./partnershipManage.php">
                     <span class="nav-icon icon-partnership"></span>
                     <span class="nav-label">Partnership Management</span>
                 </a>
-                <a class="nav-item" href="#">
+                <a class="nav-item" href="./placementManage.php">
                     <span class="nav-icon icon-placement"></span>
                     <span class="nav-label">Placement Management</span>
                 </a>
-                <a class="nav-item" href="#">
+                <a class="nav-item" href="./creation.php">
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Project Creation</span>
                 </a>
@@ -48,8 +48,6 @@
         <main class="main-content">
             
 
-
-			
         </main>
     </div>
 </body>

@@ -17,6 +17,7 @@ $user = getUserInfo();
             gap: 15px;
             font-size: 0.9rem;
         }
+
         .logout-btn {
             background: #ffd41c;
             color: #111;
@@ -28,7 +29,7 @@ $user = getUserInfo();
         }
         .logout-btn:hover {
             background: #f2c500;
-        }
+        }       
     </style>
 </head>
 <body>
@@ -37,7 +38,6 @@ $user = getUserInfo();
         <div class="header-inner">
             <h1 class="app-title">AILPO</h1>
             <div class="user-info">
-                <span>Welcome, <?php echo htmlspecialchars($user['username']); ?>!</span>
                 <a href="../controller/logout.php" class="logout-btn">Logout</a>
             </div>
         </div>
@@ -59,7 +59,7 @@ $user = getUserInfo();
                     <span class="nav-icon icon-score"></span>
                     <span class="nav-label">Partnership Score</span>
                 </a>
-                <a class="nav-item" href="#">
+                <a class="nav-item" href="./partnershipManage.php">
                     <span class="nav-icon icon-partnership"></span>
                     <span class="nav-label">Partnership Management</span>
                 </a>
@@ -67,7 +67,7 @@ $user = getUserInfo();
                     <span class="nav-icon icon-placement"></span>
                     <span class="nav-label">Placement Management</span>
                 </a>
-                <a class="nav-item" href="#">
+                <a class="nav-item" href="./creation.php">
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Project Creation</span>
                 </a>
