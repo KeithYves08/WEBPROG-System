@@ -7,13 +7,13 @@ function checkLogin() {
     }
     
     if (!isset($_SESSION['is_logged_in']) || $_SESSION['is_logged_in'] !== true) {
-        // Redirect to login page
+        //redirect to login page
         header("Location: ../index.php");
         exit();
     }
     
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
-        // Session expired
+        //session expired
         session_unset();
         session_destroy();
         header("Location: ../index.php?timeout=1");
@@ -29,7 +29,7 @@ function getUserInfo() {
     return [
         'id' => $_SESSION['admin_id'] ?? null,
         'username' => $_SESSION['admin_username'] ?? null,
-        'name' => $_SESSION['admin_username'] ?? null // Use username as display name
+        'name' => $_SESSION['admin_username'] ?? null
     ];
 }
 
