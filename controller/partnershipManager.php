@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'PartnershipFilter.php';
 
 class PartnershipController {
     private $conn;
@@ -8,7 +9,7 @@ class PartnershipController {
         $this->conn = $connection;
     }
     
-    public function getAllPartnerships($searchQuery = null) {
+    public function getAllPartnerships($searchQuery = null, $statusFilter = null, $scopeFilter = null) {
         try {
             $sql = "
                 SELECT 
@@ -31,12 +32,41 @@ class PartnershipController {
                 LEFT JOIN scopes s ON ps.scope_id = s.id
             ";
             
+            $whereConditions = [];
             $params = [];
             
+            // Search query conditions
             if ($searchQuery) {
-                $sql .= " WHERE c.name LIKE ? OR c.industry_sector LIKE ? OR s.name LIKE ?";
+                $whereConditions[] = "(c.name LIKE ? OR c.industry_sector LIKE ? OR s.name LIKE ?)";
                 $searchParam = '%' . $searchQuery . '%';
-                $params = [$searchParam, $searchParam, $searchParam];
+                $params = array_merge($params, [$searchParam, $searchParam, $searchParam]);
+            }
+            
+            // Status filter conditions
+            if ($statusFilter && $statusFilter !== 'All') {
+                if ($statusFilter === 'Active') {
+                    $whereConditions[] = "(p.agreement_end_date IS NULL OR p.agreement_end_date >= CURDATE())";
+                } elseif ($statusFilter === 'Expired') {
+                    $whereConditions[] = "(p.agreement_end_date IS NOT NULL AND p.agreement_end_date < CURDATE())";
+                } elseif ($statusFilter === 'Pending') {
+                    // For future implementation - assuming partnerships without start date are pending
+                    $whereConditions[] = "(p.agreement_start_date IS NULL OR p.agreement_start_date > CURDATE())";
+                } elseif ($statusFilter === 'Terminated') {
+                    // For future implementation - assuming we'll add a status column later
+                    // For now, treating very old expired partnerships as terminated
+                    $whereConditions[] = "(p.agreement_end_date IS NOT NULL AND p.agreement_end_date < DATE_SUB(CURDATE(), INTERVAL 1 YEAR))";
+                }
+            }
+            
+            // Scope filter conditions
+            if ($scopeFilter && $scopeFilter !== 'All') {
+                $whereConditions[] = "s.name = ?";
+                $params[] = $scopeFilter;
+            }
+            
+            // Add WHERE clause if there are conditions
+            if (!empty($whereConditions)) {
+                $sql .= " WHERE " . implode(" AND ", $whereConditions);
             }
             
             $sql .= " GROUP BY p.id, c.name, c.industry_sector, p.agreement_start_date, p.agreement_end_date, p.mou_contract, p.created_at";
@@ -103,6 +133,23 @@ class PartnershipController {
     }
     
     /**
+     * Get all available scopes for filter dropdown
+     */
+    public function getAllScopes() {
+        try {
+            $sql = "SELECT DISTINCT name FROM scopes ORDER BY name ASC";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+        } catch (PDOException $e) {
+            error_log("Error fetching scopes: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Get detailed information about a specific partnership
      */
     public function getPartnershipDetails($partnershipId) {
@@ -141,11 +188,27 @@ class PartnershipController {
 // Initialize the controller
 $partnershipController = new PartnershipController($conn);
 
-// Handle search query
-$searchQuery = isset($_GET['q']) ? trim($_GET['q']) : null;
+// Handle search query and filters
+$rawFilters = [
+    'q' => isset($_GET['q']) ? $_GET['q'] : null,
+    'status' => isset($_GET['status']) ? $_GET['status'] : 'All',
+    'scope' => isset($_GET['scope']) ? $_GET['scope'] : 'All'
+];
 
-// Get partnerships data
-$partnerships = $partnershipController->getAllPartnerships($searchQuery);
+// Sanitize filters
+$sanitizedFilters = PartnershipFilter::sanitizeFilters($rawFilters);
+$searchQuery = $sanitizedFilters['q'];
+$statusFilter = $sanitizedFilters['status'];
+$scopeFilter = $sanitizedFilters['scope'];
+
+// Get all available scopes for filter validation and dropdown
+$availableScopes = $partnershipController->getAllScopes();
+
+// Validate filters against available options
+list($statusFilter, $scopeFilter) = PartnershipFilter::validateFilters($statusFilter, $scopeFilter, $availableScopes);
+
+// Get partnerships data with validated filters
+$partnerships = $partnershipController->getAllPartnerships($searchQuery, $statusFilter, $scopeFilter);
 
 // Handle AJAX requests for partnership details
 if (isset($_GET['action']) && $_GET['action'] === 'get_details' && isset($_GET['id'])) {

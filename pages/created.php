@@ -66,11 +66,11 @@ $user = getUserInfo();
                     <span class="nav-icon icon-score"></span>
                     <span class="nav-label">Partnership Score</span>
                 </a>
-                <a class="nav-item" href="./creation.php">
+                <a class="nav-item" href="./partnershipManage.php">
                     <span class="nav-icon icon-partnership"></span>
                     <span class="nav-label">Partnership Management</span>
                 </a>
-                <a class="nav-item" href="#">
+                <a class="nav-item" href="./placementManagement.php">
                     <span class="nav-icon icon-placement"></span>
                     <span class="nav-label">Placement Management</span>
                 </a>
