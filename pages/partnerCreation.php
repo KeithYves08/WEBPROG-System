@@ -79,28 +79,31 @@
                     <div class="grid">
                         <div class="mb-3">
                             <label for="companyName" class="form-label">Company name:</label>
-                            <input type="text" id="companyName" name="company_name" class="form-control" placeholder="Enter company name" required>
+                            <input type="text" id="companyName" name="company_name" class="form-control" placeholder="Enter company name" 
+                                   value="<?php echo isset($_SESSION['form_data']['company_name']) ? htmlspecialchars($_SESSION['form_data']['company_name']) : ''; ?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="industrySector" class="form-label">Industry Sector:</label>
                             <select id="industrySector" name="industry_sector" class="form-select">
                                 <option value="">Select</option>
-                                <option value="software-development">Software Development</option>
-                                <option value="healthcare">Healthcare</option>
-                                <option value="finance">Finance</option>
-                                <option value="education">Education</option>
-                                <option value="manufacturing">Manufacturing</option>
-                                <option value="retail">Retail</option>
-                                <option value="other">Other</option>
+                                <option value="software-development" <?php echo (isset($_SESSION['form_data']['industry_sector']) && $_SESSION['form_data']['industry_sector'] === 'software-development') ? 'selected' : ''; ?>>Software Development</option>
+                                <option value="healthcare" <?php echo (isset($_SESSION['form_data']['industry_sector']) && $_SESSION['form_data']['industry_sector'] === 'healthcare') ? 'selected' : ''; ?>>Healthcare</option>
+                                <option value="finance" <?php echo (isset($_SESSION['form_data']['industry_sector']) && $_SESSION['form_data']['industry_sector'] === 'finance') ? 'selected' : ''; ?>>Finance</option>
+                                <option value="education" <?php echo (isset($_SESSION['form_data']['industry_sector']) && $_SESSION['form_data']['industry_sector'] === 'education') ? 'selected' : ''; ?>>Education</option>
+                                <option value="manufacturing" <?php echo (isset($_SESSION['form_data']['industry_sector']) && $_SESSION['form_data']['industry_sector'] === 'manufacturing') ? 'selected' : ''; ?>>Manufacturing</option>
+                                <option value="retail" <?php echo (isset($_SESSION['form_data']['industry_sector']) && $_SESSION['form_data']['industry_sector'] === 'retail') ? 'selected' : ''; ?>>Retail</option>
+                                <option value="other" <?php echo (isset($_SESSION['form_data']['industry_sector']) && $_SESSION['form_data']['industry_sector'] === 'other') ? 'selected' : ''; ?>>Other</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="companyAddress" class="form-label">Company Address:</label>
-                            <input type="text" id="companyAddress" name="company_address" class="form-control" placeholder="Enter address">
+                            <input type="text" id="companyAddress" name="company_address" class="form-control" placeholder="Enter address"
+                                   value="<?php echo isset($_SESSION['form_data']['company_address']) ? htmlspecialchars($_SESSION['form_data']['company_address']) : ''; ?>">
                         </div>
                         <div class="mb-3">
                             <label for="website" class="form-label">Website:</label>
-                            <input type="url" id="website" name="website" class="form-control" placeholder="https://">
+                            <input type="url" id="website" name="website" class="form-control" placeholder="https://"
+                                   value="<?php echo isset($_SESSION['form_data']['website']) ? htmlspecialchars($_SESSION['form_data']['website']) : ''; ?>">
                         </div>
                     </div>
 
@@ -108,19 +111,23 @@
                     <div class="contact-grid">
                         <div class="mb-3">
                             <label for="contactPerson" class="form-label">Contact Person:</label>
-                            <input type="text" id="contactPerson" name="contact_person" class="form-control" placeholder="Full name" required>
+                            <input type="text" id="contactPerson" name="contact_person" class="form-control" placeholder="Full name" 
+                                   value="<?php echo isset($_SESSION['form_data']['contact_person']) ? htmlspecialchars($_SESSION['form_data']['contact_person']) : ''; ?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="contactPosition" class="form-label">Position:</label>
-                            <input type="text" id="contactPosition" name="contact_position" class="form-control" placeholder="Job title">
+                            <input type="text" id="contactPosition" name="contact_position" class="form-control" placeholder="Job title"
+                                   value="<?php echo isset($_SESSION['form_data']['contact_position']) ? htmlspecialchars($_SESSION['form_data']['contact_position']) : ''; ?>">
                         </div>
                         <div class="mb-3">
                             <label for="contactEmail" class="form-label">Email:</label>
-                            <input type="email" id="contactEmail" name="contact_email" class="form-control" placeholder="name@example.com">
+                            <input type="email" id="contactEmail" name="contact_email" class="form-control" placeholder="name@example.com"
+                                   value="<?php echo isset($_SESSION['form_data']['contact_email']) ? htmlspecialchars($_SESSION['form_data']['contact_email']) : ''; ?>">
                         </div>
                         <div class="mb-3">
                             <label for="contactPhone" class="form-label">Phone:</label>
-                            <input type="tel" id="contactPhone" name="contact_phone" class="form-control" placeholder="+63 900 000 0000">
+                            <input type="tel" id="contactPhone" name="contact_phone" class="form-control" placeholder="+63 900 000 0000"
+                                   value="<?php echo isset($_SESSION['form_data']['contact_phone']) ? htmlspecialchars($_SESSION['form_data']['contact_phone']) : ''; ?>">
                         </div>
                     </div>
 
@@ -128,47 +135,38 @@
                     <div class="agreement-grid">
                         <div class="mb-3">
                             <label for="startDetails" class="form-label">Start Date:</label>
-                            <input type="date" id="startDetails" name="start_details" class="form-control">
+                            <input type="date" id="startDetails" name="start_details" class="form-control"
+                                   value="<?php echo isset($_SESSION['form_data']['start_details']) ? htmlspecialchars($_SESSION['form_data']['start_details']) : ''; ?>">
                         </div>
 
                         <div class="mb-3">
                             <label for="endDetails" class="form-label">End Date:</label>
-                            <input type="date" id="endDetails" name="end_details" class="form-control">
+                            <input type="date" id="endDetails" name="end_details" class="form-control"
+                                   value="<?php echo isset($_SESSION['form_data']['end_details']) ? htmlspecialchars($_SESSION['form_data']['end_details']) : ''; ?>">
                         </div>
 
                         <div class="mb-3 upload-box">
                             <label class="form-label">Upload MOU/Contract:</label>
-                            <label for="mouFile" class="upload-btn">Upload File</label>
-                            <input type="file" id="mouFile" name="mou_contract" accept=".pdf,.docx" style="display: none;">
+                            <input type="file" id="mouFile" name="mou_contract" accept=".pdf,.docx" class="form-control">
+                            <?php if (isset($_SESSION['uploaded_file'])): ?>
+                                <small class="text-success">Previously uploaded: <?php echo htmlspecialchars($_SESSION['uploaded_file']); ?></small>
+                            <?php endif; ?>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Scope of Collaboration:</label>
                             <div class="checkbox-inline">
+                                <?php 
+                                $savedScopes = isset($_SESSION['form_data']['scope']) ? $_SESSION['form_data']['scope'] : [];
+                                $scopeOptions = ['Internships', 'Placements', 'Research', 'Events', 'Training', 'Others'];
+                                foreach ($scopeOptions as $scope): 
+                                    $isChecked = in_array($scope, $savedScopes) ? 'checked' : '';
+                                ?>
                                 <label class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="scope[]" value="Internships">
-                                    <span class="form-check-label">Internships</span>
+                                    <input class="form-check-input" type="checkbox" name="scope[]" value="<?php echo $scope; ?>" <?php echo $isChecked; ?>>
+                                    <span class="form-check-label"><?php echo $scope; ?></span>
                                 </label>
-                                <label class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="scope[]" value="Placements">
-                                    <span class="form-check-label">Placements</span>
-                                </label>
-                                <label class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="scope[]" value="Research">
-                                    <span class="form-check-label">Research</span>
-                                </label>
-                                <label class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="scope[]" value="Events">
-                                    <span class="form-check-label">Events</span>
-                                </label>
-                                <label class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="scope[]" value="Training">
-                                    <span class="form-check-label">Training</span>
-                                </label>
-                                <label class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="scope[]" value="Others">
-                                    <span class="form-check-label">Others</span>
-                                </label>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
@@ -177,19 +175,23 @@
                     <div class="contact-grid">
                         <div class="mb-3">
                             <label for="academeName" class="form-label">Academe Liaison Name:</label>
-                            <input type="text" id="academeName" name="academe_name" class="form-control" placeholder="Full name">
+                            <input type="text" id="academeName" name="academe_name" class="form-control" placeholder="Full name"
+                                   value="<?php echo isset($_SESSION['form_data']['academe_name']) ? htmlspecialchars($_SESSION['form_data']['academe_name']) : ''; ?>">
                         </div>
                         <div class="mb-3">
                             <label for="academePosition" class="form-label">Position:</label>
-                            <input type="text" id="academePosition" name="academe_position" class="form-control" placeholder="Job title">
+                            <input type="text" id="academePosition" name="academe_position" class="form-control" placeholder="Job title"
+                                   value="<?php echo isset($_SESSION['form_data']['academe_position']) ? htmlspecialchars($_SESSION['form_data']['academe_position']) : ''; ?>">
                         </div>
                         <div class="mb-3">
                             <label for="academeEmail" class="form-label">Email:</label>
-                            <input type="email" id="academeEmail" name="academe_email" class="form-control" placeholder="name@example.com">
+                            <input type="email" id="academeEmail" name="academe_email" class="form-control" placeholder="name@example.com"
+                                   value="<?php echo isset($_SESSION['form_data']['academe_email']) ? htmlspecialchars($_SESSION['form_data']['academe_email']) : ''; ?>">
                         </div>
                         <div class="mb-3">
                             <label for="academePhone" class="form-label">Phone:</label>
-                            <input type="tel" id="academePhone" name="academe_phone" class="form-control" placeholder="+63 900 000 0000">
+                            <input type="tel" id="academePhone" name="academe_phone" class="form-control" placeholder="+63 900 000 0000"
+                                   value="<?php echo isset($_SESSION['form_data']['academe_phone']) ? htmlspecialchars($_SESSION['form_data']['academe_phone']) : ''; ?>">
                         </div>
                     </div>
                 </section>
@@ -204,39 +206,15 @@
         </main>
     </div>
 
-    <script>
-        // File upload handling
-        document.getElementById('mouFile').addEventListener('change', function(e) {
-            const fileName = e.target.files[0]?.name;
-            const uploadBtn = document.querySelector('.upload-btn');
-            if (fileName) {
-                uploadBtn.textContent = fileName;
-                uploadBtn.style.color = '#28a745';
-            } else {
-                uploadBtn.textContent = 'Upload File';
-                uploadBtn.style.color = '';
-            }
-        });
 
-        // Form validation
-        document.getElementById('partnerForm').addEventListener('submit', function(e) {
-            const companyName = document.getElementById('companyName').value.trim();
-            const contactPerson = document.getElementById('contactPerson').value.trim();
-            
-            if (!companyName) {
-                alert('Company Name is required.');
-                e.preventDefault();
-                return false;
-            }
-            
-            if (!contactPerson) {
-                alert('Contact Person is required.');
-                e.preventDefault();
-                return false;
-            }
-            
-            return true;
-        });
-    </script>
+    <?php
+    // Clear form data from session after displaying
+    if (isset($_SESSION['form_data'])) {
+        unset($_SESSION['form_data']);
+    }
+    if (isset($_SESSION['uploaded_file'])) {
+        unset($_SESSION['uploaded_file']);
+    }
+    ?>
 </body>
 </html>

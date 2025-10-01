@@ -334,17 +334,158 @@ body {
     gap: 12px;
     z-index: 1;
 }
-.export-btn {
-    background-color: #35408e;
-    color: #ffffff;
-    font-weight: 600;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    cursor: pointer;
+/* Filter Form Styles */
+.filter-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
 }
-.export-btn:hover { opacity: 0.95; }
+
+.pm-filter-select {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background: #ffd41c;
+    color: #1a1a1a;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 120px;
+    transition: background-color 0.2s ease, transform 0.02s ease;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    height: auto;
+    box-sizing: border-box;
+}
+
+.pm-filter-select:focus {
+    outline: 2px solid #1a1a1a;
+    outline-offset: 2px;
+}
+
+.pm-filter-select:hover {
+    background-color: #e6bf19;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.pm-filter-select:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+/* Export Button Styles */
+.export-btn {
+    display: inline-block;
+    padding: 10px 16px;
+    background-color: #35408e;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    height: 42px;
+    box-sizing: border-box;
+    align-items: center;
+}
+
+.export-btn:hover {
+    background-color: #2a3374;
+    color: white;
+    text-decoration: none;
+}
+
+.export-btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.export-btn:disabled:hover {
+    background-color: #6c757d;
+}
+
 .export-btn:focus {
     outline: 2px solid #222a6f;
     outline-offset: 2px;
+}
+
+/* Status Badge Styles */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-active {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-expired {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-terminated {
+    background-color: #f1f3f4;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+/* Score Badge Styles */
+.score-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: white;
+    min-width: 30px;
+    text-align: center;
+    display: inline-block;
+}
+
+.score-high {
+    background-color: #28a745;
+}
+
+.score-medium {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.score-low {
+    background-color: #dc3545;
+}
+
+/* Details Arrow Button Styles */
+.details-arrow-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.details-arrow-btn:hover {
+    background-color: #f8f9fa;
+}
+
+.arrow-icon {
+    width: 16px;
+    height: 16px;
 }
