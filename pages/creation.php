@@ -5,12 +5,20 @@ $user = getUserInfo();
 ?>
 <!DOCTYPE html>
 <html>
+<<<<<<< HEAD
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, width=device-width">
     <title>AILPO</title>
     <link rel="stylesheet" href="../view/styles/creation.css">
+=======
+<head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="initial-scale=1, width=device-width"> 	
+  	<title>AILPO</title>
+    <link rel="stylesheet" href="../view/styles/creation.css"> 	
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
     <style>
         .user-info {
             display: flex;
@@ -18,7 +26,10 @@ $user = getUserInfo();
             gap: 15px;
             font-size: 0.9rem;
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
         .logout-btn {
             background: #ffd41c;
             color: #111;
@@ -28,22 +39,37 @@ $user = getUserInfo();
             font-weight: 600;
             transition: background 0.2s;
         }
+<<<<<<< HEAD
 
         .logout-btn:hover {
             background: #f2c500;
         }
 
+=======
+        .logout-btn:hover {
+            background: #f2c500;
+        }
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
         .dates-row {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
+<<<<<<< HEAD
     </style>
 </head>
 
 <body>
 
     <header class="site-header">
+=======
+
+    </style>
+</head>
+<body>
+
+	<header class="site-header">
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
         <div class="header-inner">
             <h1 class="app-title">AILPO</h1>
             <div class="user-info">
@@ -53,7 +79,11 @@ $user = getUserInfo();
         </div>
         <div class="header-accent-line"></div>
     </header>
+<<<<<<< HEAD
 
+=======
+  	
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
     <div class="dash-layout">
         <aside class="sidebar">
             <nav class="nav">
@@ -65,7 +95,11 @@ $user = getUserInfo();
                     <span class="nav-icon icon-archived"></span>
                     <span class="nav-label">Archived Projects</span>
                 </a>
+<<<<<<< HEAD
                 <a class="nav-item" href="./partnershipScore.php">
+=======
+                <a class="nav-item" href="./partnership.php">
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                     <span class="nav-icon icon-score"></span>
                     <span class="nav-label">Partnership Score</span>
                 </a>
@@ -90,11 +124,17 @@ $user = getUserInfo();
                 <div class="creation-sections">
                     <!-- Project Information -->
                     <div class="creation-card">
+<<<<<<< HEAD
                         <div class="card-head">
                             <h2>Project Information</h2>
                         </div>
                         <div class="card-accent"></div>
                         <div class="card-body">
+=======
+                        <div class="card-head"><h2>Project Information</h2></div>
+                        <div class="card-accent"></div>
+                        <div class="card-body">                       
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                             <form class="project-info-form" id="projectInfoForm">
                                 <div class="field">
                                     <label for="projectTitle">Project Title</label>
@@ -126,14 +166,22 @@ $user = getUserInfo();
                                     </div>
                                 </div>
                             </form>
+<<<<<<< HEAD
                             <script src="../controller/script/creation.js"></script>
+=======
+                             <script src="../controller/script/creation.js"></script>
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                         </div>
                     </div>
                     <!-- Academe Information -->
                     <div class="creation-card">
+<<<<<<< HEAD
                         <div class="card-head">
                             <h2>Academe Information</h2>
                         </div>
+=======
+                        <div class="card-head"><h2>Academe Information</h2></div>
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                         <div class="card-accent"></div>
                         <div class="card-body">
                             <div class="academe-info">
@@ -179,11 +227,17 @@ $user = getUserInfo();
                     </div>
                     <!-- Agreement and Resources -->
                     <div class="creation-card">
+<<<<<<< HEAD
                         <div class="card-head">
                             <h2>Agreement and Resources</h2>
                         </div>
                         <div class="card-accent"></div>
                         <div class="card-body">
+=======
+                        <div class="card-head"><h2>Agreement and Resources</h2></div>
+                        <div class="card-accent"></div>
+                        <div class="card-body">                          
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                             <form id="agreementResourcesForm" class="agreement-form" enctype="multipart/form-data">
                                 <div class="field">
                                     <label>MOA / MOU Documents</label>
@@ -223,16 +277,25 @@ $user = getUserInfo();
 
                                 <div class="field">
                                     <label for="projectBudget">Estimated Budget (PHP)</label>
+<<<<<<< HEAD
                                     <div class="currency-input">
                                         <input type="number" id="projectBudget" name="budget" step="0.01" min="0" placeholder="0.00">
                                     </div>
                                 </div>
                             </form>
+=======
+                                    <div class="currency-input">                                       
+                                        <input type="number" id="projectBudget" name="budget" step="0.01" min="0" placeholder="0.00">
+                                    </div>
+                                </div>                               
+                            </form>                                              
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                             <script src="../controller/script/creation.js"></script>
                         </div>
                     </div>
                     <!-- Deliverables and Tracking -->
                     <div class="creation-card">
+<<<<<<< HEAD
                         <div class="card-head">
                             <h2>Deliverables and Tracking</h2>
                         </div>
@@ -264,13 +327,48 @@ $user = getUserInfo();
                                     <input type="hidden" name="objectives" id="objectivesHidden">
                                 </div>
                             </form>
+=======
+                        <div class="card-head"><h2>Deliverables and Tracking</h2></div>
+                        <div class="card-accent"></div>
+                        <div class="card-body">
+                            <form id="deliverablesTrackingForm" class="deliverables-form">                              
+                                <div class="field">
+                                    <label for="expectedOutputInput">Expected Outputs</label>
+                                    <div class="list-add-row">
+                                        <input type="text" id="expectedOutputInput" placeholder="Enter expected output">                            
+                                    </div>
+                                    <ul id="expectedOutputsList" class="dynamic-list"></ul>
+                                    <input type="hidden" name="expected_outputs" id="expectedOutputsHidden">
+                                </div>                            
+                                <div class="field">
+                                    <label for="kpiInput">KPIs / Success Metrics</label>
+                                    <div class="list-add-row">
+                                        <input type="text" id="kpiInput" placeholder="Enter KPI or success metric">                                  
+                                    </div>
+                                    <ul id="kpisList" class="dynamic-list"></ul>
+                                    <input type="hidden" name="kpis" id="kpisHidden">
+                                </div>                              
+                                <div class="field">
+                                    <label for="objectiveInput">Objectives</label>
+                                    <div class="list-add-row">
+                                        <input type="text" id="objectiveInput" placeholder="Enter objective">                                       
+                                    </div>
+                                    <ul id="objectivesList" class="dynamic-list"></ul>
+                                    <input type="hidden" name="objectives" id="objectivesHidden">
+                                </div>                             
+                            </form>                   
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                         </div>
                     </div>
                     <!-- Industry Partner Information -->
                     <div class="creation-card industry-partner-card">
+<<<<<<< HEAD
                         <div class="card-head">
                             <h2>Industry Partner Information</h2>
                         </div>
+=======
+                        <div class="card-head"><h2>Industry Partner Information</h2></div>
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                         <div class="card-accent"></div>
                         <div class="card-body">
                             <form id="industryPartnerForm" class="industry-partner-form">
@@ -278,7 +376,11 @@ $user = getUserInfo();
                                     <label for="companyNameSelect">Company Name</label>
                                     <select id="companyNameSelect" required>
                                         <option value="" disabled selected>Select company</option>
+<<<<<<< HEAD
                                         <option value="Microsoft">Microsoft</option>
+=======
+                                        <option value="Microsoft">Microsoft</option>       
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                                         <!-- added partnership / companies should appear here  -->
                                         <option value="Other">Other (Not Listed)</option>
                                     </select>
@@ -290,6 +392,7 @@ $user = getUserInfo();
                                 </div>
 
                                 <input type="hidden" name="company_name" id="companyNameFinal">
+<<<<<<< HEAD
                             </form>
                         </div>
                     </div>
@@ -297,6 +400,13 @@ $user = getUserInfo();
                         <div class="card-head">
                             <h2>Milestones</h2>
                         </div>
+=======
+                            </form>                        
+                        </div>
+                    </div>
+                    <div class="creation-card">
+                        <div class="card-head"><h2>Milestones</h2></div>
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                         <div class="card-accent"></div>
                         <div class="card-body">
                             <form id="milestonesForm" class="milestones-form">
@@ -332,6 +442,7 @@ $user = getUserInfo();
                                 </button>
                                 <div id="milestonesContainer"></div>
                                 <input type="hidden" name="milestones" id="milestonesHidden">
+<<<<<<< HEAD
                             </form>
                         </div>
                         <script src="../controller/script/creation.js"></script>
@@ -339,11 +450,25 @@ $user = getUserInfo();
                 </div>
                 <div class="actions-inline">
 
+=======
+                            </form>                                              
+                        </div>
+                        <script src="../controller/script/creation.js"></script>
+                    </div>                  
+               </div>              
+                <div class="actions-inline">
+                    
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                     <a href="./dashboard.html" id="cancelBtn" class="btn btn-cancel">Cancel</a>
                     <a href="./created.html" id="submitAllBtn" class="btn btn-submit">Submit</a>
                 </div>
             </div>
+<<<<<<< HEAD
         </main>
 </body>
 
+=======
+        </main>   
+</body>
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
 </html>

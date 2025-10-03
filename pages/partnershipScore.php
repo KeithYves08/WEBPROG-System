@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<<<<<<< HEAD
 
 <head>
     <meta charset="utf-8">
@@ -17,6 +18,23 @@
         <div class="header-accent-line"></div>
     </header>
 
+=======
+<head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="initial-scale=1, width=device-width"> 	
+  	<title>AILPO</title>
+    <link rel="stylesheet" href="../view/styles/partnership.css"> 	
+</head>
+<body>
+	<header class="site-header">
+        <div class="header-inner">
+            <h1 class="app-title">AILPO</h1>
+            
+        </div>
+        <div class="header-accent-line"></div>
+    </header>
+  	
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
     <div class="dash-layout">
         <aside class="sidebar">
             <nav class="nav">
@@ -28,7 +46,11 @@
                     <span class="nav-icon icon-archived"></span>
                     <span class="nav-label">Archived Projects</span>
                 </a>
+<<<<<<< HEAD
                 <a class="nav-item is-active" href="./partnershipScore.php">
+=======
+                <a class="nav-item is-active" href="./partnership.php">
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                     <span class="nav-icon icon-score"></span>
                     <span class="nav-label">Partnership Score</span>
                 </a>
@@ -48,6 +70,7 @@
         </aside>
 
         <main class="main-content">
+<<<<<<< HEAD
             <div class="main-white-container">
                 <div class="page-header">
                     <div class="page-title"> <span>PARTNERSHIP SCORE</span>
@@ -115,4 +138,11 @@
     </div>
 </body>
 
+=======
+            
+
+        </main>
+    </div>
+</body>
+>>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
 </html>
