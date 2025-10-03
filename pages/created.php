@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
 <?php
 require_once '../controller/auth.php';
 checkLogin();
@@ -9,20 +6,11 @@ $user = getUserInfo();
 ?>
 <!DOCTYPE html>
 <html>
-<<<<<<< HEAD
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, width=device-width">
-    <title>AILPO</title>
-    <link rel="stylesheet" href="../view/styles/created.css">
-=======
 <head>
   	<meta charset="utf-8">
   	<meta name="viewport" content="initial-scale=1, width=device-width"> 	
   	<title>AILPO</title>
     <link rel="stylesheet" href="../view/styles/created.css"> 	
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
     <style>
         .user-info {
             display: flex;
@@ -30,10 +18,6 @@ $user = getUserInfo();
             gap: 15px;
             font-size: 0.9rem;
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
         .logout-btn {
             background: #ffd41c;
             color: #111;
@@ -43,37 +27,20 @@ $user = getUserInfo();
             font-weight: 600;
             transition: background 0.2s;
         }
-<<<<<<< HEAD
-
         .logout-btn:hover {
             background: #f2c500;
         }
-
-=======
-        .logout-btn:hover {
-            background: #f2c500;
-        }
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
         .dates-row {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
-<<<<<<< HEAD
-    </style>
-</head>
-
-<body>
-
-    <header class="site-header">
-=======
 
     </style>
 </head>
 <body>
 
 	<header class="site-header">
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
         <div class="header-inner">
             <h1 class="app-title">AILPO</h1>
             <div class="user-info">
@@ -83,11 +50,7 @@ $user = getUserInfo();
         </div>
         <div class="header-accent-line"></div>
     </header>
-<<<<<<< HEAD
-
-=======
   	
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
     <div class="dash-layout">
         <aside class="sidebar">
             <nav class="nav">
@@ -99,11 +62,7 @@ $user = getUserInfo();
                     <span class="nav-icon icon-archived"></span>
                     <span class="nav-label">Archived Projects</span>
                 </a>
-<<<<<<< HEAD
-                <a class="nav-item" href="./partnershipScore.php">
-=======
                 <a class="nav-item" href="./partnership.php">
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                     <span class="nav-icon icon-score"></span>
                     <span class="nav-label">Partnership Score</span>
                 </a>
@@ -124,11 +83,7 @@ $user = getUserInfo();
 
         <main class="main-content">
             <div class="main-white-container">
-<<<<<<< HEAD
-
-=======
                
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                 <h2 class="section-title">Project Details</h2>
 
                 <section class="project-details-box">
@@ -139,11 +94,7 @@ $user = getUserInfo();
 
                     <div class="info-grid">
                         <article class="info-card">
-<<<<<<< HEAD
-                            <header class="card-header">Project Information</header>
-=======
                             <header class="card-header">Project Information</header>                                                     
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                             <div class="card-body">
                                 <div class="details-list">
                                     <div class="detail-row">
@@ -163,22 +114,14 @@ $user = getUserInfo();
                                         <span class="detail-value">MM/DD/YYYY</span>
                                         <span class="detail-label" style="margin-left:21px;">End Date:</span>
                                         <span class="detail-value">MM/DD/YYYY</span>
-<<<<<<< HEAD
-                                    </div>
-=======
                                     </div>                                   
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                                 </div>
                             </div>
                         </article>
 
                         <article class="info-card">
                             <header class="card-header">Industry Partner Information</header>
-<<<<<<< HEAD
-                            <div class="card-body">
-=======
                             <div class="card-body">                   
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                                 <div class="contact-section">
                                     <div class="contact-title">Partner Contact Person</div>
                                     <div class="contact-grid">
@@ -203,22 +146,6 @@ $user = getUserInfo();
 
                         <article class="info-card">
                             <header class="card-header">Deliverables and Tracking</header>
-<<<<<<< HEAD
-                            <div class="card-body">
-                                <div class="dt-sections" aria-label="Deliverables and Tracking">
-                                    <h4 class="dt-title">Expected Outputs</h4>
-                                    <ul class="dt-list">
-                                        <li></li>
-                                    </ul>
-                                    <h4 class="dt-title">KPIs / Success Metrics</h4>
-                                    <ul class="dt-list">
-                                        <li></li>
-                                    </ul>
-                                    <h4 class="dt-title">Objectives</h4>
-                                    <ul class="dt-list">
-                                        <li></li>
-                                    </ul>
-=======
                             <div class="card-body">                               
                                 <div class="dt-sections" aria-label="Deliverables and Tracking">                                   
                                         <h4 class="dt-title">Expected Outputs</h4>
@@ -233,30 +160,12 @@ $user = getUserInfo();
                                         <ul class="dt-list">
                                             <li></li>
                                         </ul>                                
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                                 </div>
                             </div>
                         </article>
 
                         <article class="info-card">
                             <header class="card-header">Milestones</header>
-<<<<<<< HEAD
-                            <div class="card-body">
-                                <form class="milestone-form" action="#" method="post" onsubmit="return false;">
-                                    <div class="form-row">
-                                        <label for="ms-name">Milestone Name:</label>
-                                    </div>
-                                    <div class="form-row">
-                                        <label for="ms-desc">Description:</label>
-
-                                    </div>
-                                    <div class="form-row dates-row">
-                                        <div class="date-field">
-                                            <label for="ms-start">Start Date:</label>
-                                        </div>
-                                        <div class="date-field">
-                                            <label for="ms-end">End Date:</label>
-=======
                             <div class="card-body">                                
                                 <form class="milestone-form" action="#" method="post" onsubmit="return false;">
                                     <div class="form-row">
@@ -272,7 +181,6 @@ $user = getUserInfo();
                                         </div>
                                         <div class="date-field">
                                             <label for="ms-end">End Date:</label>                                          
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                                         </div>
                                     </div>
                                     <div class="form-row">
@@ -293,17 +201,8 @@ $user = getUserInfo();
                     </div>
                 </section>
 
-<<<<<<< HEAD
-
-            </div>
-        </main>
-</body>
-
-</html>
-=======
                
             </div>
         </main>   
 </body>
 </html>
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
