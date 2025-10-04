@@ -55,7 +55,7 @@ $user = getUserInfo();
                     <span class="nav-icon icon-archived"></span>
                     <span class="nav-label">Archived Projects</span>
                 </a>
-                <a class="nav-item" href="./partnershipScore.php">
+                <a class="nav-item" href="./partnership.php">
                     <span class="nav-icon icon-score"></span>
                     <span class="nav-label">Partnership Score</span>
                 </a>
