@@ -1,0 +1,37 @@
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*~
+
+# Test files
+test_*.php
+debug_*.php
+temp_*.php
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Environment files (if any sensitive config)
+.env
+.env.local
+
+# Upload temp files
+uploads/temp/
+
+# Cache files
+cache/
+temp/

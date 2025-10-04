@@ -40,7 +40,7 @@ WEBPROG-System/
 │   ├── connection.php (Database connection)
 │   ├── login.php (Login processing)
 │   ├── logout.php (Logout handling)
-│   ├── setup_database.php (Database initialization)
+│   ├── setupDatabase.php (Database initialization)
 │   ├── createPartner.php (Partnership creation backend)
 │   ├── partnershipManager.php (Partnership management controller)
 │   └── uploads/ (File upload storage)
@@ -64,8 +64,8 @@ WEBPROG-System/
         ├── archived.css (Archived projects styles)
         ├── partnership.css (Partnership score styles)
         ├── partManage.css (Partnership management styles)
-        ├── partcreation.css (Partnership creation styles)
-        └── flash-messages.css (Message system styles)
+        ├── partCreation.css (Partnership creation styles)
+        └── flashMessages.css (Message system styles)
 ```
 
 ## Database Configuration
@@ -437,8 +437,8 @@ Companies ──→ Partnerships ──→ Projects ──→ Milestones
   - `styles.css` - Base styles and global components
   - `dboard.css` - Dashboard-specific styling
   - `partManage.css` - Partnership management interface
-  - `partcreation.css` - Partnership creation form styling
-  - `flash-messages.css` - Message system styling
+  - `partCreation.css` - Partnership creation form styling
+  - `flashMessages.css` - Message system styling
 - **Bootstrap Integration**: Custom styles layered over Bootstrap framework
 - **Responsive Design**: Mobile-first approach with breakpoint considerations
 
@@ -521,7 +521,7 @@ Companies ──→ Partnerships ──→ Projects ──→ Milestones
 ## Development Setup
 
 ### Database Setup Process
-1. Run `setup_database.php` to initialize the complete database schema
+1. Run `setupDatabase.php` to initialize the complete database schema
 2. Creates `ailpo` database if not exists
 3. Creates all required tables in order:
    - `admins` - System administrators

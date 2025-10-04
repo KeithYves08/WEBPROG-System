@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $contactEmail = isset($_POST['contact_email']) ? FormValidator::sanitize($_POST['contact_email']) : '';
     $contactPhone = isset($_POST['contact_phone']) ? FormValidator::sanitize($_POST['contact_phone']) : '';
     $scopes = isset($_POST['scope']) ? $_POST['scope'] : [];
+    $othersSpecify = isset($_POST['others_specify']) ? FormValidator::sanitize($_POST['others_specify']) : '';
 
     // Perform validations using the validator class
     $validator->validateRequired($companyName, 'Company Name');
@@ -70,7 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'contact_position' => $contactPosition,
             'contact_email' => $_POST['contact_email'] ?? '', // Use original email value
             'contact_phone' => $contactPhone,
-            'scope' => $scopes
+            'scope' => $scopes,
+            'others_specify' => $othersSpecify
         ];
         
         // Preserve uploaded file name if exists
@@ -122,8 +124,9 @@ try {
         }
 
         //partnership
-        $stmt = $pdo->prepare("INSERT INTO partnerships (company_id, agreement_start_date, agreement_end_date, mou_contract, academe_liaison_id) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$companyId, $startDate, $endDate, $mouContractPath, $academeLiaisonId]);
+        $customScope = (in_array('Others', $scopes) && !empty($othersSpecify)) ? $othersSpecify : null;
+        $stmt = $pdo->prepare("INSERT INTO partnerships (company_id, agreement_start_date, agreement_end_date, mou_contract, academe_liaison_id, custom_scope) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$companyId, $startDate, $endDate, $mouContractPath, $academeLiaisonId, $customScope]);
         $partnershipId = $pdo->lastInsertId();
 
         //contact person

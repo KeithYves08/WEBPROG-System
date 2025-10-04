@@ -1,0 +1,688 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nata+Sans:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+body {    
+    margin: 0;
+    height: 100vh;
+    background: #e1e1e1;
+}
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.9rem;
+}
+.logout-btn {
+    background: #ffd41c;
+    color: #111;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.logout-btn:hover {
+    background: #f2c500;
+}
+:root{
+    --header-h: 64px;   
+    --accent-h: 4px;
+}
+/* AILPO HEADER */
+.site-header {
+    background:#35408e;
+    font-family:"Montserrat", sans-serif;
+    color:#fff;
+}
+.header-inner {
+    width:100%;
+    max-width:clamp(1000px, 92%, 1700px);
+    margin:0 auto;
+    padding:12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+.app-title {
+    margin:0;
+    font-weight:700;
+    font-size:1.9rem;
+    letter-spacing:.5px;
+    color:#ffd41c;
+    text-shadow:0 4px 4px rgba(0,0,0,0.35);
+    display: flex;
+}
+.nu-logo {
+    height:48px;
+    width:auto;
+    display:block;
+}
+.header-accent-line {
+    height:4px;
+    background:#ffd41c;
+    width:100%;
+}
+
+/* Dashboard layout - Nav Bar Section */
+.dash-layout{
+    display:flex;
+    gap:0;
+    height: calc(100dvh - var(--header-h) - var(--accent-h));
+    min-height:calc(100vh - 120px); 
+}
+.sidebar{
+    width:260px;
+    background:#ffffff;
+    border-right:1px solid #e9e9e9;
+    padding:16px 12px;
+    box-sizing:border-box;
+    position:sticky;
+    top:0;                       
+    height:100%;
+    max-height: calc(100dvh - var(--header-h) - var(--accent-h));
+    overflow:auto;                
+    align-self:stretch;     
+}
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    font-family:"Montserrat", sans-serif;
+}
+.nav-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    border-radius:12px;
+    text-decoration:none;
+    color:#222;
+    transition:background .2s;
+}
+.nav-item:hover{
+    background:#f3f3f3;
+}
+
+.nav-item.is-active{
+    background:#bbbbbb;           
+    border-radius:12px;        
+}
+.nav-icon{
+    width:22px;
+    height:22px;
+    background-repeat:no-repeat;
+    background-size:contain;
+    background-position:center;
+    flex:0 0 22px;
+}
+.icon-dashboard{  background-image:url('../assets/dashboard_image.webp'); }
+.icon-archived{   background-image:url('../assets/archive_image.webp'); }
+.icon-score{      background-image:url('../assets/partnership_image.webp'); }
+.icon-partnership{background-image:url('../assets/partnership_image.webp'); }
+.icon-placement{  background-image:url('../assets/placement_image.webp'); }
+.icon-creation{   background-image:url('../assets/project_image.webp'); }
+.nav-label{
+    font-weight:600;
+    font-size:0.98rem;
+}
+/* Responsive Nav Bar */
+@media (max-width:1024px){
+    .sidebar{ width:220px; }
+    .nav-label{ font-size:0.95rem; }
+}
+@media (max-width:880px){
+    .sidebar{ width:72px; padding:12px 8px; }
+    .nav-item{ justify-content:center; }
+    .nav-label{ display:none; }      
+    .dash-content{ padding:24px 16px; }
+}
+@media (max-width:640px){
+    .dash-layout{
+        flex-direction:column;
+        height:auto;
+        min-height: calc(100dvh - var(--header-h) - var(--accent-h));
+    }
+    .sidebar{
+        position: static;             
+        width:100%;
+        height:auto;
+        max-height:none;
+        display:flex;
+        overflow:auto;
+        padding:10px 8px;
+        border-right:none;
+        border-bottom:1px solid #e9e9e9;
+    }
+    .nav{
+        flex-direction:row;
+        gap:8px;
+        overflow-x:auto;          
+    }
+    .nav-item{
+        flex:0 0 auto;
+    }
+    .nav-label{
+        display:inline;                
+        font-size:.9rem;
+    }
+}
+
+.main-content{
+    flex:1;
+    padding:24px;
+    box-sizing:border-box;
+}
+.main-white-container{
+    width:100%;
+    height:100%;
+    background:#ffffff;
+    border-radius:18px;
+    box-shadow:0 10px 28px -10px rgba(0,0,0,0.25);
+    padding:24px;
+    box-sizing:border-box;
+    overflow:auto; 
+}
+.page-title-btn {
+    background: #35408E;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    margin-bottom: 10px;
+    width: fit-content;
+    border-radius: 24px;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    cursor: default;
+    box-shadow: 0 2px 4px rgba(93, 107, 179, 0.3);
+}
+.partner-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    grid-auto-rows: minmax(250px, auto);
+    align-items: stretch;
+}
+
+/* Ensure cards in the same row have exactly the same height */
+/* Top row: Company Info and Agreement cards */
+.partner-grid > .partner-card:nth-child(1),
+.partner-grid > .partner-card:nth-child(2) {
+    min-height: 350px;
+    height: 350px;
+}
+
+/* Bottom row: Contact and Academic Liaison cards */
+.partner-grid > .partner-card:nth-child(3),
+.partner-grid > .partner-card:nth-child(4) {
+    min-height: 280px;
+    height: 280px;
+}
+.partner-card {
+    border: 1px solid #35408e;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.partner-card_header {
+    background: #35408e;
+    padding: 10px 12px;
+}
+.partner-card_title {
+    margin: 0;
+    color: #fff;
+    font-family: 'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.2;
+}
+.partner-card_body {
+    padding: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.partner-card_body > div {
+    flex: 1;
+}
+
+/* Scope Pills */
+.scope-pill {
+    display: inline-block;
+    background-color: #35408e;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
+    margin-right: 8px;
+    margin-bottom: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.scope-pill:hover {
+    background-color: #2a3478;
+}
+@media (max-width: 768px) {
+    .partner-grid {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+        gap: 16px;
+    }
+    
+    /* Remove height constraints on mobile for natural flow */
+    .partner-grid > .partner-card:nth-child(1),
+    .partner-grid > .partner-card:nth-child(2),
+    .partner-grid > .partner-card:nth-child(3),
+    .partner-grid > .partner-card:nth-child(4) {
+        min-height: auto;
+        height: auto;
+    }
+    
+    .action-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    .scope-pill {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+}
+
+.main-white-container { position: relative; }
+.partnership-actions {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    display: flex;
+    gap: 16px;
+    z-index: 1;
+}
+.p-btn {
+    background-color: #35408e;
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+   
+}
+.p-btn:hover {
+    background-color: #112ead;
+}
+.p-btn:active {
+    transform: translateY(1px);
+}
+.p-btn:focus-visible {
+    outline: 2px solid #1a1a1a;
+    outline-offset: 2px;
+}
+.agreement-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 80px;
+}
+.agreement-actions {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+/* Modern Action Buttons */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.3px;
+}
+
+.action-btn--primary {
+    background: linear-gradient(135deg, #35408e 0%, #4a56a3 100%);
+    color: white;
+}
+
+.action-btn--primary:hover {
+    background: linear-gradient(135deg, #2a3478 0%, #3d4b8f 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(53, 64, 142, 0.2);
+}
+
+.action-btn--secondary {
+    background: linear-gradient(135deg, #ffd41c 0%, #f0c900 100%);
+    color: #1a1a1a;
+}
+
+.action-btn--secondary:hover {
+    background: linear-gradient(135deg, #f0c900 0%, #e6b800 100%);
+    transform: translateY(-1px);
+}
+
+.action-btn--disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.action-btn--disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.action-btn--danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+}
+
+.action-btn--danger:hover {
+    background: linear-gradient(135deg, #bd2130 0%, #a71e2a 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+}
+
+/* Old scope grid styles removed - now using inline scope pills */
+
+/* Renewal Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #35408e;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.modal-close {
+    font-size: 24px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    color: #666;
+    background: #f5f5f5;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: #333;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input[type="date"],
+.form-group textarea,
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e1e5e9;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: 'Montserrat', sans-serif;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-group input[type="date"]:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #35408e;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.file-info {
+    display: block;
+    margin-top: 4px;
+    color: #666;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 20px 20px 20px;
+    border-top: 1px solid #eee;
+    background: #fafafa;
+    border-radius: 0 0 8px 8px;
+}
+
+
+
+
+
+/* Terminate Modal Specific Styles */
+.terminate-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.terminate-warning h4 {
+    color: #856404;
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+}
+
+.terminate-warning p {
+    color: #856404;
+    margin: 8px 0;
+    font-size: 0.9rem;
+}
+
+.terminate-warning ul {
+    color: #856404;
+    margin: 10px 0 10px 20px;
+    font-size: 0.9rem;
+}
+
+.terminate-warning strong {
+    color: #721c24;
+}
+
+/* Select field styling */
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e1e5e9;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: 'Montserrat', sans-serif;
+    background: white;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: #35408e;
+}
+
+/* Form Section Styling */
+.form-section {
+    border: 1px solid #e1e5e9;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background: #fafafa;
+}
+
+.form-section legend {
+    font-weight: 600;
+    color: #35408e;
+    font-size: 0.95rem;
+    padding: 0 10px;
+    margin-bottom: 0;
+}
+
+.form-section .form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Flash Messages */
+.flash-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    max-width: 400px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-family: 'Montserrat', sans-serif;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.flash-success {
+    background: #d1edff;
+    border: 1px solid #0066cc;
+    color: #004085;
+}
+
+.flash-error {
+    background: #f8d7da;
+    border: 1px solid #dc3545;
+    color: #721c24;
+}
+
+.flash-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: inherit;
+    cursor: pointer;
+    padding: 0 0 0 10px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.flash-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Responsive adjustments for modal */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .btn-cancel,
+    .btn-renew {
+        width: 100%;
+    }
+    
+    .flash-message {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}

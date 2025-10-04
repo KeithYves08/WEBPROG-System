@@ -32,7 +32,7 @@ if (isset($_GET['timeout']) && $_GET['timeout'] === '1') {
     <meta name="description" content="AILPO System">
     <title>AILPO - Login</title>
     <link rel="stylesheet" href="view/styles/styles.css">
-    <link rel="stylesheet" href="view/styles/flash-messages.css">
+    <link rel="stylesheet" href="view/styles/flashMessages.css">
 </head>
 <body>
     <header class="site-header">

@@ -20,11 +20,15 @@ class PartnershipController {
                     p.agreement_end_date,
                     p.mou_contract,
                     p.created_at,
+                    p.custom_scope,
                     GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') as scopes,
                     CASE 
+                        WHEN p.status = 'terminated' THEN 'Terminated'
                         WHEN p.agreement_end_date IS NULL THEN 'Active'
-                        WHEN p.agreement_end_date >= CURDATE() THEN 'Active'
-                        ELSE 'Expired'
+                        WHEN p.agreement_end_date < DATE_SUB(CURDATE(), INTERVAL 1 YEAR) THEN 'Terminated'
+                        WHEN p.agreement_end_date < CURDATE() THEN 'Expired'
+                        WHEN p.agreement_end_date < DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 'Expiring Soon'
+                        ELSE 'Active'
                     END as status
                 FROM partnerships p
                 INNER JOIN companies c ON p.company_id = c.id
@@ -45,16 +49,13 @@ class PartnershipController {
             // Status filter conditions
             if ($statusFilter && $statusFilter !== 'All') {
                 if ($statusFilter === 'Active') {
-                    $whereConditions[] = "(p.agreement_end_date IS NULL OR p.agreement_end_date >= CURDATE())";
+                    $whereConditions[] = "(p.status != 'terminated' AND (p.agreement_end_date IS NULL OR (p.agreement_end_date >= CURDATE() AND p.agreement_end_date >= DATE_ADD(CURDATE(), INTERVAL 30 DAY))))";
+                } elseif ($statusFilter === 'Expiring Soon') {
+                    $whereConditions[] = "(p.status != 'terminated' AND p.agreement_end_date IS NOT NULL AND p.agreement_end_date >= CURDATE() AND p.agreement_end_date < DATE_ADD(CURDATE(), INTERVAL 30 DAY))";
                 } elseif ($statusFilter === 'Expired') {
-                    $whereConditions[] = "(p.agreement_end_date IS NOT NULL AND p.agreement_end_date < CURDATE())";
-                } elseif ($statusFilter === 'Pending') {
-                    // For future implementation - assuming partnerships without start date are pending
-                    $whereConditions[] = "(p.agreement_start_date IS NULL OR p.agreement_start_date > CURDATE())";
+                    $whereConditions[] = "(p.status != 'terminated' AND p.agreement_end_date IS NOT NULL AND p.agreement_end_date < CURDATE() AND p.agreement_end_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR))";
                 } elseif ($statusFilter === 'Terminated') {
-                    // For future implementation - assuming we'll add a status column later
-                    // For now, treating very old expired partnerships as terminated
-                    $whereConditions[] = "(p.agreement_end_date IS NOT NULL AND p.agreement_end_date < DATE_SUB(CURDATE(), INTERVAL 1 YEAR))";
+                    $whereConditions[] = "(p.status = 'terminated' OR (p.agreement_end_date IS NOT NULL AND p.agreement_end_date < DATE_SUB(CURDATE(), INTERVAL 1 YEAR)))";
                 }
             }
             
@@ -133,6 +134,108 @@ class PartnershipController {
     }
     
     /**
+     * Get enhanced company information for display
+     */
+    public function getEnhancedCompanyInfo($partnership) {
+        $companyName = $partnership['company_name'] ?? 'Unknown Company';
+        $industrySector = $partnership['industry_sector'] ?? 'Not specified';
+        
+        // Format company name
+        $formattedName = $this->formatCompanyName($companyName);
+        
+        // Format industry sector
+        $formattedSector = $this->formatIndustrySector($industrySector);
+        
+        // Categorize industry
+        $category = $this->categorizeIndustrySector($industrySector);
+        
+        return [
+            'name' => $formattedName,
+            'industry_sector' => $formattedSector,
+            'category' => $category,
+            'display_name' => $this->getCompanyDisplayName($formattedName, $industrySector)
+        ];
+    }
+    
+    /**
+     * Format company name with proper capitalization
+     */
+    private function formatCompanyName($companyName) {
+        if (!$companyName) return 'Not specified';
+        
+        $suffixes = ['Inc.', 'Corp.', 'LLC', 'Ltd.', 'Co.', 'LP', 'LLP'];
+        $formatted = trim($companyName);
+        
+        foreach ($suffixes as $suffix) {
+            $pattern = '/\b' . preg_quote($suffix, '/') . '\b/i';
+            $formatted = preg_replace($pattern, $suffix, $formatted);
+        }
+        
+        return $formatted;
+    }
+    
+    /**
+     * Format industry sector
+     */
+    private function formatIndustrySector($sector) {
+        if (!$sector) return 'Not specified';
+        
+        $formatted = ucwords(strtolower(trim($sector)));
+        
+        $abbreviations = [
+            'It' => 'IT', 'Ai' => 'AI', 'Hr' => 'HR', 'Pr' => 'PR', 
+            'R&d' => 'R&D', 'Sme' => 'SME', 'Bpo' => 'BPO'
+        ];
+        
+        foreach ($abbreviations as $search => $replace) {
+            $formatted = str_ireplace($search, $replace, $formatted);
+        }
+        
+        return $formatted;
+    }
+    
+    /**
+     * Categorize industry sector
+     */
+    private function categorizeIndustrySector($sector) {
+        if (!$sector) return 'Other';
+        
+        $sector = strtolower(trim($sector));
+        
+        $categories = [
+            'Technology' => ['technology', 'software', 'it', 'tech', 'digital', 'ai', 'data'],
+            'Manufacturing' => ['manufacturing', 'industrial', 'factory', 'production', 'automotive'],
+            'Healthcare' => ['healthcare', 'medical', 'pharmaceutical', 'biotech', 'health'],
+            'Finance' => ['finance', 'financial', 'banking', 'insurance', 'investment'],
+            'Education' => ['education', 'educational', 'academic', 'training', 'learning'],
+            'Consulting' => ['consulting', 'advisory', 'services', 'professional services'],
+            'Retail' => ['retail', 'commerce', 'sales', 'marketing', 'trade'],
+            'Energy' => ['energy', 'renewable', 'oil', 'gas', 'power', 'utilities']
+        ];
+        
+        foreach ($categories as $category => $keywords) {
+            foreach ($keywords as $keyword) {
+                if (strpos($sector, $keyword) !== false) {
+                    return $category;
+                }
+            }
+        }
+        
+        return 'Other';
+    }
+    
+    /**
+     * Get company display name formatted as "Company Name, Industry Sector"
+     */
+    private function getCompanyDisplayName($companyName, $industrySector = null) {
+        $formattedName = $this->formatCompanyName($companyName);
+        $formattedSector = $this->formatIndustrySector($industrySector);
+        
+        // Format as "Company Name, Industry Sector"
+        return $formattedName . ', ' . $formattedSector;
+    }
+    
+    /**
      * Get all available scopes for filter dropdown
      */
     public function getAllScopes() {
@@ -148,6 +251,28 @@ class PartnershipController {
             return [];
         }
     }
+    
+    /**
+     * Format scopes for display, replacing "Others" with custom specification
+     */
+    public function formatScopesForDisplay($scopesString, $customScope = null) {
+        if (empty($scopesString)) {
+            return 'Not specified';
+        }
+        
+        $scopes = array_map('trim', explode(',', $scopesString));
+        $formattedScopes = [];
+        
+        foreach ($scopes as $scope) {
+            if (trim($scope) === 'Others' && !empty($customScope)) {
+                $formattedScopes[] = trim($customScope);
+            } else {
+                $formattedScopes[] = $scope;
+            }
+        }
+        
+        return implode(', ', $formattedScopes);
+    }
 
     /**
      * Get detailed information about a specific partnership
@@ -161,10 +286,15 @@ class PartnershipController {
                     c.address as company_address,
                     c.industry_sector,
                     c.website,
+                    liaison.name as academe_liaison_name,
+                    liaison.position as academe_liaison_position,
+                    liaison.email as academe_liaison_email,
+                    liaison.phone as academe_liaison_phone,
                     GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') as scopes,
-                    GROUP_CONCAT(DISTINCT CONCAT(per.name, ' (', per.position, ')') SEPARATOR ', ') as contacts
+                    GROUP_CONCAT(DISTINCT CONCAT(per.name, ' (', per.position, ') - ', per.email, ' | ', per.phone) SEPARATOR ', ') as contacts
                 FROM partnerships p
                 INNER JOIN companies c ON p.company_id = c.id
+                LEFT JOIN persons liaison ON p.academe_liaison_id = liaison.id
                 LEFT JOIN partnership_scopes ps ON p.id = ps.partnership_id
                 LEFT JOIN scopes s ON ps.scope_id = s.id
                 LEFT JOIN partnership_contacts pc ON p.id = pc.partnership_id

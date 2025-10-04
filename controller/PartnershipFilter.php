@@ -84,7 +84,7 @@ class PartnershipFilter {
      * Validate filter values
      */
     public static function validateFilters($statusFilter, $scopeFilter, $availableScopes) {
-        $validStatuses = ['All', 'Active', 'Expired', 'Pending', 'Terminated'];
+        $validStatuses = ['All', 'Active', 'Expiring Soon', 'Expired', 'Terminated'];
         $validScopes = array_merge(['All'], $availableScopes);
         
         // Validate status filter
@@ -98,6 +98,117 @@ class PartnershipFilter {
         }
         
         return [$statusFilter, $scopeFilter];
+    }
+    
+    /**
+     * Get available status options for filter dropdown
+     */
+    public static function getStatusOptions() {
+        return [
+            'All' => 'All Statuses',
+            'Active' => 'Active',
+            'Expiring Soon' => 'Expiring Soon',
+            'Expired' => 'Expired', 
+            'Terminated' => 'Terminated'
+        ];
+    }
+    
+    /**
+     * Get status badge class for display
+     */
+    public static function getStatusBadgeClass($status) {
+        $statusClass = strtolower(str_replace(' ', '-', $status));
+        return 'status-' . $statusClass;
+    }
+    
+    /**
+     * Format company name for search and display
+     */
+    public static function formatCompanyForSearch($companyName, $industrySector = null) {
+        $formatted = trim($companyName);
+        
+        if ($industrySector) {
+            $sector = ucwords(strtolower(trim($industrySector)));
+            // Handle common abbreviations
+            $abbreviations = [
+                'It' => 'IT', 'Ai' => 'AI', 'Hr' => 'HR', 'Pr' => 'PR', 
+                'R&d' => 'R&D', 'Sme' => 'SME', 'Bpo' => 'BPO'
+            ];
+            
+            foreach ($abbreviations as $search => $replace) {
+                $sector = str_ireplace($search, $replace, $sector);
+            }
+            
+            return $formatted . ', ' . $sector;
+        }
+        
+        return $formatted;
+    }
+    
+    /**
+     * Enhanced search matching for company info
+     */
+    public static function matchesSearchQuery($partnership, $searchQuery) {
+        if (empty($searchQuery)) {
+            return true;
+        }
+        
+        $searchLower = strtolower($searchQuery);
+        
+        // Search in company name
+        if (stripos($partnership['company_name'], $searchQuery) !== false) {
+            return true;
+        }
+        
+        // Search in industry sector
+        if (isset($partnership['industry_sector']) && stripos($partnership['industry_sector'], $searchQuery) !== false) {
+            return true;
+        }
+        
+        // Search in formatted company name (Company, Sector format)
+        $formattedName = self::formatCompanyForSearch($partnership['company_name'], $partnership['industry_sector'] ?? null);
+        if (stripos($formattedName, $searchQuery) !== false) {
+            return true;
+        }
+        
+        // Search in scopes
+        if (isset($partnership['scopes']) && stripos($partnership['scopes'], $searchQuery) !== false) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Get filter statistics
+     */
+    public static function getFilterStats($partnerships) {
+        $stats = [
+            'total' => count($partnerships),
+            'active' => 0,
+            'expiring_soon' => 0,
+            'expired' => 0,
+            'terminated' => 0
+        ];
+        
+        foreach ($partnerships as $partnership) {
+            switch ($partnership['status']) {
+                case 'Active':
+                    $stats['active']++;
+                    break;
+                case 'Expiring Soon':
+                    $stats['expiring_soon']++;
+                    break;
+                case 'Expired':
+                    $stats['expired']++;
+                    break;
+                case 'Terminated':
+                    $stats['terminated']++;
+                    break;
+            }
+        }
+        
+        return $stats;
     }
 }
 ?>

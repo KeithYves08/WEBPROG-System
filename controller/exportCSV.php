@@ -32,9 +32,12 @@ try {
         c.industry_sector, 
         c.website, 
         CASE 
+            WHEN p.status = 'terminated' THEN 'Terminated'
             WHEN p.agreement_end_date IS NULL THEN 'Active'
-            WHEN p.agreement_end_date >= CURDATE() THEN 'Active'
-            ELSE 'Expired'
+            WHEN p.agreement_end_date < DATE_SUB(CURDATE(), INTERVAL 1 YEAR) THEN 'Terminated'
+            WHEN p.agreement_end_date < CURDATE() THEN 'Expired'
+            WHEN p.agreement_end_date < DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 'Expiring Soon'
+            ELSE 'Active'
         END as status,
         p.agreement_start_date AS start_date, 
         p.agreement_end_date AS end_date,
@@ -61,13 +64,13 @@ try {
     // Status filter conditions
     if ($statusFilter && $statusFilter !== 'All') {
         if ($statusFilter === 'Active') {
-            $whereConditions[] = "(p.agreement_end_date IS NULL OR p.agreement_end_date >= CURDATE())";
+            $whereConditions[] = "(p.status != 'terminated' AND (p.agreement_end_date IS NULL OR (p.agreement_end_date >= CURDATE() AND p.agreement_end_date >= DATE_ADD(CURDATE(), INTERVAL 30 DAY))))";
+        } elseif ($statusFilter === 'Expiring Soon') {
+            $whereConditions[] = "(p.status != 'terminated' AND p.agreement_end_date IS NOT NULL AND p.agreement_end_date >= CURDATE() AND p.agreement_end_date < DATE_ADD(CURDATE(), INTERVAL 30 DAY))";
         } elseif ($statusFilter === 'Expired') {
-            $whereConditions[] = "(p.agreement_end_date IS NOT NULL AND p.agreement_end_date < CURDATE())";
-        } elseif ($statusFilter === 'Pending') {
-            $whereConditions[] = "(p.agreement_start_date IS NULL OR p.agreement_start_date > CURDATE())";
+            $whereConditions[] = "(p.status != 'terminated' AND p.agreement_end_date IS NOT NULL AND p.agreement_end_date < CURDATE() AND p.agreement_end_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR))";
         } elseif ($statusFilter === 'Terminated') {
-            $whereConditions[] = "(p.agreement_end_date IS NOT NULL AND p.agreement_end_date < DATE_SUB(CURDATE(), INTERVAL 1 YEAR))";
+            $whereConditions[] = "(p.status = 'terminated' OR (p.agreement_end_date IS NOT NULL AND p.agreement_end_date < DATE_SUB(CURDATE(), INTERVAL 1 YEAR)))";
         }
     }
     
@@ -92,9 +95,10 @@ try {
     // Output the column headings
     $headers = [
         'ID',
+        'Company Name, Industry Sector',
         'Company Name',
-        'Company Address',
         'Industry Sector',
+        'Company Address',
         'Website',
         'Status',
         'Start Date',
@@ -105,13 +109,19 @@ try {
     fputcsv($output, $headers);
 
     if (!empty($results)) {
+        // Load PartnershipFilter for company formatting
+        require_once 'PartnershipFilter.php';
+        
         // Output the data rows
         foreach ($results as $row) {
+            $formattedCompanyName = PartnershipFilter::formatCompanyForSearch($row['company_name'], $row['industry_sector']);
+            
             $csvRow = [
                 $row['id'] ?? '',
+                $formattedCompanyName,
                 $row['company_name'] ?? '',
-                $row['company_address'] ?? '',
                 $row['industry_sector'] ?? '',
+                $row['company_address'] ?? '',
                 $row['website'] ?? '',
                 $row['status'] ?? '',
                 $row['start_date'] ? date('m/d/Y', strtotime($row['start_date'])) : '',

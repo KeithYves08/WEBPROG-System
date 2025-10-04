@@ -6,7 +6,7 @@
     <title>AILPO - Partnership Creation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../view/styles/partcreation.css">
+    <link rel="stylesheet" href="../view/styles/partCreation.css">
 </head>
 <body>
 
@@ -145,20 +145,12 @@
                                    value="<?php echo isset($_SESSION['form_data']['end_details']) ? htmlspecialchars($_SESSION['form_data']['end_details']) : ''; ?>">
                         </div>
 
-                        <div class="mb-3 upload-box">
-                            <label class="form-label">Upload MOU/Contract:</label>
-                            <input type="file" id="mouFile" name="mou_contract" accept=".pdf,.docx" class="form-control">
-                            <?php if (isset($_SESSION['uploaded_file'])): ?>
-                                <small class="text-success">Previously uploaded: <?php echo htmlspecialchars($_SESSION['uploaded_file']); ?></small>
-                            <?php endif; ?>
-                        </div>
-
                         <div class="mb-3">
                             <label class="form-label">Scope of Collaboration:</label>
                             <div class="checkbox-inline">
                                 <?php 
                                 $savedScopes = isset($_SESSION['form_data']['scope']) ? $_SESSION['form_data']['scope'] : [];
-                                $scopeOptions = ['Internships', 'Placements', 'Research', 'Events', 'Training', 'Others'];
+                                $scopeOptions = ['Internships', 'Placements', 'Research', 'Events', 'Training'];
                                 foreach ($scopeOptions as $scope): 
                                     $isChecked = in_array($scope, $savedScopes) ? 'checked' : '';
                                 ?>
@@ -167,8 +159,32 @@
                                     <span class="form-check-label"><?php echo $scope; ?></span>
                                 </label>
                                 <?php endforeach; ?>
+                                <label class="form-check others-check">
+                                    <input class="form-check-input" type="checkbox" name="scope[]" value="Others" id="othersCheckbox" <?php echo in_array('Others', $savedScopes) ? 'checked' : ''; ?>>
+                                    <span class="form-check-label">Others:</span>
+                                </label>
+                                <input type="text" id="othersInput" name="others_specify" class="form-control others-input" 
+                                       placeholder="Please specify..." 
+                                       value="<?php echo isset($_SESSION['form_data']['others_specify']) ? htmlspecialchars($_SESSION['form_data']['others_specify']) : ''; ?>">
                             </div>
                         </div>
+                    </div>
+
+                    <div class="mb-3 upload-box">
+                        <label class="form-label">Upload MOU/Contract:</label>
+                        <div class="upload-row">
+                            <input type="file" id="mouFile" name="mou_contract" accept=".pdf,.docx" style="display: none;">
+                            <button type="button" class="upload-btn" id="uploadBtn" onclick="document.getElementById('mouFile').click()">
+                                <span id="btnText">Choose File</span>
+                            </button>
+                            <div id="fileInfo" class="file-info-inline" style="display: none;">
+                                <span class="file-icon"></span>
+                                <span id="fileName" class="file-name"></span>
+                            </div>
+                        </div>
+                        <?php if (isset($_SESSION['uploaded_file'])): ?>
+                            <small class="text-success">Previously uploaded: <?php echo htmlspecialchars($_SESSION['uploaded_file']); ?></small>
+                        <?php endif; ?>
                     </div>
 
                     <h2 class="section-heading">Assigned Academe Liaison</h2>                 
@@ -206,6 +222,58 @@
         </main>
     </div>
 
+
+    <script>
+        // Handle file input change
+        document.getElementById('mouFile').addEventListener('change', function(e) {
+            const uploadBtn = document.getElementById('uploadBtn');
+            const btnText = document.getElementById('btnText');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileNameSpan = document.getElementById('fileName');
+            
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const fileName = file.name;
+                const fileSize = (file.size / 1024 / 1024).toFixed(2); // Convert to MB
+                
+                // Update button appearance
+                uploadBtn.classList.add('file-selected');
+                btnText.textContent = 'Change File';
+                
+                // Show file info inline
+                fileNameSpan.textContent = fileName + ' (' + fileSize + ' MB)';
+                fileInfo.style.display = 'flex';
+                
+                // Add file type validation feedback
+                const allowedTypes = ['pdf', 'docx'];
+                const fileExtension = fileName.split('.').pop().toLowerCase();
+                
+                if (!allowedTypes.includes(fileExtension)) {
+                    fileInfo.classList.add('error');
+                    fileNameSpan.textContent = fileName + ' - Invalid file type (only PDF and DOCX allowed)';
+                } else {
+                    fileInfo.classList.remove('error');
+                }
+            } else {
+                // Reset to initial state
+                uploadBtn.classList.remove('file-selected');
+                btnText.textContent = 'Choose File';
+                fileInfo.style.display = 'none';
+                fileInfo.classList.remove('error');
+            }
+        });
+
+        // Handle Others checkbox toggle
+        document.getElementById('othersCheckbox').addEventListener('change', function() {
+            const othersInput = document.getElementById('othersInput');
+            
+            if (this.checked) {
+                othersInput.focus();
+            } else {
+                othersInput.value = '';
+            }
+        });
+    </script>
 
     <?php
     // Clear form data from session after displaying

@@ -36,7 +36,7 @@ require_once '../controller/partnershipManager.php';
                     <span class="nav-icon icon-archived"></span>
                     <span class="nav-label">Archived Projects</span>
                 </a>
-                <a class="nav-item" href="./partnership.php">
+                <a class="nav-item" href="./partnershipScore.php">
                     <span class="nav-icon icon-score"></span>
                     <span class="nav-label">Partnership Score</span>
                 </a>
@@ -68,11 +68,13 @@ require_once '../controller/partnershipManager.php';
                         
                         <!-- Status Filter -->
                         <select name="status" class="pm-filter-select" onchange="this.form.submit()">
-                            <option value="All" <?php echo $statusFilter === 'All' ? 'selected' : ''; ?>>All Status</option>
-                            <option value="Active" <?php echo $statusFilter === 'Active' ? 'selected' : ''; ?>>Active</option>
-                            <option value="Expired" <?php echo $statusFilter === 'Expired' ? 'selected' : ''; ?>>Expired</option>
-                            <option value="Pending" <?php echo $statusFilter === 'Pending' ? 'selected' : ''; ?>>Pending</option>
-                            <option value="Terminated" <?php echo $statusFilter === 'Terminated' ? 'selected' : ''; ?>>Terminated</option>
+                            <?php 
+                            $statusOptions = PartnershipFilter::getStatusOptions();
+                            foreach ($statusOptions as $value => $label): ?>
+                                <option value="<?php echo htmlspecialchars($value); ?>" <?php echo $statusFilter === $value ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($label); ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
 
                         <!-- Scope Filter -->
@@ -156,24 +158,28 @@ require_once '../controller/partnershipManager.php';
                                             $score = $partnershipController->calculatePartnershipScore($partnership['partnership_id']);
                                             $expiryDate = $partnership['agreement_end_date'] ? date('m/d/Y', strtotime($partnership['agreement_end_date'])) : 'N/A';
                                             
-                                            //enhanced status calculation
+                                            // Use consistent status from database query (now enhanced)
                                             $status = $partnership['status'];
-                                            $statusClass = strtolower($status);
+                                            $statusClass = PartnershipFilter::getStatusBadgeClass($status);
                                             
-                                            //check for additional status types
-                                            if ($partnership['agreement_start_date'] && strtotime($partnership['agreement_start_date']) > time()) {
-                                                $status = 'Pending';
-                                                $statusClass = 'pending';
-                                            } elseif ($partnership['agreement_end_date'] && strtotime($partnership['agreement_end_date']) < strtotime('-1 year')) {
-                                                $status = 'Terminated';
-                                                $statusClass = 'terminated';
-                                            }
+                                            // Get enhanced company information
+                                            $companyInfo = $partnershipController->getEnhancedCompanyInfo($partnership);
+                                            
+                                            // Format scopes with custom Others specification
+                                            $formattedScopes = $partnershipController->formatScopesForDisplay(
+                                                $partnership['scopes'], 
+                                                $partnership['custom_scope'] ?? null
+                                            );
                                         ?>
                                         <tr class="table-row" data-partnership-id="<?php echo $partnership['partnership_id']; ?>">
-                                            <td class="cell-CompName"><?php echo htmlspecialchars($partnership['company_name']); ?></td>
-                                            <td class="cell-soc"><?php echo htmlspecialchars($partnership['scopes'] ?: 'Not specified'); ?></td>
+                                            <td class="cell-CompName">
+                                                <div class="company-info">
+                                                    <?php echo htmlspecialchars($companyInfo['display_name']); ?>
+                                                </div>
+                                            </td>
+                                            <td class="cell-soc"><?php echo htmlspecialchars($formattedScopes); ?></td>
                                             <td class="cell-status">
-                                                <span class="status-badge status-<?php echo $statusClass; ?>">
+                                                <span class="status-badge <?php echo $statusClass; ?>">
                                                     <?php echo htmlspecialchars($status); ?>
                                                 </span>
                                             </td>
@@ -184,7 +190,7 @@ require_once '../controller/partnershipManager.php';
                                                 </span>
                                             </td>
                                             <td class="cell-details">
-                                                <form method="GET" action="partnershipDetails.php" style="display: inline;">
+                                                <form method="GET" action="partnerDetails.php" style="display: inline;">
                                                     <input type="hidden" name="id" value="<?php echo $partnership['partnership_id']; ?>">
                                                     <button class="details-arrow-btn" type="submit" aria-label="View details">
                                                         <img class="arrow-icon" src="../view/assets/right-arrow.png" alt="">
@@ -210,130 +216,6 @@ require_once '../controller/partnershipManager.php';
             </div>   
         </main>
     </div>
-
-    <style>
-        /* Filter Form Styles - Essential for functionality */
-        .filter-form {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .pm-filter-select {
-            display: inline-flex;
-            align-items: center;
-            padding: 10px 14px;
-            border: none;
-            border-radius: 10px;  
-            background: #ffd41c;
-            color: #1a1a1a;
-            font-weight: 600;
-            cursor: pointer;
-            min-width: 120px;
-            transition: background-color 0.2s ease, transform 0.02s ease;
-            text-decoration: none;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-            height: auto;
-            box-sizing: border-box;
-        }
-
-        .pm-filter-select:focus {
-            outline: 2px solid #1a1a1a;
-            outline-offset: 2px;
-        }
-
-        .pm-filter-select:hover {
-            background-color: #e6bf19;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-        }
-
-        .pm-filter-select:active {
-            transform: translateY(1px);
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.18);
-        }
-
-        /* Export Button Styles */
-        .export-btn {
-            display: inline-block;
-            padding: 10px 16px;
-            background-color: #35408e;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 600;
-            transition: background-color 0.2s;
-            height: 42px;
-            box-sizing: border-box;
-            align-items: center;
-        }
-
-        .export-btn:hover {
-            background-color: #2a3374;
-            color: white;
-            text-decoration: none;
-        }
-
-        /* Status Badge Styles */
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .status-active {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-expired {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .status-terminated {
-            background-color: #f1f3f4;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
-        }
-
-        /* Score Badge Styles */
-        .score-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            color: white;
-            min-width: 30px;
-            text-align: center;
-            display: inline-block;
-        }
-
-        .score-high {
-            background-color: #28a745;
-        }
-
-        .score-medium {
-            background-color: #ffc107;
-            color: #212529;
-        }
-
-        .score-low {
-            background-color: #dc3545;
-        }
-    </style>
 </body>
 </html>
 

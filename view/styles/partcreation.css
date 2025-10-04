@@ -184,13 +184,13 @@ body {
     background: #35408E;
     color: white;
     border: none;
-    padding: 12px 24px;
-    margin-bottom: 10px;
+    padding: 10px 22px;
+    margin-bottom: 8px;
     width: fit-content;
-    border-radius: 24px;
+    border-radius: 22px;
     font-family: "Montserrat", sans-serif;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.9rem;
     letter-spacing: 0.5px;
     cursor: default;
     box-shadow: 0 2px 4px rgba(93, 107, 179, 0.3);
@@ -199,8 +199,8 @@ body {
 .company-details .section-heading {
     color: #35408e;
     font-weight: 600;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
+    margin-bottom: 0.875rem;
+    font-size: 1.375rem;
 }
 .company-details label {
     color: #000;
@@ -208,13 +208,13 @@ body {
 }
 .company-details .grid {
     display: grid;
-    gap: 13px;
+    gap: 11px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 60%;                           
 }
 .company-details .form-control,
 .company-details .form-select {
-    height: 44px;
+    height: 42px;
 }
 @media (max-width: 768px) {
     .company-details .grid {
@@ -224,7 +224,7 @@ body {
 .company-details .contact-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 13px;
+    gap: 11px;
     width: 80%;
 }
 
@@ -236,8 +236,8 @@ body {
 .agreement-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 13px;
-    width: 60%;
+    gap: 11px;
+    width: 95%;
     align-items: start;
 }
 .agreement-grid .form-label {
@@ -252,28 +252,110 @@ body {
     border: 1px solid #e6c200;
     color: #000;
     font-weight: 600;
-    padding: 10px 16px;
-    border-radius: 6px;
+    padding: 4px 10px;
+    border-radius: 4px;
     display: inline-block;
     text-align: center;
-    width: 70%;
+    width: 20%;
+    height: 2.4rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+}
+
+.upload-box .upload-btn:hover {
+    background: #f2c500;
+    border-color: #d4ac00;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.upload-box .upload-btn.file-selected {
+    background: #28a745;
+    border-color: #1e7e34;
+    color: white;
+}
+
+.upload-box .upload-btn.file-selected:hover {
+    background: #218838;
+    border-color: #1c7430;
 }
 .checkbox-inline {
     display: flex;
-    gap: 12px;
-   
+    gap: 8px;
     align-items: center;
+    flex-wrap: nowrap;
+    position: relative;
+    width: 100%;
+    min-height: 38px;
+    padding: 6px 0;
 }
 .checkbox-inline .form-check {
     margin: 0;
-  
-    display:inline;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+.checkbox-inline .others-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 5px;
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+.checkbox-inline .others-input {
+    width: 138px;
+    height: 36px;
+    margin-left: 3px;
+    font-size: 0.85rem;
+    padding: 4px 6px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    pointer-events: auto;
+    z-index: 1;
+    position: relative;
+    background: white;
+    outline: none;
+    flex-shrink: 0;
+}
+
+.checkbox-inline .others-input:focus {
+    border-color: #35408e;
+    box-shadow: 0 0 0 2px rgba(53, 64, 142, 0.2);
+}
+
+.checkbox-inline .others-input:disabled {
+    background-color: #f8f9fa;
+    opacity: 0.6;
 }
 @media (max-width: 992px) {
     .agreement-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .checkbox-inline {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .checkbox-inline .others-input {
+        width: 150px;
+        margin-top: 5px;
+    }
+    
+    .upload-box .upload-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .upload-box .file-info-inline {
+        min-width: auto;
+        width: 100%;
     }
 }
 
@@ -292,8 +374,8 @@ body {
     color: #000000;
     font-weight: 600;
     border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
+    padding: 8px 14px;
+    border-radius: 6px;
     cursor: pointer;
     text-decoration: none;
 }
@@ -312,8 +394,8 @@ body {
     color: #000000;
     font-weight: 600;
     border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
+    padding: 8px 14px;
+    border-radius: 6px;
     cursor: pointer;
     text-decoration: none;
 }
@@ -326,4 +408,70 @@ body {
 .create-btn:focus-visible {
     outline: 2px solid #1a1a1a;
     outline-offset: 2px;
+}
+
+/* File upload container styling */
+.upload-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.upload-box .upload-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.upload-box .file-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.upload-box .file-info.success {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.upload-box .file-info-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #155724;
+    flex-shrink: 0;
+    margin-top: 0;
+    min-width: 200px;
+}
+
+.upload-box .file-info-inline.error {
+    background: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.upload-box .file-info .file-icon {
+    width: 16px;
+    height: 16px;
+    background: #28a745;
+    border-radius: 2px;
+    display: inline-block;
+}
+
+.upload-box .file-name {
+    font-weight: 500;
+    color: #28a745;
 }

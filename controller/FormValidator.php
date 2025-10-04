@@ -1,8 +1,4 @@
 <?php
-/**
- * Form Validation Helper Class
- * Handles all validation logic for partnership forms
- */
 class FormValidator {
     private $errors = [];
     

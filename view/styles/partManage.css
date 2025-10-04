@@ -283,6 +283,21 @@ body {
     vertical-align: middle;
 }
 
+/* Enhanced company info display */
+.company-info {
+    text-align: left;
+    padding: 8px 0;
+}
+
+.company-info strong {
+    display: block;
+    font-size: 14px;
+    color: #2c3e50;
+    line-height: 1.4;
+    max-width: 250px;
+    word-wrap: break-word;
+}
+
 .details-arrow-btn img {
     width: 24px;
     height: 24px;
@@ -435,16 +450,23 @@ body {
     border: 1px solid #f5c6cb;
 }
 
-.status-pending {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
-}
-
 .status-terminated {
     background-color: #f1f3f4;
     color: #6c757d;
     border: 1px solid #dee2e6;
+}
+
+.status-expiring-soon {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #f59e0b;
+    animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+    0% { opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { opacity: 1; }
 }
 
 /* Score Badge Styles */
