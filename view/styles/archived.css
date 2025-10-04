@@ -18,10 +18,6 @@ body {
     --accent-h: 4px;
 }
 
-<<<<<<< HEAD
-:root {
-    --header-h: 64px;
-=======
 /* AILPO HEADER */
 .site-header {
     background: #35408e;
@@ -393,7 +389,6 @@ th.Details {
 =======
 :root{
     --header-h: 64px;   
->>>>>>> b1ed4f565867605dd40018a1375d2fb1ff2cc330
     --accent-h: 4px;
 }
 

@@ -1,24 +1,5 @@
 <!DOCTYPE html>
 <html>
-<<<<<<< HEAD
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, width=device-width">
-    <title>AILPO</title>
-    <link rel="stylesheet" href="../view/styles/archived.css">
-</head>
-
-<body>
-    <header class="site-header">
-        <div class="header-inner">
-            <h1 class="app-title">AILPO</h1>
-
-        </div>
-        <div class="header-accent-line"></div>
-    </header>
-
-=======
 <head>
   	<meta charset="utf-8">
   	<meta name="viewport" content="initial-scale=1, width=device-width"> 	
@@ -34,7 +15,6 @@
         <div class="header-accent-line"></div>
     </header>
   	
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
     <div class="dash-layout">
         <aside class="sidebar">
             <nav class="nav">
