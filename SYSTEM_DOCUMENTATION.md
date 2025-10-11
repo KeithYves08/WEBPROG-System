@@ -5,12 +5,19 @@
 **AILPO** is an Academic Industry Linkage Program Office web system designed to manage industry-academe partnerships, internships, and project collaborations. The system provides comprehensive administrative functionality for creating and managing partnerships, tracking projects, and maintaining relationships between academic institutions and industry partners.
 
 ### Current System Capabilities
-- **Partnership Management**: Complete lifecycle management of industry partnerships
-- **Document Management**: Secure upload and storage of MOA/MOU documents
+- **Partnership Management**: Complete lifecycle management of industry partnerships with CRUD operations
+- **Partnership Renewal**: Simple renewal system for extending partnership agreements
+- **Partnership Termination**: Controlled termination with reasons and audit trail
+- **Partnership Scoring**: Advanced scoring system for partnership evaluation
+- **Custom Scope Management**: Flexible scope definitions with custom "Others" specifications
+- **Status Management**: 4-tier status system (Active, Expiring Soon, Expired, Terminated)
+- **Document Management**: Secure upload and storage of MOA/MOU documents with file validation
 - **Contact Management**: Comprehensive tracking of industry and academic contacts
-- **Search and Filtering**: Advanced search capabilities across all partnership data
-- **User Authentication**: Secure login system with session management
+- **Search and Filtering**: Advanced search capabilities across all partnership data with multiple filters
+- **Export Functionality**: CSV and PDF export capabilities with dynamic content
+- **User Authentication**: Secure login system with session management and timeout handling
 - **Responsive Interface**: Modern Bootstrap-based UI supporting multiple device types
+- **Real-time Notifications**: Flash message system for user feedback
 
 ### System Name Variations
 - AILPO (Academic Industry Linkage Program Office)
@@ -42,7 +49,15 @@ WEBPROG-System/
 │   ├── logout.php (Logout handling)
 │   ├── setupDatabase.php (Database initialization)
 │   ├── createPartner.php (Partnership creation backend)
-│   ├── partnershipManager.php (Partnership management controller)
+│   ├── partnershipManager.php (Main partnership management controller)
+│   ├── partnerDetailsController.php (Individual partnership details)
+│   ├── simpleRenewalController.php (Partnership renewal functionality)
+│   ├── editPartnershipController.php (Partnership editing)
+│   ├── terminatePartnershipController.php (Partnership termination)
+│   ├── exportCSV.php (CSV export functionality)
+│   ├── exportPDF.php (PDF export functionality)
+│   ├── FormValidator.php (Form validation utilities)
+│   ├── PartnershipFilter.php (Search and filtering logic)
 │   └── uploads/ (File upload storage)
 │       ├── 68dae0f2ccba8.pdf (Sample uploaded document)
 │       └── 68dae6573d1c3.pdf (Sample uploaded document)
@@ -51,9 +66,10 @@ WEBPROG-System/
 │   ├── created.php (Project details view)
 │   ├── creation.php (Project creation form)
 │   ├── dashboard.php (Main dashboard)
-│   ├── partnershipScore.php (Partnership evaluation)
-│   ├── partnershipManage.php (Partnership management interface)
-│   └── partnerCreation.php (Partnership creation form)
+│   ├── partnershipScore.php (Partnership evaluation and scoring)
+│   ├── partnershipManage.php (Partnership management interface with filtering)
+│   ├── partnerCreation.php (Partnership creation form)
+│   └── partnerDetails.php (Individual partnership details and management)
 └── view/ (Static assets and styles)
     ├── assets/ (Images and icons)
     └── styles/ (CSS files)
@@ -67,6 +83,35 @@ WEBPROG-System/
         ├── partCreation.css (Partnership creation styles)
         └── flashMessages.css (Message system styles)
 ```
+
+## Partnership Lifecycle Management
+
+### Partnership Status System
+The system implements a comprehensive 4-tier status management:
+
+1. **Active**: Current partnerships within agreement period
+2. **Expiring Soon**: Partnerships ending within 30 days
+3. **Expired**: Partnerships past end date but within 1 year
+4. **Terminated**: Manually terminated partnerships with audit trail
+
+### Partnership Operations
+
+#### Renewal Process
+- **Simple Renewal**: Update agreement dates with optional document replacement
+- **Validation**: Date validation and file type checking
+- **Audit Trail**: Maintains history of renewals
+- **Controller**: `simpleRenewalController.php`
+
+#### Termination Process
+- **Controlled Termination**: Manual partnership termination with reasons
+- **Database Updates**: Automatic schema updates for termination fields
+- **Audit Information**: Termination date, reason, and timestamp tracking
+- **Controller**: `terminatePartnershipController.php`
+
+#### Custom Scope Management
+- **Flexible Scopes**: Pre-defined scopes plus custom "Others" specification
+- **Dynamic Display**: Shows actual custom scope instead of generic "Others"
+- **Database Integration**: `custom_scope` field for storing specifications
 
 ## Database Configuration
 
@@ -115,7 +160,7 @@ CREATE TABLE persons (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-**Partnerships Table** - Main partnership agreements
+**Partnerships Table** - Main partnership agreements with lifecycle management
 ```sql
 CREATE TABLE partnerships (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -124,6 +169,11 @@ CREATE TABLE partnerships (
     agreement_end_date DATE,
     mou_contract VARCHAR(255),
     academe_liaison_id INT,
+    custom_scope TEXT NULL,                    -- Custom scope specification for "Others"
+    status VARCHAR(20) DEFAULT 'active',      -- Partnership status (active, terminated)
+    termination_date DATE NULL,               -- Date of termination
+    termination_reason TEXT NULL,             -- Reason for termination
+    terminated_at TIMESTAMP NULL,             -- Timestamp of termination
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (company_id) REFERENCES companies(id),
     FOREIGN KEY (academe_liaison_id) REFERENCES persons(id)
@@ -144,9 +194,25 @@ CREATE TABLE partnership_contacts (
 
 #### Scope and Category Management
 
-**Scopes Table** - Partnership scope categories
+**Scopes Table** - Partnership scope categories with default data
 ```sql
 CREATE TABLE scopes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Default scopes inserted during setup:
+-- Research and Development
+-- Internship Programs  
+-- Training and Workshops
+-- Consultancy Services
+-- Technology Transfer
+-- Others (with custom_scope field support)
+```
+
+**Partnership Scopes Table** - Many-to-many relationship
+```sql
+CREATE TABLE partnership_scopes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -400,12 +466,51 @@ Companies ──→ Partnerships ──→ Projects ──→ Milestones
   - Multi-section partnership creation form
   - Company information collection
   - Academic liaison assignment
-  - Partnership scope selection
+  - Partnership scope selection with custom "Others" specification
   - Contact person management
   - Agreement date setting
   - Document upload capabilities
 - **Backend**: Processed by `createPartner.php` controller
 - **Validation**: Comprehensive input sanitization and validation
+
+### 9. Partnership Details (partnerDetails.php)
+- **Purpose**: Individual partnership management and operations
+- **Features**:
+  - Complete partnership information display
+  - Partnership status management (Active, Expiring Soon, Expired, Terminated)
+  - Custom scope display (converts "Others" to actual specifications)
+  - Partnership scoring integration
+  - Document viewing and download
+  - Partnership renewal functionality
+  - Partnership termination with reason tracking
+  - Partnership editing capabilities
+- **Backend**: Multiple controllers for different operations
+  - `partnerDetailsController.php` - Main details management
+  - `simpleRenewalController.php` - Renewal processing
+  - `terminatePartnershipController.php` - Termination handling
+  - `editPartnershipController.php` - Partnership editing
+
+### 10. Export Functionality
+- **CSV Export** (exportCSV.php):
+  - Dynamic filename generation with timestamps
+  - Comprehensive partnership data export
+  - Search and filter integration
+  - UTF-8 BOM support for Excel compatibility
+- **PDF Export** (exportPDF.php):
+  - Professional PDF generation
+  - Filtered data export
+  - Custom formatting and layouts
+
+### 11. Advanced Search and Filtering
+- **Partnership Filtering** (PartnershipFilter.php):
+  - Multi-criteria search (company name, industry, scope)
+  - Status-based filtering (All, Active, Expiring Soon, Expired, Terminated)
+  - Scope-based filtering with dynamic options
+  - Real-time results updating
+- **Status Management**:
+  - Automatic status calculation based on agreement dates
+  - Manual termination with audit trail
+  - Color-coded status indicators
 
 ## UI Design System
 

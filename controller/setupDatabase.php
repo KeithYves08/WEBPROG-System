@@ -119,6 +119,11 @@ try {
         agreement_end_date DATE,
         mou_contract VARCHAR(255),
         academe_liaison_id INT,
+        custom_scope TEXT NULL,
+        status VARCHAR(20) DEFAULT 'active',
+        termination_date DATE NULL,
+        termination_reason TEXT NULL,
+        terminated_at TIMESTAMP NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (company_id) REFERENCES companies(id),
         FOREIGN KEY (academe_liaison_id) REFERENCES persons(id)
@@ -197,6 +202,24 @@ try {
     
     $pdo->exec($sql);
     echo "Milestones table created successfully.<br>";
+
+    // Insert default scopes
+    $defaultScopes = [
+        'Research and Development',
+        'Internship Programs', 
+        'Training and Workshops',
+        'Consultancy Services',
+        'Technology Transfer',
+        'Others'
+    ];
+    
+    $insertScope = "INSERT IGNORE INTO scopes (name) VALUES (?)";
+    $stmt = $pdo->prepare($insertScope);
+    
+    foreach ($defaultScopes as $scope) {
+        $stmt->execute([$scope]);
+    }
+    echo "Default scopes inserted successfully.<br>";
     
     $adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
     
