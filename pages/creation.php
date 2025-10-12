@@ -60,6 +60,27 @@ $user = getUserInfo();
             color: #333;
         }
 
+        /* Partnership button style */
+        .pm-btn {
+            display: inline-block;
+            align-items: center;
+            margin-top:8px;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 10px;
+            background: #ffd41c;
+            color: #1a1a1a;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.02s ease;
+            text-decoration: none;
+        }
+        .pm-btn:hover {
+            background: #f2c500;
+        }
+
     </style>
 </head>
 <body>
@@ -176,7 +197,7 @@ $user = getUserInfo();
                                         </div>
                                     </div>
 
-                                    <div class="students-wrapper">
+                                    <!-- <div class="students-wrapper">
                                         <label for="studentsInvolved">Students Involved</label>
                                         <div class="students-flex">
                                             <input type="text" id="studentsInvolved" name="students_involved" placeholder="Enter student names (comma separated)">
@@ -188,7 +209,7 @@ $user = getUserInfo();
                                             <input type="file" id="studentsFile" name="students_file" accept=".csv,.xlsx,.xls,.txt" hidden>
                                         </div>
                                         <small>Accepted formats: CSV, XLSX, XLS, TXT</small>
-                                    </div>
+                                    </div> -->
                                 </form>
                             </div>
                             <script src="../controller/script/creation.js"></script>
@@ -409,21 +430,87 @@ $user = getUserInfo();
                                     <label for="companyNameSelect">Company Name</label>
                                     <select id="companyNameSelect" required>
                                         <option value="" disabled selected>Select company</option>
-                                        <option value="Microsoft">Microsoft</option>       
-                                        <!-- added partnership / companies should appear here  -->
-                                        <option value="Other">Other (Not Listed)</option>
+                                        <!-- populated by JS -->
+                                        <!-- <option value="Other">Other (Not Listed)</option> -->
                                     </select>
                                 </div>
 
-                                <div class="field hidden" id="customCompanyWrapper">
+                                <!-- <div class="field hidden" id="customCompanyWrapper">
                                     <label for="customCompanyInput">Company Name (If not listed)</label>
                                     <input type="text" id="customCompanyInput" placeholder="Enter company name">
+                                </div> -->
+
+                                <div>
+                                    <a href="./partnerCreation.php" id="newPartnershipBtn" class="pm-btn">Create Partnerships</a>
                                 </div>
 
                                 <input type="hidden" name="company_name" id="companyNameFinal">
                             </form>                        
                         </div>
                     </div>
+                    <script>
+                        (function(){
+                            const select = document.getElementById('companyNameSelect');
+                            const customWrapper = document.getElementById('customCompanyWrapper');
+                            const customInput = document.getElementById('customCompanyInput');
+                            // Fetch companies list
+                            fetch('../controller/partnersList.php', {credentials: 'same-origin'})
+                            .then(r => r.json())
+                            .then(data => {
+                                if (!data || data.status !== 'ok' || !Array.isArray(data.companies)) {
+                                    console.error('Failed to load partners or invalid response');
+                                    return;
+                                }
+                                const otherOption = Array.from(select.options).find(o => o.value === 'Other');
+                                if (data.companies.length === 0) {
+                                    // show a disabled placeholder
+                                    const noneOpt = document.createElement('option');
+                                    noneOpt.value = '';
+                                    noneOpt.disabled = true;
+                                    noneOpt.selected = true;
+                                    noneOpt.textContent = 'No Partnerships Created';
+                                    // clear existing options then add noneOpt and Other
+                                    select.innerHTML = '';
+                                    select.appendChild(noneOpt);
+                                    const other = document.createElement('option');
+                                    other.value = 'Other';
+                                    other.textContent = 'Other (Not Listed)';
+                                    select.appendChild(other);
+                                } else {
+                                    // insert companies before the 'Other' option
+                                    data.companies.forEach(c => {
+                                        const opt = document.createElement('option');
+                                        opt.value = c.id;
+                                        opt.textContent = c.name;
+                                        select.insertBefore(opt, otherOption);
+                                    });
+                                }
+                            }).catch(err => console.error('Failed to load partners', err));
+
+                            select.addEventListener('change', function(){
+                                if (this.value === 'Other') {
+                                    customWrapper.classList.remove('hidden');
+                                } else {
+                                    customWrapper.classList.add('hidden');
+                                }
+                            });
+
+                            // fill hidden input on submit or change
+                            select.addEventListener('change', function(){
+                                const final = document.getElementById('companyNameFinal');
+                                if (this.value === 'Other') {
+                                    final.value = customInput.value || '';
+                                } else {
+                                    final.value = this.options[this.selectedIndex].text;
+                                }
+                            });
+
+                            customInput.addEventListener('input', function(){
+                                const final = document.getElementById('companyNameFinal');
+                                final.value = this.value;
+                            });
+                        })();
+                    </script>
                     <div class="creation-card">
                         <div class="card-head"><h2>Milestones</h2></div>
                         <div class="card-accent"></div>
