@@ -106,15 +106,16 @@ try {
             $allowedExt = ['pdf', 'docx'];
             $fileInfo = pathinfo($_FILES['mou_contract']['name']);
             $ext = strtolower($fileInfo['extension']);
-            if (in_array($ext, $allowedExt)) {
+                if (in_array($ext, $allowedExt)) {
                 $newName = uniqid() . '.' . $ext;
-                $uploadDir = __DIR__ . '/uploads/';
+                // store partnership MOU uploads separately
+                $uploadDir = __DIR__ . '/MOUMOA_NewPartnership/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
                 $uploadPath = $uploadDir . $newName;
                 if (move_uploaded_file($_FILES['mou_contract']['tmp_name'], $uploadPath)) {
-                    $mouContractPath = 'uploads/' . $newName;
+                    $mouContractPath = 'MOUMOA_NewPartnership/' . $newName;
                 } else {
                     throw new Exception('Failed to move uploaded file.');
                 }

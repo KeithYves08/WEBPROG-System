@@ -967,6 +967,28 @@ body {
     }
 }
 
+/* Uploaded files UI tweaks */
+.file-list li{
+    /* allow children to shrink so long filenames can ellipsize */
+    min-width: 0;
+}
+.file-list .file-name{
+    flex: 1 1 auto;
+    min-width: 0; /* required for overflow to work inside flex */
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.remove-file-btn{
+    background: #dc3545; /* bootstrap danger */
+    color: #fff;
+    border: none;
+}
+.remove-file-btn:hover{
+    background: #c82333;
+}
+
 /* Push actions down when milestones exist */
 .creation-sections:has(#milestonesContainer .milestone-box) + .actions-inline{
   margin-top: 28px;

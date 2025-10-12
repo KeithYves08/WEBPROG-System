@@ -240,7 +240,8 @@ $user = getUserInfo();
                                         <ul id="moaMouFileList" class="file-list empty">
 <?php
     // Server-side render of already uploaded files so the list is cumulative on load
-    $uploadsDir = __DIR__ . '/../controller/uploads';
+    // Use the project-specific uploads folder
+    $uploadsDir = __DIR__ . '/../controller/MOUMOA_ProjCreate';
     if (is_dir($uploadsDir)) {
         $stored = array_values(array_diff(scandir($uploadsDir), ['.', '..']));
         if (count($stored) === 0) {
@@ -252,7 +253,9 @@ $user = getUserInfo();
                 $size = filesize($fpath);
                 $sizeKb = round($size / 1024, 1);
                 $mtime = date('Y-m-d H:i', filemtime($fpath));
-                echo "<li><div class=\"file-name\">$escaped</div><div class=\"file-meta\">$sizeKb KB • $mtime</div></li>";
+                // include a Remove button so users can delete uploaded files
+                $removeBtn = "<button type=\"button\" class=\"remove-file-btn\" data-fname=\"$escaped\">Remove</button>";
+                echo "<li><div class=\"file-name\">$escaped</div><div class=\"file-meta\">$sizeKb KB • $mtime</div>$removeBtn</li>";
             }
         }
     } else {
@@ -302,6 +305,8 @@ $user = getUserInfo();
 
                                         const form = new FormData();
                                         files.forEach((f) => form.append('moa_mou_files[]', f));
+                                        // ensure these uploads go to the project-creation uploads folder
+                                        form.append('target', 'MOUMOA_ProjCreate');
 
                                         fetch('../controller/uploadDocument.php', {
                                             method: 'POST',
@@ -321,8 +326,14 @@ $user = getUserInfo();
                                                     const metaDiv = document.createElement('div');
                                                     metaDiv.className = 'file-meta';
                                                     metaDiv.textContent = '';
+                                                    const removeBtn = document.createElement('button');
+                                                    removeBtn.type = 'button';
+                                                    removeBtn.className = 'remove-file-btn';
+                                                    removeBtn.dataset.fname = storedName;
+                                                    removeBtn.textContent = 'Remove';
                                                     li.appendChild(nameDiv);
                                                     li.appendChild(metaDiv);
+                                                    li.appendChild(removeBtn);
                                                     fileList.appendChild(li);
                                                 });
                                             } else {
@@ -348,6 +359,13 @@ $user = getUserInfo();
                                                         li.appendChild(nameDiv);
                                                         li.appendChild(metaDiv);
                                                     }
+                                                    // append remove button for fallback render
+                                                    const removeBtn = document.createElement('button');
+                                                    removeBtn.type = 'button';
+                                                    removeBtn.className = 'remove-file-btn';
+                                                    removeBtn.dataset.fname = item.ok ? item.result : item.original;
+                                                    removeBtn.textContent = 'Remove';
+                                                    li.appendChild(removeBtn);
                                                     fileList.appendChild(li);
                                                 });
                                             }
@@ -364,6 +382,8 @@ $user = getUserInfo();
                                                 btn.disabled = false;
                                                 btn.classList.remove('disabled');
                                             }
+                                            // attach remove handlers
+                                            attachRemoveHandlers();
                                         }).catch(err => {
                                             console.error('Upload error', err);
                                             alert('Upload failed. Check console for details.');
@@ -383,6 +403,66 @@ $user = getUserInfo();
                                             return;
                                         }
                                     });
+
+                                    // remove button handler: sends AJAX delete to uploadDocument.php
+                                    function attachRemoveHandlers(){
+                                        const removes = fileList.querySelectorAll('.remove-file-btn');
+                                        removes.forEach(b => {
+                                            if (b.dataset.bound) return; // avoid double-binding
+                                            b.dataset.bound = '1';
+                                            b.addEventListener('click', function(){
+                                                const fname = this.dataset.fname;
+                                                if (!confirm(`Remove file ${fname}?`)) return;
+                                                const f = new FormData();
+                                                f.append('action', 'delete');
+                                                f.append('filename', fname);
+                                                f.append('target', 'MOUMOA_ProjCreate');
+                                                fetch('../controller/uploadDocument.php', { method: 'POST', body: f, credentials: 'same-origin' })
+                                                .then(r => r.json())
+                                                .then(data => {
+                                                    if (data && data.status === 'deleted'){
+                                                        // re-render list
+                                                        fileList.innerHTML = '';
+                                                        if (Array.isArray(data.all_stored) && data.all_stored.length > 0) {
+                                                            data.all_stored.forEach(n => {
+                                                                const li = document.createElement('li');
+                                                                const nameDiv = document.createElement('div');
+                                                                nameDiv.className = 'file-name';
+                                                                nameDiv.textContent = n;
+                                                                const metaDiv = document.createElement('div');
+                                                                metaDiv.className = 'file-meta';
+                                                                metaDiv.textContent = '';
+                                                                const removeBtn = document.createElement('button');
+                                                                removeBtn.type = 'button';
+                                                                removeBtn.className = 'remove-file-btn';
+                                                                removeBtn.dataset.fname = n;
+                                                                removeBtn.textContent = 'Remove';
+                                                                li.appendChild(nameDiv);
+                                                                li.appendChild(metaDiv);
+                                                                li.appendChild(removeBtn);
+                                                                fileList.appendChild(li);
+                                                            });
+                                                        } else {
+                                                            fileList.innerHTML = '<li class="placeholder-text">No files uploaded yet.</li>';
+                                                        }
+                                                        // update counter and button state
+                                                        const counter = document.getElementById('moaCounter');
+                                                        const maxFiles = 5;
+                                                        const currentCount = fileList.querySelectorAll('li').length;
+                                                        counter.textContent = `You have ${currentCount} uploaded file(s). Maximum ${maxFiles}.`;
+                                                        const btn = document.getElementById('browseMoaMouBtn');
+                                                        if (currentCount >= maxFiles) { btn.disabled = true; btn.classList.add('disabled'); } else { btn.disabled = false; btn.classList.remove('disabled'); }
+                                                        attachRemoveHandlers();
+                                                    } else {
+                                                        alert('Delete failed: ' + (data && data.message ? data.message : 'Unknown'));
+                                                    }
+                                                }).catch(e => { console.error('Delete failed', e); alert('Delete failed'); });
+                                            });
+                                        });
+                                    }
+
+                                    // attach handlers to initial server-rendered buttons
+                                    attachRemoveHandlers();
                                 })();
                             </script>
                         </div>

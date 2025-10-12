@@ -60,7 +60,59 @@ function handleFile(array $tmpFile, string $originalFilename, string $uploadDir,
     return [true, $safeName];
 }
 
-$uploadDir = __DIR__ . '/uploads';
+$defaultDir = __DIR__ . '/uploads';
+
+// allow caller to request a specific subfolder (whitelisted)
+$allowedTargets = [
+    'MOUMOA_ProjCreate' => __DIR__ . '/MOUMOA_ProjCreate',
+    'MOUMOA_NewPartnership' => __DIR__ . '/MOUMOA_NewPartnership',
+];
+
+$uploadDir = $defaultDir;
+if (isset($_POST['target']) && is_string($_POST['target'])) {
+    $t = $_POST['target'];
+    if (array_key_exists($t, $allowedTargets)) {
+        $uploadDir = $allowedTargets[$t];
+    }
+}
+
+// Support AJAX delete action: expects POST 'action' = 'delete' and 'filename'
+if (isset($_POST['action']) && $_POST['action'] === 'delete') {
+    header('Content-Type: application/json');
+    $resp = ['status' => 'error', 'message' => 'Unknown error'];
+    if (!isset($_POST['filename']) || !is_string($_POST['filename']) || strlen($_POST['filename']) === 0) {
+        $resp['message'] = 'Missing filename';
+        echo json_encode($resp);
+        exit;
+    }
+    $filename = basename($_POST['filename']); // sanitize path
+    // determine directory (target param may override)
+    $delDir = $uploadDir;
+    if (!is_dir($delDir)) {
+        $resp['message'] = 'Directory not found';
+        echo json_encode($resp);
+        exit;
+    }
+    $filePath = $delDir . DIRECTORY_SEPARATOR . $filename;
+    if (!file_exists($filePath)) {
+        $resp['message'] = 'File not found';
+        echo json_encode($resp);
+        exit;
+    }
+    if (!is_writable($filePath)) {
+        // still attempt unlink, but report failure if unable
+    }
+    if (!unlink($filePath)) {
+        $resp['message'] = 'Failed to delete file';
+        echo json_encode($resp);
+        exit;
+    }
+    // return updated list
+    $allStored = array_values(array_diff(scandir($delDir), ['.', '..']));
+    $resp = ['status' => 'deleted', 'filename' => $filename, 'all_stored' => $allStored];
+    echo json_encode($resp);
+    exit;
+}
 
 // If multiple files from agreement form
 if (isset($_FILES['moa_mou_files'])) {
