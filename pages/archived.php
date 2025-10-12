@@ -71,11 +71,7 @@
                                     <td class="cell-archived-date">2024-01-15</td>
                                     <td class="cell-names">John Doe, Jane Smith</td>
                                     <td class="cell-details">
-<<<<<<< HEAD
                                         <button class="details-arrow-btn" type="button" aria-label="View details" onclick="location.href='creation.php'">
-=======
-                                        <button class="details-arrow-btn" type="button" aria-label="View details">
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
                                             <img class="arrow-icon" src="../view/assets/right-arrow.png" alt="">
                                         </button>
                                     </td>
@@ -89,8 +85,4 @@
         </main>
     </div>
 </body>
-<<<<<<< HEAD
-
-=======
->>>>>>> 316f136f6e7fa20a0f5cbf2f5d56fd290b2a3cc7
 </html>

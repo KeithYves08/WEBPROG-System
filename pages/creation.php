@@ -8,7 +8,7 @@ $user = getUserInfo();
 <head>
   	<meta charset="utf-8">
   	<meta name="viewport" content="initial-scale=1, width=device-width"> 	
-  	<title>AILPO</title>
+  	<title>AILPO - Project Creation</title>
     <link rel="stylesheet" href="../view/styles/creation.css"> 	
     <style>
         .user-info {
@@ -33,6 +33,31 @@ $user = getUserInfo();
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
+        }
+
+        /* MOA/MOU file list styling */
+        .file-list li {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-list .file-name {
+            color: #1e7e34; /* bootstrap success green */
+            font-weight: 700;
+        }
+
+        .file-list .file-meta {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .upload-counter {
+            margin-top: 8px;
+            font-size: 0.95rem;
+            color: #333;
         }
 
     </style>
@@ -188,10 +213,31 @@ $user = getUserInfo();
                                         </button>
                                         <input type="file" id="moaMouInput" name="moa_mou_files[]" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple hidden>
                                     </div>
+                                    <div class="upload-counter" id="moaCounter">You can upload up to 5 files.</div>
                                     <div class="uploaded-wrapper">
                                         <label class="uploaded-label">Uploaded Files</label>
                                         <ul id="moaMouFileList" class="file-list empty">
-                                            <li class="placeholder-text">No files uploaded yet.</li>
+<?php
+    // Server-side render of already uploaded files so the list is cumulative on load
+    $uploadsDir = __DIR__ . '/../controller/uploads';
+    if (is_dir($uploadsDir)) {
+        $stored = array_values(array_diff(scandir($uploadsDir), ['.', '..']));
+        if (count($stored) === 0) {
+            echo '<li class="placeholder-text">No files uploaded yet.</li>';
+        } else {
+            foreach ($stored as $sf) {
+                $escaped = htmlspecialchars($sf);
+                $fpath = $uploadsDir . DIRECTORY_SEPARATOR . $sf;
+                $size = filesize($fpath);
+                $sizeKb = round($size / 1024, 1);
+                $mtime = date('Y-m-d H:i', filemtime($fpath));
+                echo "<li><div class=\"file-name\">$escaped</div><div class=\"file-meta\">$sizeKb KB • $mtime</div></li>";
+            }
+        }
+    } else {
+        echo '<li class="placeholder-text">No uploads directory.</li>';
+    }
+?>
                                         </ul>
                                     </div>
                                 </div>
@@ -219,6 +265,105 @@ $user = getUserInfo();
                                 </div>                               
                             </form>                                              
                             <script src="../controller/script/creation.js"></script>
+                            <script>
+                                (function(){
+                                    const browseBtn = document.getElementById('browseMoaMouBtn');
+                                    const fileInput = document.getElementById('moaMouInput');
+                                    const fileList = document.getElementById('moaMouFileList');
+
+                                    browseBtn.addEventListener('click', function(){
+                                        fileInput.click();
+                                    });
+
+                                    fileInput.addEventListener('change', function(){
+                                        const files = Array.from(fileInput.files);
+                                        if (files.length === 0) return;
+
+                                        const form = new FormData();
+                                        files.forEach((f) => form.append('moa_mou_files[]', f));
+
+                                        fetch('../controller/uploadDocument.php', {
+                                            method: 'POST',
+                                            body: form,
+                                            credentials: 'same-origin'
+                                        }).then(resp => resp.json())
+                                        .then(data => {
+                                            if (!data || !data.files) return;
+                                            // render stored files from server (all_stored) so the list is cumulative
+                                            fileList.innerHTML = '';
+                                            if (data.all_stored && Array.isArray(data.all_stored)) {
+                                                data.all_stored.forEach(storedName => {
+                                                    const li = document.createElement('li');
+                                                    const nameDiv = document.createElement('div');
+                                                    nameDiv.className = 'file-name';
+                                                    nameDiv.textContent = storedName;
+                                                    const metaDiv = document.createElement('div');
+                                                    metaDiv.className = 'file-meta';
+                                                    metaDiv.textContent = '';
+                                                    li.appendChild(nameDiv);
+                                                    li.appendChild(metaDiv);
+                                                    fileList.appendChild(li);
+                                                });
+                                            } else {
+                                                // fallback: use per-file results
+                                                data.files.forEach(item => {
+                                                    const li = document.createElement('li');
+                                                    if (item.ok) {
+                                                        const nameDiv = document.createElement('div');
+                                                        nameDiv.className = 'file-name';
+                                                        nameDiv.textContent = item.result;
+                                                        const metaDiv = document.createElement('div');
+                                                        metaDiv.className = 'file-meta';
+                                                        metaDiv.textContent = `Original: ${item.original}`;
+                                                        li.appendChild(nameDiv);
+                                                        li.appendChild(metaDiv);
+                                                    } else {
+                                                        const nameDiv = document.createElement('div');
+                                                        nameDiv.className = 'file-name';
+                                                        nameDiv.textContent = item.original;
+                                                        const metaDiv = document.createElement('div');
+                                                        metaDiv.className = 'file-meta';
+                                                        metaDiv.textContent = `Error: ${item.result}`;
+                                                        li.appendChild(nameDiv);
+                                                        li.appendChild(metaDiv);
+                                                    }
+                                                    fileList.appendChild(li);
+                                                });
+                                            }
+                                            // update counter and disable upload if limit reached
+                                            const counter = document.getElementById('moaCounter');
+                                            const maxFiles = 5;
+                                            const currentCount = fileList.querySelectorAll('li').length;
+                                            counter.textContent = `You have ${currentCount} uploaded file(s). Maximum ${maxFiles}.`;
+                                            const btn = document.getElementById('browseMoaMouBtn');
+                                            if (currentCount >= maxFiles) {
+                                                btn.disabled = true;
+                                                btn.classList.add('disabled');
+                                            } else {
+                                                btn.disabled = false;
+                                                btn.classList.remove('disabled');
+                                            }
+                                        }).catch(err => {
+                                            console.error('Upload error', err);
+                                            alert('Upload failed. Check console for details.');
+                                        });
+                                    });
+                                    // client-side enforcement: max 5 files
+                                    fileInput.addEventListener('click', () => {
+                                        // reset input to allow re-selecting same file(s)
+                                        fileInput.value = null;
+                                    });
+
+                                    fileInput.addEventListener('change', () => {
+                                        const maxFiles = 5;
+                                        if (fileInput.files.length > maxFiles) {
+                                            alert(`You can upload up to ${maxFiles} files. You selected ${fileInput.files.length}.`);
+                                            fileInput.value = null;
+                                            return;
+                                        }
+                                    });
+                                })();
+                            </script>
                         </div>
                     </div>
                     <!-- Deliverables and Tracking -->

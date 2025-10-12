@@ -36,6 +36,27 @@ $user = getUserInfo();
             flex-wrap: wrap;
         }
 
+        /* uploaded files area */
+        .upload-section {
+            margin-top: 18px;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .uploaded-list {
+            margin-top: 8px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .uploaded-list li {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+
     </style>
 </head>
 <body>
@@ -87,6 +108,62 @@ $user = getUserInfo();
                 <h2 class="section-title">Project Details</h2>
 
                 <section class="project-details-box">
+                    <?php
+                    // Flash messages for upload
+                    $uploadMsg = '';
+                    if (isset($_GET['upload'])) {
+                        switch ($_GET['upload']) {
+                            case 'success':
+                                $file = isset($_GET['file']) ? basename($_GET['file']) : '';
+                                $uploadMsg = "Upload successful: " . htmlspecialchars($file);
+                                break;
+                            case 'empty':
+                                $uploadMsg = "No file selected.";
+                                break;
+                            case 'invalid_type':
+                                $uploadMsg = "Invalid file type. Only PDF and DOCX are allowed.";
+                                break;
+                            case 'large':
+                                $uploadMsg = "File is too large (max 10MB).";
+                                break;
+                            default:
+                                $uploadMsg = "Upload failed.";
+                                break;
+                        }
+                    }
+                    ?>
+
+                    <div class="upload-section">
+                        <form action="../controller/uploadDocument.php" method="post" enctype="multipart/form-data">
+                            <label for="document">Upload Document (PDF or DOCX):</label>
+                            <input type="file" name="document" id="document" accept=".pdf,.docx" required>
+                            <button type="submit" class="status-btn">Upload</button>
+                        </form>
+
+                        <?php if (!empty($uploadMsg)): ?>
+                            <div class="flash-message"><?php echo htmlspecialchars($uploadMsg); ?></div>
+                        <?php endif; ?>
+
+                        <h4 style="margin-top:12px;">Uploaded Files</h4>
+                        <ul class="uploaded-list">
+                            <?php
+                            $uploadsDir = __DIR__ . '/../controller/uploads';
+                            if (is_dir($uploadsDir)) {
+                                $files = array_diff(scandir($uploadsDir), ['.', '..']);
+                                if (count($files) === 0) {
+                                    echo '<li>No files uploaded yet.</li>';
+                                } else {
+                                    foreach ($files as $f) {
+                                        $escaped = htmlspecialchars($f);
+                                        echo "<li>$escaped</li>";
+                                    }
+                                }
+                            } else {
+                                echo '<li>No uploads directory.</li>';
+                            }
+                            ?>
+                        </ul>
+                    </div>
                     <div class="box-header">
                         <div class="label-left">Project Name: -- </div>
                         <div class="label-right">Repository</div>
