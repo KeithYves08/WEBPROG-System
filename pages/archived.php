@@ -71,7 +71,7 @@
                                     <td class="cell-archived-date">2024-01-15</td>
                                     <td class="cell-names">John Doe, Jane Smith</td>
                                     <td class="cell-details">
-                                        <button class="details-arrow-btn" type="button" aria-label="View details" onclick="location.href='creation.php'">
+                                        <button class="details-arrow-btn" type="button" aria-label="View details" onclick="location.href='created.php'">
                                             <img class="arrow-icon" src="../view/assets/right-arrow.png" alt="">
                                         </button>
                                     </td>

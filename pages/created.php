@@ -243,33 +243,44 @@ $user = getUserInfo();
 
                         <article class="info-card">
                             <header class="card-header">Milestones</header>
-                            <div class="card-body">                                
-                                <form class="milestone-form" action="#" method="post" onsubmit="return false;">
-                                    <div class="form-row">
-                                        <label for="ms-name">Milestone Name:</label>                                       
-                                    </div>
-                                    <div class="form-row">
-                                        <label for="ms-desc">Description:</label>
-                                       
-                                    </div>
-                                    <div class="form-row dates-row">
-                                        <div class="date-field">
-                                            <label for="ms-start">Start Date:</label>                                           
-                                        </div>
-                                        <div class="date-field">
-                                            <label for="ms-end">End Date:</label>                                          
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <label for="ms-person">Person Responsible:</label>
+                            <div class="card-body">
+                                <form id="milestonesForm" class="milestones-form">
+                                    <div class="field">
+                                        <label for="milestoneName">Milestone Name</label>
+                                        <input type="text" id="milestoneName" name="milestone_name" placeholder="Enter milestone name" required>
                                     </div>
 
-                                    <div>
-                                        <button type="button" class="status-btn">Status</button>
+                                    <div class="field">
+                                        <label for="milestoneDescription">Description</label>
+                                        <textarea id="milestoneDescription" name="milestone_description" placeholder="Enter a short description" rows="3" required></textarea>
                                     </div>
+
+                                    <div class="dates-row">
+                                        <div class="field">
+                                            <label for="milestoneStart">Start Date</label>
+                                            <input type="date" id="milestoneStart" name="milestone_start_date" required>
+                                        </div>
+                                        <div class="field">
+                                            <label for="milestoneEnd">End Date</label>
+                                            <input type="date" id="milestoneEnd" name="milestone_end_date" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="milestoneResponsible">Person Responsible</label>
+                                        <input type="text" id="milestoneResponsible" name="milestone_responsible" placeholder="Enter name(s)" required>
+                                    </div>
+
+                                    <button type="button" id="addMilestoneBtn" class="add-milestone-btn">
+                                        <img src="../view/assets/add.webp" alt="" class="btn-icon">
+                                        <span>Add Milestone</span>
+                                    </button>
+                                    <div id="milestonesContainer"></div>
+                                    <input type="hidden" name="milestones" id="milestonesHidden">
                                 </form>
                             </div>
                         </article>
+                        <script src="../controller/script/creation.js"></script>
                     </div>
 
                     <div class="box-actions">
