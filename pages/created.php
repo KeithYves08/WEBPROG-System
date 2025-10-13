@@ -281,6 +281,115 @@ $user = getUserInfo();
                             </div>
                         </article>
                         <script src="../controller/script/creation.js"></script>
+                        <script>
+                            (function(){
+                                const addBtn = document.getElementById('addMilestoneBtn');
+                                const container = document.getElementById('milestonesContainer');
+                                const hidden = document.getElementById('milestonesHidden');
+                                const nameInput = document.getElementById('milestoneName');
+                                const descInput = document.getElementById('milestoneDescription');
+                                const startInput = document.getElementById('milestoneStart');
+                                const endInput = document.getElementById('milestoneEnd');
+                                const respInput = document.getElementById('milestoneResponsible');
+
+                                if (!addBtn || !container) return; // nothing to do
+
+                                function loadMilestones(){
+                                    try{
+                                        const v = hidden && hidden.value ? JSON.parse(hidden.value) : [];
+                                        return Array.isArray(v) ? v : [];
+                                    } catch(e){ return []; }
+                                }
+                                function saveMilestones(arr){
+                                    if (hidden) hidden.value = JSON.stringify(arr);
+                                }
+
+                                function createBox(m, idx){
+                                    const number = idx + 1;
+                                    const box = document.createElement('div');
+                                    box.className = 'milestone-box';
+
+                                    const title = document.createElement('div');
+                                    title.className = 'box-title';
+                                    title.textContent = `Milestone ${number}`;
+                                    box.appendChild(title);
+
+                                    const nameEl = document.createElement('div');
+                                    nameEl.style.fontWeight = '700';
+                                    nameEl.textContent = m.name || '';
+                                    box.appendChild(nameEl);
+
+                                    const descEl = document.createElement('div');
+                                    descEl.style.marginTop = '6px';
+                                    descEl.textContent = m.description || '';
+                                    box.appendChild(descEl);
+
+                                    const meta = document.createElement('div');
+                                    meta.className = 'milestone-meta';
+                                    const start = m.start || '';
+                                    const end = m.end || '';
+                                    const resp = m.responsible || '';
+                                    meta.textContent = `${start}${start && end ? ' → ' : ''}${end}${(start||end) && resp ? ' • ' : ''}${resp}`;
+                                    box.appendChild(meta);
+
+                                    const actions = document.createElement('div');
+                                    actions.className = 'list-add-row';
+                                    actions.style.marginTop = '8px';
+                                    const removeBtn = document.createElement('button');
+                                    removeBtn.type = 'button';
+                                    removeBtn.className = 'remove-inline';
+                                    removeBtn.textContent = 'Remove';
+                                    removeBtn.addEventListener('click', function(){
+                                        const arr = loadMilestones();
+                                        // find current index of this box
+                                        const nodes = Array.from(container.children);
+                                        const i = nodes.indexOf(box);
+                                        if (i > -1){ arr.splice(i,1); saveMilestones(arr); renderMilestones(); }
+                                    });
+                                    actions.appendChild(removeBtn);
+                                    box.appendChild(actions);
+
+                                    return box;
+                                }
+
+                                function renderMilestones(){
+                                    container.innerHTML = '';
+                                    const arr = loadMilestones();
+                                    if (arr.length === 0){
+                                        // leave container empty
+                                        return;
+                                    }
+                                    arr.forEach((m, idx) => {
+                                        container.appendChild(createBox(m, idx));
+                                    });
+                                }
+
+                                addBtn.addEventListener('click', function(){
+                                    const name = nameInput ? nameInput.value.trim() : '';
+                                    if (!name){ alert('Please enter a milestone name'); if(nameInput) nameInput.focus(); return; }
+                                    const desc = descInput ? descInput.value.trim() : '';
+                                    const start = startInput ? startInput.value : '';
+                                    const end = endInput ? endInput.value : '';
+                                    const resp = respInput ? respInput.value.trim() : '';
+
+                                    const arr = loadMilestones();
+                                    arr.push({ name, description: desc, start, end, responsible: resp });
+                                    saveMilestones(arr);
+                                    renderMilestones();
+
+                                    // clear form inputs for next entry
+                                    if (nameInput) nameInput.value = '';
+                                    if (descInput) descInput.value = '';
+                                    if (startInput) startInput.value = '';
+                                    if (endInput) endInput.value = '';
+                                    if (respInput) respInput.value = '';
+                                    if (nameInput) nameInput.focus();
+                                });
+
+                                // initial render (in case hidden contains preloaded data)
+                                renderMilestones();
+                            })();
+                        </script>
                     </div>
 
                     <div class="box-actions">

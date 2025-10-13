@@ -487,7 +487,7 @@ body {
 .milestone-box .add-inline:active{ transform:translateY(1px); }
 
 .milestone-box .remove-inline{
-    background:#888484;
+    background:#dc3545;
     color:#fff;
     font-weight:700;
     font-size:.65rem;
@@ -498,7 +498,7 @@ body {
     box-shadow:0 4px 10px -4px rgba(0,0,0,0.2);
     transition:background .2s, transform .15s;
 }
-.milestone-box .remove-inline:hover{ background:#757272; }
+.milestone-box .remove-inline:hover{ background:#c82333; }
 .milestone-box .remove-inline:active{ transform:translateY(1px); }
 
 /* Optional title if used by JS */
