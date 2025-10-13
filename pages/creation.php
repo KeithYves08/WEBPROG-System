@@ -82,6 +82,34 @@ $user = getUserInfo();
             background: #f2c500;
         }
 
+        /* Actions row: keep Cancel left, Submit + message on right */
+        .actions-inline {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* push controls to the right */
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .actions-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* right align inside the right group */
+        }
+        .actions-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* space between Cancel and Submit */
+        }
+        .actions-right .btn-submit {
+            align-self: flex-end;
+        }
+        .submit-message {
+            margin-top: 6px;
+            font-weight: 600;
+            text-align: right;
+            min-height: 1em; /* keeps layout from shifting when message appears */
+        }
+
     </style>
 </head>
 <body>
@@ -198,19 +226,6 @@ $user = getUserInfo();
                                         </div>
                                     </div>
 
-                                    <!-- <div class="students-wrapper">
-                                        <label for="studentsInvolved">Students Involved</label>
-                                        <div class="students-flex">
-                                            <input type="text" id="studentsInvolved" name="students_involved" placeholder="Enter student names (comma separated)">
-                                            <span class="or-separator">or</span>
-                                            <button type="button" id="uploadStudentsBtn" class="upload-btn">
-                                                <img src="../view/assets/upload.webp" alt="" class="upload-icon">
-                                                <span class="upload-label">Upload list</span>
-                                            </button>
-                                            <input type="file" id="studentsFile" name="students_file" accept=".csv,.xlsx,.xls,.txt" hidden>
-                                        </div>
-                                        <small>Accepted formats: CSV, XLSX, XLS, TXT</small>
-                                    </div> -->
                                 </form>
                             </div>
                             <script src="../controller/script/creation.js"></script>
@@ -240,28 +255,25 @@ $user = getUserInfo();
                                         <label class="uploaded-label">Uploaded Files</label>
                                         <ul id="moaMouFileList" class="file-list empty">
 <?php
-    // Server-side render of already uploaded files so the list is cumulative on load
-    // Use the project-specific uploads folder
-    $uploadsDir = __DIR__ . '/../controller/MOUMOA_ProjCreate';
-    if (is_dir($uploadsDir)) {
-        $stored = array_values(array_diff(scandir($uploadsDir), ['.', '..']));
-        if (count($stored) === 0) {
-            echo '<li class="placeholder-text">No files uploaded yet.</li>';
-        } else {
-            foreach ($stored as $sf) {
-                $escaped = htmlspecialchars($sf);
-                $fpath = $uploadsDir . DIRECTORY_SEPARATOR . $sf;
-                $size = filesize($fpath);
-                $sizeKb = round($size / 1024, 1);
-                $mtime = date('Y-m-d H:i', filemtime($fpath));
-                // include a Remove button so users can delete uploaded files
-                $removeBtn = "<button type=\"button\" class=\"remove-file-btn\" data-fname=\"$escaped\">Remove</button>";
-                echo "<li><div class=\"file-name\">$escaped</div><div class=\"file-meta\">$sizeKb KB • $mtime</div>$removeBtn</li>";
-            }
+    // Render server-side list of uploaded files for THIS BROWSER SESSION only.
+    // Also clear any existing session uploads on page load so a refresh shows an empty list.
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
+    $baseControllerDir = realpath(__DIR__ . '/../controller');
+    $targetFolder = 'MOUMOA_ProjCreate';
+    $sessionId = session_id();
+    $sessionUploadsDir = $baseControllerDir . DIRECTORY_SEPARATOR . $targetFolder . DIRECTORY_SEPARATOR . $sessionId;
+
+    // Ephemeral behavior: clear previous session files on page load (so refresh removes files)
+    if (is_dir($sessionUploadsDir)) {
+        foreach (array_diff(scandir($sessionUploadsDir), ['.', '..']) as $f) {
+            @unlink($sessionUploadsDir . DIRECTORY_SEPARATOR . $f);
         }
-    } else {
-        echo '<li class="placeholder-text">No uploads directory.</li>';
+        @rmdir($sessionUploadsDir); // optional: remove the now-empty session directory
     }
+
+    // After cleanup, nothing should remain for this session
+    echo '<li class="placeholder-text">No files uploaded yet.</li>';
 ?>
                                         </ul>
                                     </div>
@@ -303,6 +315,16 @@ $user = getUserInfo();
                                     fileInput.addEventListener('change', function(){
                                         const files = Array.from(fileInput.files);
                                         if (files.length === 0) return;
+
+                                        // Enforce total max 5 including already uploaded items
+                                        const maxFiles = 5;
+                                        const currentCount = fileList.querySelectorAll('li:not(.placeholder-text)').length;
+                                        if (currentCount + files.length > maxFiles) {
+                                            const allowed = Math.max(0, maxFiles - currentCount);
+                                            alert(`You can upload up to ${maxFiles} files total.`);
+                                            fileInput.value = null;
+                                            return;
+                                        }
 
                                         const form = new FormData();
                                         files.forEach((f) => form.append('moa_mou_files[]', f));
@@ -373,7 +395,7 @@ $user = getUserInfo();
                                             // update counter and disable upload if limit reached
                                             const counter = document.getElementById('moaCounter');
                                             const maxFiles = 5;
-                                            const currentCount = fileList.querySelectorAll('li').length;
+                                            const currentCount = fileList.querySelectorAll('li:not(.placeholder-text)').length;
                                             counter.textContent = `You have ${currentCount} uploaded file(s). Maximum ${maxFiles}.`;
                                             const btn = document.getElementById('browseMoaMouBtn');
                                             if (currentCount >= maxFiles) {
@@ -398,8 +420,10 @@ $user = getUserInfo();
 
                                     fileInput.addEventListener('change', () => {
                                         const maxFiles = 5;
-                                        if (fileInput.files.length > maxFiles) {
-                                            alert(`You can upload up to ${maxFiles} files. You selected ${fileInput.files.length}.`);
+                                        const currentCount = fileList.querySelectorAll('li:not(.placeholder-text)').length;
+                                        if (currentCount + (fileInput.files?.length || 0) > maxFiles) {
+                                            const allowed = Math.max(0, maxFiles - currentCount);
+                                            alert(`You can upload up to ${maxFiles} files total. You can add ${allowed} more.`);
                                             fileInput.value = null;
                                             return;
                                         }
@@ -421,11 +445,12 @@ $user = getUserInfo();
                                                 fetch('../controller/uploadDocument.php', { method: 'POST', body: f, credentials: 'same-origin' })
                                                 .then(r => r.json())
                                                 .then(data => {
-                                                    if (data && data.status === 'deleted'){
+                                                    if (data && data.status === 'ok'){
                                                         // re-render list
                                                         fileList.innerHTML = '';
-                                                        if (Array.isArray(data.all_stored) && data.all_stored.length > 0) {
-                                                            data.all_stored.forEach(n => {
+                                                        const remaining = Array.isArray(data.all_stored) ? data.all_stored : (Array.isArray(data.files) ? data.files : []);
+                                                        if (remaining.length > 0) {
+                                                            remaining.forEach(n => {
                                                                 const li = document.createElement('li');
                                                                 const nameDiv = document.createElement('div');
                                                                 nameDiv.className = 'file-name';
@@ -449,7 +474,7 @@ $user = getUserInfo();
                                                         // update counter and button state
                                                         const counter = document.getElementById('moaCounter');
                                                         const maxFiles = 5;
-                                                        const currentCount = fileList.querySelectorAll('li').length;
+                                                        const currentCount = fileList.querySelectorAll('li:not(.placeholder-text)').length;
                                                         counter.textContent = `You have ${currentCount} uploaded file(s). Maximum ${maxFiles}.`;
                                                         const btn = document.getElementById('browseMoaMouBtn');
                                                         if (currentCount >= maxFiles) { btn.disabled = true; btn.classList.add('disabled'); } else { btn.disabled = false; btn.classList.remove('disabled'); }
@@ -595,10 +620,189 @@ $user = getUserInfo();
                     <!-- Milestones moved to created.php per workflow change -->
                </div>              
                 <div class="actions-inline">
-                    
-                    <a href="./dashboard.html" id="cancelBtn" class="btn btn-cancel">Cancel</a>
-                    <a href="./created.html" id="submitAllBtn" class="btn btn-submit">Submit</a>
+                    <div class="actions-right">
+                        <div class="actions-buttons">
+                            <a href="./dashboard.php" id="cancelBtn" class="btn btn-cancel">Cancel</a>
+                            <a href="#" id="submitAllBtn" class="btn btn-submit">Submit</a>
+                        </div>
+                        <div id="submitMessage" class="submit-message"></div>
+                    </div>
                 </div>
+                <script>
+                    (function(){
+                        const submitBtn = document.getElementById('submitAllBtn');
+                        const msg = document.getElementById('submitMessage');
+                        function showMessage(text, ok){
+                            msg.textContent = text;
+                            msg.style.color = ok ? '#1e7e34' : '#c0392b';
+                        }
+
+                        // Helper: collect li text values from a UL. If empty, optionally include current input field value.
+                        function collectListValues(ulId, inputId){
+                            const ul = document.getElementById(ulId);
+                            const items = [];
+                            if (ul){
+                                const lis = ul.querySelectorAll('li');
+                                lis.forEach(li => {
+                                    // Prefer a child span if present (avoids including button labels)
+                                    const span = li.querySelector('span, .text, .item-text');
+                                    let t = '';
+                                    if (span && span.textContent) {
+                                        t = span.textContent.trim();
+                                    } else {
+                                        t = (li.cloneNode(true).textContent || '').trim();
+                                        // strip common button labels
+                                        t = t.replace(/\bRemove\b/i, '').trim();
+                                    }
+                                    if (t) items.push(t);
+                                });
+                            }
+                            // If no list items but input has text, include it as a single item
+                            if (items.length === 0 && inputId){
+                                const inp = document.getElementById(inputId);
+                                const v = (inp?.value || '').trim();
+                                if (v) items.push(v);
+                            }
+                            return items;
+                        }
+
+                        // Before submit, sync deliverables hidden inputs from current UI state
+                        function updateDeliverablesHidden(){
+                            const exp = collectListValues('expectedOutputsList', 'expectedOutputInput');
+                            const kpi = collectListValues('kpisList', 'kpiInput');
+                            const obj = collectListValues('objectivesList', 'objectiveInput');
+                            const expH = document.getElementById('expectedOutputsHidden');
+                            const kpiH = document.getElementById('kpisHidden');
+                            const objH = document.getElementById('objectivesHidden');
+                            if (expH) expH.value = JSON.stringify(exp);
+                            if (kpiH) kpiH.value = JSON.stringify(kpi);
+                            if (objH) objH.value = JSON.stringify(obj);
+                        }
+
+                        function collectSectionValues(){
+                            // Project Information
+                            const project = {
+                                project_title: document.getElementById('projectTitle')?.value.trim() || '',
+                                project_description: document.getElementById('projectDescription')?.value.trim() || '',
+                                project_type: document.getElementById('projectType')?.value || '',
+                                start_date: document.getElementById('startDate')?.value || '',
+                                end_date: document.getElementById('endDate')?.value || ''
+                            };
+                            // Academe Information
+                            const academe = {
+                                department_program: document.getElementById('departmentProgram')?.value.trim() || '',
+                                faculty_coordinator: document.getElementById('facultyCoordinator')?.value.trim() || '',
+                                contact_number: document.getElementById('contactNumber')?.value.trim() || '',
+                                contact_email: document.getElementById('contactEmail')?.value.trim() || ''
+                            };
+                            // Agreement & Resources
+                            const agreements = {
+                                funding_source: document.getElementById('fundingSource')?.value || '',
+                                private_sponsor: document.getElementById('privateSponsor')?.value.trim() || '',
+                                budget: document.getElementById('projectBudget')?.value || ''
+                            };
+                            // Deliverables
+                            const deliverables = {
+                                expected_outputs: collectListValues('expectedOutputsList', 'expectedOutputInput'),
+                                kpis: collectListValues('kpisList', 'kpiInput'),
+                                objectives: collectListValues('objectivesList', 'objectiveInput')
+                            };
+                            // Industry partner selection (optional)
+                            const compSel = document.getElementById('companyNameSelect');
+                            const industry_partner_id = compSel && compSel.value && compSel.value !== 'Other' ? parseInt(compSel.value, 10) : null;
+                            return { project, academe, agreements, deliverables, industry_partner_id };
+                        }
+
+                        function isIncomplete(p){
+                            const req = [
+                                p.project.project_title,
+                                p.project.project_description,
+                                p.project.project_type,
+                                p.project.start_date,
+                                p.project.end_date,
+                                p.academe.department_program,
+                                p.academe.faculty_coordinator,
+                                p.academe.contact_number,
+                                p.academe.contact_email,
+                                p.agreements.funding_source
+                            ];
+                            return req.some(v => !v || (typeof v === 'string' && v.trim() === ''));
+                        }
+
+                        submitBtn.addEventListener('click', function(e){
+                            e.preventDefault();
+                            // ensure deliverables hidden fields reflect current visible inputs/lists
+                            updateDeliverablesHidden();
+                            const payload = collectSectionValues();
+                            if (isIncomplete(payload)){
+                                showMessage('Please fill all the fields', false);
+                                return;
+                            }
+                            showMessage('Submitting...', true);
+                            fetch('../controller/submitProject.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload),
+                                credentials: 'same-origin'
+                            }).then(r => r.json())
+                            .then(data => {
+                                if (data && data.status === 'ok'){
+                                    // finalize temp uploads so they are retained
+                                    const params = new URLSearchParams();
+                                    params.append('action', 'finalize');
+                                    params.append('target', 'MOUMOA_ProjCreate');
+                                    if (data.project_id) params.append('project_id', String(data.project_id));
+                                    fetch('../controller/uploadDocument.php', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                        body: params.toString(),
+                                        credentials: 'same-origin'
+                                    }).catch(()=>{}).finally(() => {
+                                        // Prevent unload cleanup after successful submit
+                                        window.__skipClearUploads = true;
+                                        showMessage('Project has been successfully created', true);
+                                        setTimeout(() => { window.location.href = './dashboard.php'; }, 800);
+                                    });
+                                } else {
+                                    showMessage(data && data.message ? data.message : 'Unable to create project', false);
+                                }
+                            })
+                            .catch(err => { console.error('Submit failed', err); showMessage('Unable to create project. Please try again.', false); });
+                        });
+                    })();
+                </script>
+                <script>
+                    // On page leave, request the server to clear this session's temporary uploads.
+                    (function(){
+                        let cleared = false;
+                        function clearTempUploads(){
+                            if (window.__skipClearUploads) return; // keep files after a successful submit
+                            if (cleared) return;
+                            cleared = true;
+                            const params = new URLSearchParams();
+                            params.append('action', 'clear_all');
+                            params.append('target', 'MOUMOA_ProjCreate');
+                            // Use sendBeacon for reliability during page unload
+                            if (navigator.sendBeacon) {
+                                navigator.sendBeacon('../controller/uploadDocument.php', params);
+                            } else {
+                                // Fallback (best effort)
+                                fetch('../controller/uploadDocument.php', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                    body: params.toString(),
+                                    keepalive: true,
+                                    credentials: 'same-origin'
+                                }).catch(()=>{});
+                            }
+                        }
+                        // Trigger on page hide/visibility change
+                        window.addEventListener('pagehide', clearTempUploads);
+                        document.addEventListener('visibilitychange', function(){
+                            if (document.visibilityState === 'hidden') clearTempUploads();
+                        });
+                    })();
+                </script>
             </div>
         </main>   
 </body>

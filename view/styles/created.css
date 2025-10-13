@@ -330,240 +330,32 @@ body {
 }
 
 
-/* Milestones form and list styling */
-.milestones-form{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    font-family:"Montserrat", sans-serif;
+/* Milestones */
+.milestone-form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
 }
-.milestones-form .field{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
+.milestone-form .form-row { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 6px; 
 }
-.milestones-form label{
-    font-weight:700;
-    font-size:.78rem;
-    letter-spacing:.45px;
-    color:#1c1c1c;
-    text-transform:uppercase;
+.form-row label { 
+    font-weight: 600; 
+    color: #35408e; 
 }
-.milestones-form input,
-.milestones-form textarea{
-    background:#cccccc;
-    border:none;
-    border-radius:8px;
-    padding:6px 10px;
-    font-size:.8rem;
-    font-family:"Montserrat", sans-serif;
-    outline:none;
-    resize:vertical;
-    transition:box-shadow .2s;
-}
-.milestones-form input:focus,
-.milestones-form textarea:focus{
-    box-shadow:0 0 0 3px rgba(53,64,142,0.28);
-}
-.add-milestone-btn{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    background:#ffd41c;
-    color:#111;
-    font-weight:700;
-    font-size:.65rem;
-    border:none;
-    padding:8px 16px;
-    border-radius:24px;
-    cursor:pointer;
-    box-shadow:0 4px 10px -4px rgba(0,0,0,0.25);
-    transition:background .2s, transform .15s;
-    width:max-content;
-}
-.add-milestone-btn:hover{ background:#f2c500; }
-.add-milestone-btn:active{ transform:translateY(1px); }
-.add-milestone-btn .btn-icon{
-    width:18px;
-    height:18px;
-    object-fit:contain;
-    display:block;
+.milestone-form .dates-row { 
+    gap: 15px; 
 }
 
-/* Optional future list (if you append milestones dynamically) */
-.milestones-list{
-    list-style:none;
-    margin:6px 0 0;
-    padding:0;
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    max-height:200px;
-    overflow:auto;
+.status-btn {
+    background: 
+    #ffd41c; color: #35408e; 
+    border: 0; 
+    border-radius: 20px;
+    padding: 10px 16px; 
+    font-weight: 700; 
+    cursor: pointer;
 }
-.milestones-list li{
-    background:#f7f7f7;
-    border:1px solid #d6d6d6;
-    border-radius:8px;
-    padding:8px 10px;
-    font-size:.65rem;
-    font-weight:600;
-    letter-spacing:.4px;
-    display:grid;
-    grid-template-columns:1fr auto;
-    gap:8px;
-    align-items:center;
-}
-.milestone-meta{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    font-size:.55rem;
-    font-weight:600;
-    color:#35408e;
-    letter-spacing:.4px;
-}
-.milestones-remove-btn{
-    background:#35408e;
-    color:#fff;
-    border:none;
-    padding:4px 8px;
-    font-size:.5rem;
-    font-weight:600;
-    border-radius:14px;
-    cursor:pointer;
-    transition:background .2s;
-}
-.milestones-remove-btn:hover{ background:#1f275c; }
-
-/* Title inside each milestone box */
-.milestone-box .box-title{
-    margin:0 0 8px;
-    font-weight:700;
-    font-size:.82rem;
-    color:#35408e;
-    display:flex;
-    align-items:center;
-    gap:6px;
-}
-.milestone-box .box-title-sep{
-    color:#9aa0b4;
-    font-weight:600;
-}
-
-/* Milestone dynamic boxes */
-#milestonesContainer{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    margin-top:10px;
-}
-.milestone-box{
-    background:#ffffff;
-    border:1px solid #d6d6d6;
-    border-radius:10px;
-    padding:12px;
-    box-shadow:0 6px 16px -8px rgba(0,0,0,0.18);
-}
-
-/* Inline actions inside each milestone box (match Add Milestone styling) */
-.milestone-box .list-add-row{
-    justify-content:flex-end;
-    gap:8px;
-}
-.milestone-box .add-inline{
-    background:#ffd41c;
-    color:#111;
-    font-weight:700;
-    font-size:.65rem;
-    border:none;
-    padding:8px 16px;
-    border-radius:24px;
-    cursor:pointer;
-    box-shadow:0 4px 10px -4px rgba(0,0,0,0.25);
-    transition:background .2s, transform .15s;
-}
-.milestone-box .add-inline:hover{ background:#f2c500; }
-.milestone-box .add-inline:active{ transform:translateY(1px); }
-
-.milestone-box .remove-inline{
-    background:#dc3545;
-    color:#fff;
-    font-weight:700;
-    font-size:.65rem;
-    border:none;
-    padding:8px 16px;
-    border-radius:24px;
-    cursor:pointer;
-    box-shadow:0 4px 10px -4px rgba(0,0,0,0.2);
-    transition:background .2s, transform .15s;
-}
-.milestone-box .remove-inline:hover{ background:#c82333; }
-.milestone-box .remove-inline:active{ transform:translateY(1px); }
-
-/* Optional title if used by JS */
-.milestone-box .box-title{
-    margin:0 0 8px;
-    font-weight:700;
-    font-size:.82rem;
-    color:#35408e;
-    display:flex;
-    align-items:center;
-    gap:6px;
-}
-.milestone-box .box-title-sep{
-    color:#9aa0b4;
-    font-weight:600;
-}
-
-@media (max-width:560px){
-    .milestones-form{
-        gap:10px;
-    }
-    .milestones-list li{
-        grid-template-columns:1fr;
-        font-size:.6rem;
-    }
-    .milestone-meta{
-        font-size:.5rem;
-    }
-}
-
-/* Uploaded files UI tweaks */
-.file-list li{
-    /* allow children to shrink so long filenames can ellipsize */
-    min-width: 0;
-}
-.file-list .file-name{
-    flex: 1 1 auto;
-    min-width: 0; /* required for overflow to work inside flex */
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.remove-file-btn{
-    background: #dc3545; /* bootstrap danger */
-    color: #fff;
-    border: none;
-}
-.remove-file-btn:hover{
-    background: #c82333;
-}
-
-/* Push actions down when milestones exist */
-.creation-sections:has(#milestonesContainer .milestone-box) + .actions-inline{
-  margin-top: 28px;
-}
-
-@media (min-width:901px){
-  .creation-sections:has(#milestonesContainer .milestone-box) + .actions-inline{
-    margin-top: 32px !important; 
-  }
-}
-@media (min-width:1300px){
-  .creation-sections:has(#milestonesContainer .milestone-box) + .actions-inline{
-    margin-top: 36px !important; 
-  }
-}
-/* Lift Milestones card upward closer to Industry Partner (override) */
+.status-btn:hover { filter: brightness(0.95); }    

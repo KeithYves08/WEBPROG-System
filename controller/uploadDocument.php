@@ -1,181 +1,156 @@
 <?php
-// uploadDocument.php
-// Handles uploading of PDF or DOCX files to controller/uploads/
+// Handles temporary uploads for Project Creation page.
+// Behavior:
+// - Files are stored under controller/{target}/{session_id}/
+// - action=delete removes a single file by name in this session directory
+// - action=clear_all removes the entire session directory (used on page leave)
+// - default (no action) treats as upload of files in moa_mou_files[]
 
-require_once __DIR__ . '/auth.php';
-checkLogin();
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo 'Method Not Allowed';
-    exit;
+// Helpers
+function response($arr){ echo json_encode($arr); exit; }
+function ensure_dir($dir){ if (!is_dir($dir)) { @mkdir($dir, 0775, true); } return is_dir($dir); }
+function sanitize_filename($name){
+	$name = basename($name);
+	// remove anything dangerous
+	return preg_replace('/[^A-Za-z0-9._-]/', '_', $name);
 }
 
-$allowedExt = ['pdf', 'docx'];
-$finfo = new finfo(FILEINFO_MIME_TYPE);
-$mimeAllow = [
-    'application/pdf' => 'pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-    'application/octet-stream' => 'docx'
-];
+$target = $_POST['target'] ?? $_GET['target'] ?? 'MOUMOA_ProjCreate';
+$base = realpath(__DIR__);
+if ($base === false) { response(['status' => 'error', 'message' => 'Base path not found']); }
 
-// Helper to sanitize & move a single uploaded file
-function handleFile(array $tmpFile, string $originalFilename, string $uploadDir, array $allowedExt, finfo $finfo, array $mimeAllow)
-{
-    if ($tmpFile['error'] !== UPLOAD_ERR_OK) {
-        return [false, 'error'];
-    }
+$sessionId = session_id();
+$targetDir = $base . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $sessionId;
 
-    // detect mime
-    $mime = $finfo->file($tmpFile['tmp_name']);
-    if (!array_key_exists($mime, $mimeAllow)) {
-        $ext = strtolower(pathinfo($originalFilename, PATHINFO_EXTENSION));
-        if (!in_array($ext, $allowedExt, true)) {
-            return [false, 'invalid_type'];
-        }
-    } else {
-        $ext = $mimeAllow[$mime];
-    }
+$action = $_POST['action'] ?? $_GET['action'] ?? '';
 
-    if ($tmpFile['size'] > 10 * 1024 * 1024) {
-        return [false, 'large'];
-    }
-
-    $originalName = pathinfo($originalFilename, PATHINFO_FILENAME);
-    $originalName = preg_replace('/[^A-Za-z0-9 _.-]/', '', $originalName);
-    $originalName = substr($originalName, 0, 200);
-    $unique = bin2hex(random_bytes(6));
-    $safeName = $originalName . '_' . $unique . '.' . $ext;
-
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
-
-    $destination = $uploadDir . DIRECTORY_SEPARATOR . $safeName;
-
-    if (!move_uploaded_file($tmpFile['tmp_name'], $destination)) {
-        return [false, 'fail'];
-    }
-
-    return [true, $safeName];
+// Clear all temporary files for this session
+if ($action === 'clear_all') {
+	if (is_dir($targetDir)) {
+		foreach (array_diff(scandir($targetDir), ['.', '..']) as $f) {
+			@unlink($targetDir . DIRECTORY_SEPARATOR . $f);
+		}
+		@rmdir($targetDir);
+	}
+	response(['status' => 'ok', 'cleared' => true]);
 }
 
-$defaultDir = __DIR__ . '/uploads';
-
-// allow caller to request a specific subfolder (whitelisted)
-$allowedTargets = [
-    'MOUMOA_ProjCreate' => __DIR__ . '/MOUMOA_ProjCreate',
-    'MOUMOA_NewPartnership' => __DIR__ . '/MOUMOA_NewPartnership',
-];
-
-$uploadDir = $defaultDir;
-if (isset($_POST['target']) && is_string($_POST['target'])) {
-    $t = $_POST['target'];
-    if (array_key_exists($t, $allowedTargets)) {
-        $uploadDir = $allowedTargets[$t];
-    }
+// Finalize uploads: move files from session folder to a permanent project folder
+if ($action === 'finalize') {
+	$projectId = isset($_POST['project_id']) ? preg_replace('/[^0-9]/', '', (string)$_POST['project_id']) : '';
+	$destDir = $base . DIRECTORY_SEPARATOR . $target;
+	if ($projectId !== '') {
+		$destDir .= DIRECTORY_SEPARATOR . 'project_' . $projectId;
+	} else {
+		$destDir .= DIRECTORY_SEPARATOR . 'final_' . date('Ymd_His') . '_' . substr($sessionId, 0, 6);
+	}
+	if (!ensure_dir($destDir)) {
+		response(['status' => 'error', 'message' => 'Unable to create destination']);
+	}
+	$moved = [];
+	if (is_dir($targetDir)) {
+		foreach (array_diff(scandir($targetDir), ['.', '..']) as $f) {
+			$src = $targetDir . DIRECTORY_SEPARATOR . $f;
+			if (!is_file($src)) { continue; }
+			$dest = $destDir . DIRECTORY_SEPARATOR . $f;
+			// Avoid collisions by suffixing
+			$n = 1;
+			while (file_exists($dest)) {
+				$baseName = pathinfo($f, PATHINFO_FILENAME);
+				$ext2 = pathinfo($f, PATHINFO_EXTENSION);
+				$alt = $baseName . "_{$n}" . ($ext2 ? ".{$ext2}" : '');
+				$dest = $destDir . DIRECTORY_SEPARATOR . $alt;
+				$n++;
+			}
+			if (@rename($src, $dest)) {
+				$moved[] = basename($dest);
+			}
+		}
+		// Remove session dir if empty
+		@rmdir($targetDir);
+	}
+	response(['status' => 'ok', 'moved' => $moved, 'destination' => str_replace($base . DIRECTORY_SEPARATOR, '', $destDir)]);
 }
 
-// Support AJAX delete action: expects POST 'action' = 'delete' and 'filename'
-if (isset($_POST['action']) && $_POST['action'] === 'delete') {
-    header('Content-Type: application/json');
-    $resp = ['status' => 'error', 'message' => 'Unknown error'];
-    if (!isset($_POST['filename']) || !is_string($_POST['filename']) || strlen($_POST['filename']) === 0) {
-        $resp['message'] = 'Missing filename';
-        echo json_encode($resp);
-        exit;
-    }
-    $filename = basename($_POST['filename']); // sanitize path
-    // determine directory (target param may override)
-    $delDir = $uploadDir;
-    if (!is_dir($delDir)) {
-        $resp['message'] = 'Directory not found';
-        echo json_encode($resp);
-        exit;
-    }
-    $filePath = $delDir . DIRECTORY_SEPARATOR . $filename;
-    if (!file_exists($filePath)) {
-        $resp['message'] = 'File not found';
-        echo json_encode($resp);
-        exit;
-    }
-    if (!is_writable($filePath)) {
-        // still attempt unlink, but report failure if unable
-    }
-    if (!unlink($filePath)) {
-        $resp['message'] = 'Failed to delete file';
-        echo json_encode($resp);
-        exit;
-    }
-    // return updated list
-    $allStored = array_values(array_diff(scandir($delDir), ['.', '..']));
-    $resp = ['status' => 'deleted', 'filename' => $filename, 'all_stored' => $allStored];
-    echo json_encode($resp);
-    exit;
+// Delete a single file for this session
+if ($action === 'delete') {
+	$filename = $_POST['filename'] ?? '';
+	if (!$filename) { response(['status' => 'error', 'message' => 'No filename']); }
+	$safe = sanitize_filename($filename);
+	$path = $targetDir . DIRECTORY_SEPARATOR . $safe;
+	$ok = false;
+	if (is_file($path)) { $ok = @unlink($path); }
+	// Return remaining list for convenience
+	$remaining = [];
+	if (is_dir($targetDir)) {
+		foreach (array_diff(scandir($targetDir), ['.', '..']) as $f) { $remaining[] = $f; }
+	}
+	$resp = ['status' => $ok ? 'ok' : 'error', 'files' => $remaining, 'all_stored' => $remaining];
+	if (!$ok) {
+		$resp['message'] = is_file($path) ? 'Unable to delete file' : 'File not found';
+	}
+	response($resp);
 }
 
-// If multiple files from agreement form
-if (isset($_FILES['moa_mou_files'])) {
-    $results = [];
-    $files = $_FILES['moa_mou_files'];
-    // enforce max files server-side
-    $maxFiles = 5;
-    $countFiles = count(array_filter($files['name']));
-    if ($countFiles > $maxFiles) {
-        header('Content-Type: application/json');
-        echo json_encode(['status' => 'error', 'message' => "Too many files. Maximum allowed is $maxFiles."]);
-        exit;
-    }
-    // normalize
-    // ensure upload directory exists to count existing files
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
-    $existingFiles = array_values(array_diff(scandir($uploadDir), ['.', '..']));
-    $countExisting = count($existingFiles);
-    // count how many non-empty file names were submitted
-    $countFiles = 0;
-    foreach ($files['name'] as $n) {
-        if (is_string($n) && strlen($n) > 0) $countFiles++;
-    }
-    if ($countExisting + $countFiles > $maxFiles) {
-        header('Content-Type: application/json');
-        echo json_encode(['status' => 'error', 'message' => "Too many files. Maximum allowed is $maxFiles.", 'current_count' => $countExisting]);
-        exit;
-    }
-
-    for ($i = 0; $i < count($files['name']); $i++) {
-        $tmp = [
-            'name' => $files['name'][$i],
-            'type' => $files['type'][$i],
-            'tmp_name' => $files['tmp_name'][$i],
-            'error' => $files['error'][$i],
-            'size' => $files['size'][$i]
-        ];
-
-        list($ok, $res) = handleFile($tmp, $files['name'][$i], $uploadDir, $allowedExt, $finfo, $mimeAllow);
-        $results[] = ['ok' => $ok, 'result' => $res, 'original' => $files['name'][$i]];
-    }
-
-    // return also the full list of stored files so client can render the complete set
-    $allStored = array_values(array_diff(scandir($uploadDir), ['.', '..']));
-    header('Content-Type: application/json');
-    echo json_encode(['status' => 'done', 'files' => $results, 'all_stored' => $allStored]);
-    exit;
+// Upload handler
+if (!isset($_FILES['moa_mou_files'])) {
+	response(['status' => 'error', 'message' => 'No files found']);
 }
 
-// Backwards-compatible single-file upload (field name: document)
-if (!isset($_FILES['document']) || $_FILES['document']['error'] === UPLOAD_ERR_NO_FILE) {
-    header('Location: ../pages/created.php?upload=empty');
-    exit;
+if (!ensure_dir($targetDir)) { response(['status' => 'error', 'message' => 'Failed to create directory']); }
+
+// Enforce max 5 files per session cumulatively
+$maxFiles = 5;
+$existing = [];
+if (is_dir($targetDir)) {
+	foreach (array_diff(scandir($targetDir), ['.', '..']) as $f) { $existing[] = $f; }
+}
+$existingCount = count($existing);
+$remainingSlots = $maxFiles - $existingCount;
+
+$files = $_FILES['moa_mou_files'];
+$saved = [];
+// Support single or multiple
+$count = is_array($files['name']) ? count($files['name']) : 1;
+for ($i = 0; $i < $count; $i++) {
+	if ($remainingSlots <= 0) { break; }
+	$name = is_array($files['name']) ? $files['name'][$i] : $files['name'];
+	$tmp  = is_array($files['tmp_name']) ? $files['tmp_name'][$i] : $files['tmp_name'];
+	$err  = is_array($files['error']) ? $files['error'][$i] : $files['error'];
+	$size = is_array($files['size']) ? $files['size'][$i] : $files['size'];
+
+	if ($err !== UPLOAD_ERR_OK) { continue; }
+	// Basic validation: size limit (e.g., 10MB) and allowed extensions
+	if ($size > 10 * 1024 * 1024) { continue; }
+	$ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+	$allowed = ['pdf','doc','docx','png','jpg','jpeg'];
+	if (!in_array($ext, $allowed, true)) { continue; }
+
+	$safeName = sanitize_filename($name);
+	$dest = $targetDir . DIRECTORY_SEPARATOR . $safeName;
+	// Ensure unique filename
+	$n = 1;
+	while (file_exists($dest)) {
+		$baseName = pathinfo($safeName, PATHINFO_FILENAME);
+		$ext2 = pathinfo($safeName, PATHINFO_EXTENSION);
+		$alt = $baseName . "_{$n}" . ($ext2 ? ".{$ext2}" : '');
+		$dest = $targetDir . DIRECTORY_SEPARATOR . $alt;
+		$n++;
+	}
+	if (@move_uploaded_file($tmp, $dest)) {
+		$saved[] = basename($dest);
+		$remainingSlots--;
+	}
 }
 
-$file = $_FILES['document'];
-list($ok, $res) = handleFile($file, $file['name'], $uploadDir, $allowedExt, $finfo, $mimeAllow);
-if (!$ok) {
-    header('Location: ../pages/created.php?upload=' . $res);
-    exit;
+// Also include a list of all files currently stored for this session
+$allStored = [];
+if (is_dir($targetDir)) {
+	foreach (array_diff(scandir($targetDir), ['.', '..']) as $f) { $allStored[] = $f; }
 }
 
-header('Location: ../pages/created.php?upload=success&file=' . urlencode($res));
-exit;
+response(['status' => 'ok', 'files' => $saved, 'all_stored' => $allStored]);
+?>
