@@ -2,6 +2,7 @@
 require_once '../controller/auth.php';
 checkLogin();
 $user = getUserInfo();
+require_once '../controller/config.php';
 ?>
 <!DOCTYPE html>
 <html>
@@ -109,8 +110,35 @@ $user = getUserInfo();
                             <div class="active-projects-section">
                                 <div class="active-proj-label">Active Projects</div>
                                 <div class="projects-content">
-                                    <!-- Active projects content will go here -->
-                                    <button class="view-details-btn">View Details</button>
+                                    <?php
+                                        try {
+                                            $today = date('Y-m-d');
+                                            $sql = "SELECT id, title FROM projects 
+                                                    WHERE (end_date IS NULL OR end_date >= :today)
+                                                      AND (start_date IS NULL OR start_date <= :today)
+                                                    ORDER BY created_at DESC";
+                                            $stmt = $conn->prepare($sql);
+                                            $stmt->execute([':today' => $today]);
+                                            $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                            if ($projects && count($projects) > 0) {
+                                                echo '<div class="projects-list">';
+                                                foreach ($projects as $proj) {
+                                                    $title = htmlspecialchars($proj['title'] ?? 'Untitled Project');
+                                                    $pid = (int)($proj['id'] ?? 0);
+                                                    echo '<div class="project-row">'
+                                                        . '<span class="project-title">' . $title . '</span>'
+                                                        . '<button class="view-details-btn" data-project-id="' . $pid . '">View Details</button>'
+                                                        . '</div>';
+                                                }
+                                                echo '</div>';
+                                            } else {
+                                                echo '<div class="no-projects">No active projects.</div>';
+                                            }
+                                        } catch (Exception $e) {
+                                            echo '<div class="no-projects">Unable to load projects.</div>';
+                                        }
+                                    ?>
                                 </div>
                             </div>
                             <div class="view-all-container">
