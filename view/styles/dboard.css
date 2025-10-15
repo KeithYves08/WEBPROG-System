@@ -256,7 +256,7 @@ body {
     text-align: center;
 }
 
-.stat-number {
+.totalproj-stat-number, .partners-stat-number, .placement-stat-number, .studentsplaced-stat-number {
     font-size: 2.5rem;
     font-weight: 700;
     color: #35408e;

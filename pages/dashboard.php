@@ -3,6 +3,30 @@ require_once '../controller/auth.php';
 checkLogin();
 $user = getUserInfo();
 require_once '../controller/config.php';
+
+// Fetch dashboard statistics
+$totalProjects = '--';
+$activePartners = '--';
+
+try {
+    $stmt = $conn->query("SELECT COUNT(*) FROM projects");
+    $totalProjects = (int)$stmt->fetchColumn();
+} catch (Exception $e) {
+    // leave as '--' on failure
+}
+
+try {
+    $today = date('Y-m-d');
+    $sqlPartners = "SELECT COUNT(DISTINCT company_id) AS cnt
+                    FROM partnerships
+                    WHERE status = 'active'
+                      AND (agreement_end_date IS NULL OR agreement_end_date >= :today)";
+    $stmtP = $conn->prepare($sqlPartners);
+    $stmtP->execute([':today' => $today]);
+    $activePartners = (int)$stmtP->fetchColumn();
+} catch (Exception $e) {
+    // leave as '--' on failure
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -81,25 +105,25 @@ require_once '../controller/config.php';
                     <div class="yellow-stats">
                         <div class="stat-item">
                             <div class="stat-content">
-                                <div class="stat-number">--</div>
+                                <div class="totalproj-stat-number"><?php echo htmlspecialchars((string)$totalProjects); ?></div>
                                 <div class="stat-label">Total Projects</div>
                             </div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-content">
-                                <div class="stat-number">--</div>
+                                <div class="partners-stat-number"><?php echo htmlspecialchars((string)$activePartners); ?></div>
                                 <div class="stat-label">Industry Partners</div>
                             </div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-content">
-                                <div class="stat-number">--</div>
+                                <div class="placement-stat-number">--</div>
                                 <div class="stat-label">Placement Rate</div>
                             </div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-content">
-                                <div class="stat-number">--</div>
+                                <div class="studentsplaced-stat-number">--</div>
                                 <div class="stat-label">Students Placed</div>
                             </div>
                         </div>
