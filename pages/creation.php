@@ -499,22 +499,7 @@ $user = getUserInfo();
                         <div class="card-accent"></div>
                         <div class="card-body">
                             <form id="deliverablesTrackingForm" class="deliverables-form">                              
-                                <div class="field">
-                                    <label for="expectedOutputInput">Expected Outputs</label>
-                                    <div class="list-add-row">
-                                        <input type="text" id="expectedOutputInput" placeholder="Enter expected output">                            
-                                    </div>
-                                    <ul id="expectedOutputsList" class="dynamic-list"></ul>
-                                    <input type="hidden" name="expected_outputs" id="expectedOutputsHidden">
-                                </div>                            
-                                <div class="field">
-                                    <label for="kpiInput">KPIs / Success Metrics</label>
-                                    <div class="list-add-row">
-                                        <input type="text" id="kpiInput" placeholder="Enter KPI or success metric">                                  
-                                    </div>
-                                    <ul id="kpisList" class="dynamic-list"></ul>
-                                    <input type="hidden" name="kpis" id="kpisHidden">
-                                </div>                              
+                                                            
                                 <div class="field">
                                     <label for="objectiveInput">Objectives</label>
                                     <div class="list-add-row">

@@ -8,7 +8,7 @@ try {
             FROM projects p
             LEFT JOIN companies c ON c.id = p.industry_partner_id
             LEFT JOIN academe_information ai ON ai.id = p.academe_id
-            WHERE p.end_date IS NOT NULL AND p.end_date < :today
+        WHERE p.end_date IS NOT NULL AND p.end_date <= :today
             ORDER BY p.end_date DESC, p.created_at DESC";
     $stmt = $conn->prepare($sql);
     $stmt->execute([':today' => $today]);

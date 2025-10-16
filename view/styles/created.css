@@ -359,3 +359,140 @@ body {
     cursor: pointer;
 }
 .status-btn:hover { filter: brightness(0.95); }    
+
+/* --- Project Details: Deliverables & Milestones shared styles (aligned with creation.css) --- */
+/* Input rows for adding list items */
+.list-add-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.list-add-row input{
+    flex:1;
+    background:#cccccc;
+    border:none;
+    border-radius:8px;
+    padding:6px 10px;
+    font-size:.8rem;
+    font-family:"Montserrat", sans-serif;
+    outline:none;
+    transition:box-shadow .2s;
+}
+.list-add-row input:focus{
+    box-shadow:0 0 0 3px rgba(53,64,142,0.28);
+}
+/* Ensure placeholder color matches across inputs */
+.list-add-row input::placeholder{
+    color:#555;
+    opacity:1;
+}
+
+/* Generic dates row layout */
+.dates-row{
+    display:flex;
+    gap:12px;
+}
+/* Date input placeholder/text color to match list-add-row */
+.dates-row input[type="date"]{
+    color:#555; /* affects visible text in some browsers */
+}
+.dates-row input[type="date"]::placeholder{
+    color:#555;
+    opacity:1;
+}
+/* WebKit-based browsers: style the date edit fields when empty */
+.dates-row input[type="date"]::-webkit-datetime-edit{
+    color:#555;
+}
+@media (max-width:520px){
+    .dates-row{
+        flex-direction:column;
+        gap:14px; 
+    }
+}
+
+/* Milestones group inputs to match creation page fields */
+.ms-group .form-row{
+    margin:6px 0;
+    display:flex;
+    flex-direction:column;
+}
+.ms-group input,
+.ms-group textarea{
+    background:#cccccc;
+    border:none;
+    border-radius:8px;
+    padding:6px 10px;
+    font-size:.8rem;
+    font-family:"Montserrat", sans-serif;
+    outline:none;
+    transition:box-shadow .2s;
+}
+.ms-group input:focus,
+.ms-group textarea:focus{
+    box-shadow:0 0 0 3px rgba(53,64,142,0.28);
+}
+
+/* Add Milestone button styling */
+.add-milestone-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:#ffd41c;
+    color:#111;
+    border:none;
+    padding:10px 14px;
+    border-radius:999px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .2s;
+}
+.add-milestone-btn:hover{ background:#f2c500; }
+
+/* Milestones summary rendering */
+.milestones-summary{
+    border-top:1px dashed #e0e0e0;
+    margin-top:12px;
+    padding-top:10px;
+}
+.milestones-summary .ms-empty{
+    font-size:.85rem;
+    color:#555;
+}
+.milestones-summary .ms-item{
+    background:#ffffff;
+    border:1px solid #e6e6e6;
+    border-radius:8px;
+    padding:10px;
+    margin-top:8px;
+}
+.milestones-summary .ms-item-title{
+    font-weight:700;
+    color:#35408e;
+    margin-bottom:6px;
+}
+.milestones-summary .ms-item-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    font-size:.8rem;
+    color:#333;
+    margin-bottom:6px;
+}
+.milestones-summary .ms-item-desc{
+    font-size:.85rem;
+    color:#222;
+}
+
+.logout-btn {
+            background: #ffd41c;
+            color: #111;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover {
+            background: #f2c500;
+        }

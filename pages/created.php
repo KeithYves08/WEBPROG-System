@@ -71,32 +71,7 @@ function field($arr, $key, $default = '') {
   	<meta name="viewport" content="initial-scale=1, width=device-width"> 	
   	<title>AILPO</title>
     <link rel="stylesheet" href="../view/styles/created.css"> 	
-    <style>
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 0.9rem;
-        }
-        .logout-btn {
-            background: #ffd41c;
-            color: #111;
-            padding: 8px 16px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-        .logout-btn:hover {
-            background: #f2c500;
-        }
-        .dates-row {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-    </style>
+    
 </head>
 <body>
 
@@ -206,69 +181,270 @@ function field($arr, $key, $default = '') {
 
                         <article class="info-card">
                             <header class="card-header">Deliverables and Tracking</header>
-                            <div class="card-body">                               
-                                <div class="dt-sections" aria-label="Deliverables and Tracking">                                   
-                                        <h4 class="dt-title">Expected Outputs</h4>
-                                        <ul class="dt-list">
-                                            <?php foreach (listItems(field($project,'expected_outputs','')) as $it) { ?>
-                                                <li><?php echo safe($it); ?></li>
-                                            <?php } ?>
-                                        </ul>                                                                       
-                                        <h4 class="dt-title">KPIs / Success Metrics</h4>
-                                        <ul class="dt-list">
-                                            <?php foreach (listItems(field($project,'kpi_success_metrics','')) as $it) { ?>
-                                                <li><?php echo safe($it); ?></li>
-                                            <?php } ?>
-                                        </ul>                                                                     
-                                        <h4 class="dt-title">Objectives</h4>
-                                        <ul class="dt-list">
-                                            <?php foreach (listItems(field($project,'objectives','')) as $it) { ?>
-                                                <li><?php echo safe($it); ?></li>
-                                            <?php } ?>
-                                        </ul>                                
+                            <div class="card-body">
+                                <div class="dt-sections" aria-label="Deliverables and Tracking">
+
+                                    <h4 class="dt-title">Objectives</h4>
+                                    <ul class="dt-list" id="dt-objectives-list">
+                                        <?php foreach (listItems(field($project,'objectives','')) as $it) { ?>
+                                            <li><?php echo safe($it); ?></li>
+                                        <?php } ?>
+                                    </ul>
+
+                                    <h4 class="dt-title">Expected Outputs</h4>
+                                    <ul class="dt-list" id="dt-expected-list">
+                                        <?php foreach (listItems(field($project,'expected_outputs','')) as $it) { ?>
+                                            <li><?php echo safe($it); ?></li>
+                                        <?php } ?>
+                                    </ul>
+                                    <div class="list-add-row">
+                                        <input type="text" id="dt-expected-input" placeholder="Enter expected output">
+                                        <button type="button" id="dt-expected-add" class="btn btn-secondary">Add</button>
+                                    </div>
+
+                                    <h4 class="dt-title">KPIs / Success Metrics</h4>
+                                    <ul class="dt-list" id="dt-kpi-list">
+                                        <?php foreach (listItems(field($project,'kpi_success_metrics','')) as $it) { ?>
+                                            <li><?php echo safe($it); ?></li>
+                                        <?php } ?>
+                                    </ul>
+                                    <div class="list-add-row">
+                                        <input type="text" id="dt-kpi-input" placeholder="Enter KPI or success metric">
+                                        <button type="button" id="dt-kpi-add" class="btn btn-secondary">Add</button>
+                                    </div>
+
+                                    <div style="margin-top:12px; text-align:right;">
+                                        <button type="button" id="dt-save-btn" class="btn btn-primary">Save Changes</button>
+                                    </div>
                                 </div>
                             </div>
                         </article>
 
                         <article class="info-card">
                             <header class="card-header">Milestones</header>
-                            <div class="card-body">                                
-                                <form class="milestone-form" action="#" method="post" onsubmit="return false;">
-                                    <div class="form-row">
-                                        <label for="ms-name">Milestone Name:</label>                                       
-                                    </div>
-                                    <div class="form-row">
-                                        <label for="ms-desc">Description:</label>
-                                       
-                                    </div>
-                                    <div class="form-row dates-row">
-                                        <div class="date-field">
-                                            <label for="ms-start">Start Date:</label>                                           
-                                        </div>
-                                        <div class="date-field">
-                                            <label for="ms-end">End Date:</label>                                          
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <label for="ms-person">Person Responsible:</label>
-                                    </div>
-
-                                    <div>
-                                        <button type="button" class="status-btn">Status</button>
-                                    </div>
-                                </form>
+                            <div class="card-body">
+                                <div id="milestones-container"></div>
+                                <div style="display:flex; gap:10px; justify-content:flex-end; align-items:center; margin-top:12px;">
+                                    <button type="button" id="save-milestones-btn" class="btn btn-primary">Save Changes</button>
+                                </div>
+                                <div id="milestones-summary" class="milestones-summary" aria-live="polite" style="margin-top:12px;"></div>
                             </div>
                         </article>
                     </div>
 
                     <div class="box-actions">
                         <button class="btn btn-secondary" type="button">Add Feedback</button>
-                        <button class="btn btn-primary" type="button">Accomplish</button>
+                        <button class="btn btn-primary" type="button" id="accomplish-btn">Accomplish</button>
                     </div>
                 </section>
 
                
             </div>
-        </main>   
+    </main>   
+<script>
+(function(){
+    const projectId = <?php echo (int)$projectId; ?>;
+    let allMilestones = [];
+
+    // Utility to add list item
+    function addListItem(ul, text){
+        if (!text || !ul) return;
+        const li = document.createElement('li');
+        li.textContent = text;
+        ul.appendChild(li);
+    }
+
+    // Deliverables UI
+    const expUl = document.getElementById('dt-expected-list');
+    const expIn = document.getElementById('dt-expected-input');
+    const expAdd = document.getElementById('dt-expected-add');
+    expAdd?.addEventListener('click', ()=>{ const v = (expIn?.value||'').trim(); if (v){ addListItem(expUl, v); expIn.value=''; }});
+
+    const kpiUl = document.getElementById('dt-kpi-list');
+    const kpiIn = document.getElementById('dt-kpi-input');
+    const kpiAdd = document.getElementById('dt-kpi-add');
+    kpiAdd?.addEventListener('click', ()=>{ const v = (kpiIn?.value||'').trim(); if (v){ addListItem(kpiUl, v); kpiIn.value=''; }});
+
+    function collectList(ul){
+        return Array.from(ul?.querySelectorAll('li')||[]).map(li=>li.textContent.trim()).filter(Boolean);
+    }
+
+    document.getElementById('dt-save-btn')?.addEventListener('click', ()=>{
+        const payload = {
+            action: 'save_deliverables',
+            project_id: projectId,
+            expected_outputs: collectList(expUl),
+            kpi_success_metrics: collectList(kpiUl)
+        };
+        fetch('../controller/updateProjectDetails.php', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify(payload),
+            credentials:'same-origin'
+        }).then(r=>r.json()).then(d=>{
+            if(d?.status==='ok') alert('Deliverables saved.'); else alert('Failed to save deliverables.');
+        }).catch(()=>alert('Failed to save deliverables.'));
+    });
+
+    // Milestones UI
+    const container = document.getElementById('milestones-container');
+    function milestoneGroup(data){
+        const wrap = document.createElement('div');
+        wrap.className = 'ms-group';
+        wrap.style.marginBottom = '12px';
+        wrap.innerHTML = `
+            <div class="form-row"><label>Name:</label><input type="text" class="ms-name" value="${(data?.name||'').replace(/"/g,'&quot;')}"></div>
+            <div class="form-row"><label>Description:</label><textarea class="ms-desc">${(data?.description||'')}</textarea></div>
+            <div class="form-row dates-row">
+                <div class="date-field"><label>Start Date:</label><input type="date" class="ms-start" value="${data?.start_date||''}"></div>
+                <div class="date-field"><label>End Date:</label><input type="date" class="ms-end" value="${data?.end_date||''}"></div>
+            </div>
+            <div class="form-row"><label>Person Responsible:</label><input type="text" class="ms-person" value="${(data?.person_responsible||'').replace(/"/g,'&quot;')}"></div>
+        `;
+        if (data?.id) { wrap.dataset.id = String(data.id); }
+        return wrap;
+    }
+
+    // Start with a single blank milestone group visible (static inputs)
+    container.appendChild(milestoneGroup({}));
+
+    // Load and render saved milestones on page load so the summary persists across refreshes
+    function loadMilestones() {
+        if (!projectId) { renderMilestoneSummary([]); return; }
+        // Optionally render an empty header immediately
+        renderMilestoneSummary([]);
+        fetch(`../controller/updateProjectDetails.php?action=get_milestones&project_id=${encodeURIComponent(projectId)}`, {
+            method: 'GET',
+            credentials: 'same-origin'
+        }).then(r => r.json()).then(d => {
+            if (d?.status === 'ok' && Array.isArray(d.milestones)) {
+                allMilestones = d.milestones;
+                renderMilestoneSummary(allMilestones);
+            } else {
+                renderMilestoneSummary([]);
+            }
+        }).catch(() => {
+            renderMilestoneSummary([]);
+        });
+    }
+    loadMilestones();
+
+    function renderMilestoneSummary(items){
+        const wrap = document.getElementById('milestones-summary');
+        if (!wrap) return;
+        // clear
+        wrap.innerHTML = '';
+        // header
+        const h = document.createElement('h4');
+        h.className = 'dt-title';
+        h.textContent = 'Milestones Summary';
+        wrap.appendChild(h);
+        if (!Array.isArray(items) || items.length === 0){
+            const p = document.createElement('div');
+            p.className = 'ms-empty';
+            p.textContent = 'No milestones saved yet.';
+            wrap.appendChild(p);
+            return;
+        }
+        items.forEach((m, idx)=>{
+            const item = document.createElement('div');
+            item.className = 'ms-item';
+
+            const title = document.createElement('div');
+            title.className = 'ms-item-title';
+            title.textContent = `Milestone ${idx+1}: ${m?.name||''}`.trim();
+            item.appendChild(title);
+
+            const meta = document.createElement('div');
+            meta.className = 'ms-item-meta';
+            const sd = document.createElement('span'); sd.textContent = `Start: ${m?.start_date||'—'}`;
+            const ed = document.createElement('span'); ed.textContent = `End: ${m?.end_date||'—'}`;
+            const pr = document.createElement('span'); pr.textContent = `Person: ${m?.person_responsible||'—'}`;
+            meta.append(sd, ed, pr);
+            item.appendChild(meta);
+
+            if (m?.description){
+                const desc = document.createElement('div');
+                desc.className = 'ms-item-desc';
+                desc.textContent = m.description;
+                item.appendChild(desc);
+            }
+            wrap.appendChild(item);
+        });
+    }
+
+    document.getElementById('save-milestones-btn')?.addEventListener('click', ()=>{
+        const groups = Array.from(container.querySelectorAll('.ms-group'));
+        const milestones = groups.map(g=>({
+            id: parseInt(g.dataset.id||'0',10)||0,
+            name: g.querySelector('.ms-name')?.value||'',
+            description: g.querySelector('.ms-desc')?.value||'',
+            start_date: g.querySelector('.ms-start')?.value||null,
+            end_date: g.querySelector('.ms-end')?.value||null,
+            person_responsible: g.querySelector('.ms-person')?.value||''
+        }));
+        const payload = { action:'save_milestones', project_id: projectId, milestones };
+        fetch('../controller/updateProjectDetails.php',{
+            method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload), credentials:'same-origin'
+        }).then(r=>r.json()).then(d=>{
+            if(d?.status==='ok'){
+                const saved = d.milestones||[];
+                // Accumulate and render cumulative summary (Milestone 1, 2, ...)
+                if (saved.length){
+                    allMilestones = allMilestones.concat(saved);
+                } else {
+                    // If API didn't return items (unlikely), fall back to current inputs
+                    allMilestones = allMilestones.concat(milestones.filter(m=> (m.name||'').trim() !== '' || (m.description||'').trim() !== ''));
+                }
+                renderMilestoneSummary(allMilestones);
+                // Reset the single input group so user can add another milestone
+                const g = container.querySelector('.ms-group');
+                if (g){
+                    g.dataset.id = '';
+                    const nameEl = g.querySelector('.ms-name'); if (nameEl) nameEl.value = '';
+                    const descEl = g.querySelector('.ms-desc'); if (descEl) descEl.value = '';
+                    const sEl = g.querySelector('.ms-start'); if (sEl) sEl.value = '';
+                    const eEl = g.querySelector('.ms-end'); if (eEl) eEl.value = '';
+                    const pEl = g.querySelector('.ms-person'); if (pEl) pEl.value = '';
+                }
+                alert('Milestones saved.');
+            } else {
+                alert('Failed to save milestones.');
+            }
+        }).catch(()=>alert('Failed to save milestones.'));
+    });
+
+    // Accomplish button: mark project as accomplished and redirect to Archived
+    const accomplishBtn = document.getElementById('accomplish-btn');
+    accomplishBtn?.addEventListener('click', ()=>{
+        if (!projectId) { alert('Invalid project.'); return; }
+        if (!confirm('Mark this project as Accomplished? This will move it to Archived.')) return;
+        accomplishBtn.disabled = true;
+        const originalText = accomplishBtn.textContent;
+        accomplishBtn.textContent = 'Accomplishing…';
+        fetch('../controller/updateProjectDetails.php', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({ action: 'accomplish_project', project_id: projectId }),
+            credentials: 'same-origin'
+        }).then(r=>r.json()).then(d=>{
+            if (d?.status === 'ok'){
+                alert('Project marked as accomplished.');
+                // Redirect to Archived so the user can see it
+                window.location.href = './archived.php';
+            } else {
+                alert('Failed to accomplish project.');
+                accomplishBtn.disabled = false;
+                accomplishBtn.textContent = originalText;
+            }
+        }).catch(()=>{
+            alert('Failed to accomplish project.');
+            accomplishBtn.disabled = false;
+            accomplishBtn.textContent = originalText;
+        });
+    });
+
+})();
+</script>
 </body>
 </html>
