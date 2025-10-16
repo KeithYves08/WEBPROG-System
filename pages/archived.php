@@ -1,3 +1,22 @@
+<?php
+require_once '../controller/config.php';
+
+$today = date('Y-m-d');
+$archivedProjects = [];
+try {
+    $sql = "SELECT p.id, p.title, p.end_date, c.name AS company_name, ai.faculty_coordinator
+            FROM projects p
+            LEFT JOIN companies c ON c.id = p.industry_partner_id
+            LEFT JOIN academe_information ai ON ai.id = p.academe_id
+            WHERE p.end_date IS NOT NULL AND p.end_date < :today
+            ORDER BY p.end_date DESC, p.created_at DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([':today' => $today]);
+    $archivedProjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $archivedProjects = [];
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -63,20 +82,31 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Backend will dynamically generate these rows -->
-                                <!-- Placeholder rows for demonstration -->
-                                <tr class="table-row">
-                                    <td class="cell-project-name">Project Alpha</td>
-                                    <td class="cell-partner">Tech Corp</td>
-                                    <td class="cell-archived-date">2024-01-15</td>
-                                    <td class="cell-names">John Doe, Jane Smith</td>
-                                    <td class="cell-details">
-                                        <button class="details-arrow-btn" type="button" aria-label="View details" onclick="location.href='created.php'">
-                                            <img class="arrow-icon" src="../view/assets/right-arrow.png" alt="">
-                                        </button>
-                                    </td>
-                                </tr>
-                                <!-- End placeholder rows -->
+                                <?php if (!empty($archivedProjects)) { ?>
+                                    <?php foreach ($archivedProjects as $row) { 
+                                        $pid = (int)($row['id'] ?? 0);
+                                        $title = htmlspecialchars($row['title'] ?? 'Untitled Project');
+                                        $partner = htmlspecialchars($row['company_name'] ?? '—');
+                                        $archivedDate = htmlspecialchars($row['end_date'] ?? '—');
+                                        $names = htmlspecialchars($row['faculty_coordinator'] ?? '—');
+                                    ?>
+                                    <tr class="table-row">
+                                        <td class="cell-project-name"><?php echo $title; ?></td>
+                                        <td class="cell-partner"><?php echo $partner; ?></td>
+                                        <td class="cell-archived-date"><?php echo $archivedDate; ?></td>
+                                        <td class="cell-names"><?php echo $names; ?></td>
+                                        <td class="cell-details">
+                                            <button class="details-arrow-btn" type="button" aria-label="View details" onclick="location.href='created.php?id=<?php echo $pid; ?>'">
+                                                <img class="arrow-icon" src="../view/assets/right-arrow.png" alt="">
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <?php } ?>
+                                <?php } else { ?>
+                                    <tr class="table-row">
+                                        <td class="cell-project-name" colspan="5">No archived projects found.</td>
+                                    </tr>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>

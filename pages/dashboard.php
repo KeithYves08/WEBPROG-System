@@ -152,7 +152,7 @@ try {
                                                     $pid = (int)($proj['id'] ?? 0);
                                                     echo '<div class="project-row">'
                                                         . '<span class="project-title">' . $title . '</span>'
-                                                        . '<button class="view-details-btn" data-project-id="' . $pid . '">View Details</button>'
+                                                        . '<button class="view-details-btn" type="button" onclick="location.href=\'created.php?id=' . $pid . '\'">View Details</button>'
                                                         . '</div>';
                                                 }
                                                 echo '</div>';
