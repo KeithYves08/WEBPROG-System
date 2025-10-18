@@ -50,11 +50,15 @@
         <main class="main-content">
             <div class="main-white-container">
                 <div class="page-header">
-                    <div class="page-title"> <span>PARTNERSHIP SCORE</span>
-                        <input type="text" placeholder="Search">
+                    <div class="page-title">
+                        <span>PARTNERSHIP SCORE</span>
+                        <div style="position:relative; display:inline-block;">
+                            <input type="text" id="company-search" placeholder="Search" autocomplete="off">
+                            <div id="search-suggestions" class="suggestions" style="position:absolute; left:0; right:0; background:#fff; border:1px solid #ddd; border-radius:6px; margin-top:4px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:none; max-height:240px; overflow:auto; z-index:10;"></div>
+                        </div>
                     </div>
                 </div>
-                <span class="companyName">Company Name: </span>
+                <span class="companyName" id="selected-company">Company Name: </span>
 
                 <div class="dashboard-grid">
                     <div class="dashboard-row top-section">
@@ -113,6 +117,98 @@
                 </div>
         </main>
     </div>
+    <script>
+    (function(){
+        const input = document.getElementById('company-search');
+        const suggBox = document.getElementById('search-suggestions');
+        const selectedEl = document.getElementById('selected-company');
+        let companies = [];
+        let lastQuery = '';
+
+        function fetchCompanies(){
+            fetch('../controller/partnersList.php', { credentials: 'same-origin' })
+                .then(r => r.json())
+                .then(d => {
+                    if (d && d.status === 'ok' && Array.isArray(d.companies)) {
+                        companies = d.companies;
+                    } else {
+                        companies = [];
+                    }
+                })
+                .catch(()=>{ companies = []; });
+        }
+
+        function filterPrefix(q){
+            const s = (q||'').trim().toLowerCase();
+            if (!s) return [];
+            return companies.filter(c => (c.name||'').toLowerCase().startsWith(s)).slice(0, 10);
+        }
+
+        function clearSuggestions(){
+            if (!suggBox) return;
+            suggBox.innerHTML = '';
+            suggBox.style.display = 'none';
+        }
+
+        function renderSuggestions(list){
+            if (!suggBox) return;
+            suggBox.innerHTML = '';
+            if (!list.length){ clearSuggestions(); return; }
+            list.forEach(item => {
+                const row = document.createElement('div');
+                row.textContent = item.name;
+                row.setAttribute('data-id', item.id);
+                row.style.padding = '8px 10px';
+                row.style.cursor = 'pointer';
+                row.addEventListener('mouseenter', ()=>{ row.style.background = '#f6f6f6'; });
+                row.addEventListener('mouseleave', ()=>{ row.style.background = '#fff'; });
+                row.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectCompany(item); });
+                suggBox.appendChild(row);
+            });
+            suggBox.style.display = 'block';
+        }
+
+        function selectCompany(item){
+            if (!item) return;
+            input.value = item.name;
+            if (selectedEl){ selectedEl.textContent = 'Company Name: ' + item.name; }
+            clearSuggestions();
+        }
+
+        let debounceTimer = null;
+        function onInput(){
+            const q = input.value || '';
+            lastQuery = q;
+            if (debounceTimer) clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(()=>{
+                const list = filterPrefix(q);
+                // Render only if query hasn't changed during debounce
+                if (q === lastQuery) renderSuggestions(list);
+            }, 120);
+        }
+
+        function onKeyDown(e){
+            if (e.key === 'Enter'){
+                const list = filterPrefix(input.value||'');
+                if (list.length){ selectCompany(list[0]); }
+            } else if (e.key === 'Escape'){
+                clearSuggestions();
+            }
+        }
+
+        function onBlur(){
+            // Delay to allow click selection via mousedown
+            setTimeout(clearSuggestions, 120);
+        }
+
+        if (input){
+            input.addEventListener('input', onInput);
+            input.addEventListener('keydown', onKeyDown);
+            input.addEventListener('blur', onBlur);
+            fetchCompanies();
+        }
+    })();
+    </script>
 </body>
 
 </html>
