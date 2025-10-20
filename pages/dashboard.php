@@ -7,6 +7,7 @@ require_once '../controller/config.php';
 // Fetch dashboard statistics
 $totalProjects = '--';
 $activePartners = '--';
+$studentsPlaced = '--';
 
 try {
     $stmt = $conn->query("SELECT COUNT(*) FROM projects");
@@ -24,6 +25,14 @@ try {
     $stmtP = $conn->prepare($sqlPartners);
     $stmtP->execute([':today' => $today]);
     $activePartners = (int)$stmtP->fetchColumn();
+} catch (Exception $e) {
+    // leave as '--' on failure
+}
+
+// Students placed (count from students table)
+try {
+    $stmtS = $conn->query("SELECT COUNT(*) FROM students");
+    $studentsPlaced = (int)$stmtS->fetchColumn();
 } catch (Exception $e) {
     // leave as '--' on failure
 }
@@ -54,7 +63,7 @@ try {
         }
         .logout-btn:hover {
             background: #f2c500;
-        }       
+        }
     </style>
 </head>
 <body>
@@ -123,7 +132,7 @@ try {
                         </div>
                         <div class="stat-item">
                             <div class="stat-content">
-                                <div class="studentsplaced-stat-number">--</div>
+                                <div class="studentsplaced-stat-number"><?php echo htmlspecialchars((string)$studentsPlaced); ?></div>
                                 <div class="stat-label">Students Placed</div>
                             </div>
                         </div>
@@ -137,10 +146,12 @@ try {
                                     <?php
                                         try {
                                             $today = date('Y-m-d');
-                                            $sql = "SELECT id, title FROM projects 
-                                                    WHERE (end_date IS NULL OR end_date >= :today)
-                                                      AND (start_date IS NULL OR start_date <= :today)
-                                                    ORDER BY created_at DESC";
+                                                                                        $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
+                                                                                                        FROM projects p
+                                                                                                        LEFT JOIN companies c ON c.id = p.industry_partner_id
+                                                                                                        WHERE (p.end_date IS NULL OR p.end_date >= :today)
+                                                                                                            AND (p.start_date IS NULL OR p.start_date <= :today)
+                                                                                                        ORDER BY p.created_at DESC";
                                             $stmt = $conn->prepare($sql);
                                             $stmt->execute([':today' => $today]);
                                             $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -150,10 +161,34 @@ try {
                                                 foreach ($projects as $proj) {
                                                     $title = htmlspecialchars($proj['title'] ?? 'Untitled Project');
                                                     $pid = (int)($proj['id'] ?? 0);
-                                                    echo '<div class="project-row">'
-                                                        . '<span class="project-title">' . $title . '</span>'
-                                                        . '<button class="view-details-btn" type="button" onclick="location.href=\'created.php?id=' . $pid . '\'">View Details</button>'
-                                                        . '</div>';
+                                                    $partner = htmlspecialchars($proj['company_name'] ?? '—');
+                                                    $sd = !empty($proj['start_date']) ? date('m/d/Y', strtotime($proj['start_date'])) : '—';
+                                                    $ed = !empty($proj['end_date']) ? date('m/d/Y', strtotime($proj['end_date'])) : '—';
+                                                    // Status determination for active list
+                                                    $todayStr = date('Y-m-d');
+                                                    $status = 'Ongoing';
+                                                    if (!empty($proj['end_date'])) {
+                                                        $status = ($proj['end_date'] === $todayStr) ? 'Ending Today' : 'Ongoing';
+                                                    }
+
+                                                    echo '<div class="project-card">';
+                                                    echo '  <div class="project-title-line">';
+                                                    echo '    <span class="project-title">' . $title . '</span>';
+                                                    echo '  </div>';
+                                                    echo '  <div class="project-block">';
+                                                    echo '    <div class="project-meta-row">';
+                                                    echo '      <span class="project-partner"><strong>Partner:</strong> ' . $partner . '</span>';
+                                                    echo '    </div>';
+                                                    echo '    <div class="project-meta-row">';
+                                                    echo '      <span class="project-placement"><strong>Placement:</strong> ' . $sd . '</span>';
+                                                    echo '      <span class="project-deadline"><strong>Deadline:</strong> ' . $ed . '</span>';
+                                                    echo '    </div>';
+                                                    echo '    <div class="project-status">';
+                                                    echo '      <span><strong>Status:</strong> ' . htmlspecialchars($status) . '</span>';
+                                                    echo '      <button class="view-details-btn" type="button" onclick="location.href=\'created.php?id=' . $pid . '\'">View Details</button>';
+                                                    echo '    </div>';
+                                                    echo '  </div>';
+                                                    echo '</div>';
                                                 }
                                                 echo '</div>';
                                             } else {
@@ -165,9 +200,9 @@ try {
                                     ?>
                                 </div>
                             </div>
-                            <div class="view-all-container">
+                            <!-- <div class="view-all-container">
                                 <button class="view-all-btn">VIEW ALL</button>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="right-section">

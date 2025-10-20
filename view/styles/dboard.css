@@ -238,7 +238,7 @@ body {
     height: 120px;
     width: 100%;
     justify-content: space-between;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .stat-item {
@@ -324,25 +324,21 @@ body {
     justify-content: flex-start;
 }
 
-/* Active Projects list layout */
-.projects-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.project-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.project-title {
-    font-weight: 600;
-    color: #35408e;
-    font-size: 1rem;
-}
+/* Active Projects list layout (scoped) */
+.active-projects-section .projects-content { overflow: auto; max-height: 48vh; }
+.active-projects-section .projects-list { display: flex; flex-direction: column; gap: 12px; }
+.active-projects-section .project-card { padding: 12px 16px; border: 1px solid #eee; border-radius: 12px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.active-projects-section .project-title-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+/* No edge offset needed; card padding handles alignment */
+.active-projects-section .project-title { font-weight: 700; color: #35408e; font-size: 1.12rem; }
+.active-projects-section .project-block { margin-top: 8px; }
+.active-projects-section .project-meta-row { display: flex; flex-wrap: wrap; gap: 16px; font-size: 0.92rem; color: #333; }
+.active-projects-section .project-meta-row + .project-meta-row { margin-top: 6px; }
+.active-projects-section .project-status { margin-top: 8px; font-size: 0.92rem; color: #111; display: flex; align-items: center; gap: 12px; }
+.active-projects-section .project-status .view-details-btn { margin-left: auto; }
+/* keep button on the right in title line without affecting other buttons */
+.active-projects-section .project-title-line .view-details-btn { margin-left: auto; white-space: nowrap; }
+/* removed bottom-right action area (button is now on status line) */
 
 .no-projects {
     color: #666;
