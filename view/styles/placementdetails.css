@@ -287,6 +287,7 @@ body {
     padding: 20px;
     background: #ffffff;
     flex: 1;
+    min-height: 500px;
 }
 
 .content-split {
@@ -331,7 +332,7 @@ body {
     background: #35408e;
     color: #ffffff;
     padding: 12px 16px;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     margin: 0;
     border-radius: 8px;
@@ -403,8 +404,6 @@ body {
     border:2px solid #35408e;
     border-radius: 20px;
     overflow: hidden;
-    min-height: 500px;
-    height: 400px;
 }
 
 .students-table thead {
@@ -414,7 +413,7 @@ body {
 .students-table th {
     background: #35408e;
     color: #ffffff;
-    padding: 12px 16px;
+    padding: 8px 12px;
     text-align: center;
     font-weight: 600;
     font-size: 0.95rem;
@@ -427,15 +426,14 @@ body {
 }
 
 .students-table td {
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-right: 1px solid #35408e;
     border-bottom: 1px solid #35408e;
     font-size: 0.9rem;
     color: #333;
     font-weight: 600;
     text-align: center;
-    vertical-align: top;
-    height: auto;
+    vertical-align: middle;
 }
 
 .students-table td:last-child {
@@ -452,14 +450,15 @@ body {
 .student-form {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     margin-top: 16px;
 }
 
 .form-field {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 1px;
+    height: 45px;
 }
 
 .form-field label {

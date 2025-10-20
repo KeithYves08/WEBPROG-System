@@ -298,21 +298,10 @@ body {
     word-wrap: break-word;
 }
 
-.details-arrow-btn img {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #ffd41c;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(255, 212, 28, 0.3);
-}
+/* Details Arrow Button (consolidated) */
 .details-arrow-btn {
-    width: 36px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     background: #ffd41c;
     border: none;
@@ -320,24 +309,25 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     box-shadow: 0 2px 4px rgba(255, 212, 28, 0.3);
+    padding: 0;
 }
 
 .details-arrow-btn:hover {
     background: #ffcd00;
-    transform: scale(1.05);
+    transform: scale(1.06);
     box-shadow: 0 4px 8px rgba(255, 212, 28, 0.4);
 }
 
 .details-arrow-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
 }
+
 .arrow-icon {
-    font-size: 16px;
-    font-weight: bold;
-    color: #35408E;
-    line-height: 1;
+    width: 14px;
+    height: 14px;
+    display: block;
 }
 .main-white-container { position: relative; }
 
@@ -493,21 +483,4 @@ body {
     background-color: #dc3545;
 }
 
-/* Details Arrow Button Styles */
-.details-arrow-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 3px;
-    transition: background-color 0.2s;
-}
-
-.details-arrow-btn:hover {
-    background-color: #f8f9fa;
-}
-
-.arrow-icon {
-    width: 16px;
-    height: 16px;
-}
+/* Details Arrow Button Styles consolidated above */

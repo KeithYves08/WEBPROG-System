@@ -79,7 +79,7 @@ function field($arr, $key, $default = '') {
         <div class="header-inner">
             <h1 class="app-title">AILPO</h1>
             <div class="user-info">
-                <span>Welcome, <?php echo htmlspecialchars(is_array($user) ? (string)($user['username'] ?? 'User') : (string)($user ?? 'User')); ?>!</span>
+                <!-- <span>Welcome, <?php echo htmlspecialchars(is_array($user) ? (string)($user['username'] ?? 'User') : (string)($user ?? 'User')); ?>!</span> -->
                 <a href="../controller/logout.php" class="logout-btn">Logout</a>
             </div>
         </div>
@@ -213,9 +213,9 @@ function field($arr, $key, $default = '') {
                                         <button type="button" id="dt-kpi-add" class="btn btn-secondary">Add</button>
                                     </div>
 
-                                    <div style="margin-top:12px; text-align:right;">
+                                    <!-- <div style="margin-top:12px; text-align:right;">
                                         <button type="button" id="dt-save-btn" class="btn btn-primary">Save Changes</button>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </article>

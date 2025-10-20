@@ -98,7 +98,7 @@ if ($projectId > 0) {
                                     </div>
                                 </div>
                                 <div class="add-students-section">
-                                    <h4 class="add-students-title">Add New Student</h4>
+                                    <h4 class="add-students-title">Add Students to Project</h4>
                                 </div>
                                 <div class="student-form">
                                     <div class="form-field">
@@ -111,7 +111,7 @@ if ($projectId > 0) {
                                     </div>
                                     <div class="form-field">
                                         <label for="idNumber">ID Number:</label>
-                                        <input type="text" id="idNumber" name="id_number">
+                                        <input type="text" id="idNumber" name="school_id">
                                     </div>
                                     <div class="form-field">
                                         <label for="program">Program:</label>
@@ -127,7 +127,7 @@ if ($projectId > 0) {
                                 </div>
 
                                 <div class="students-table-container">
-                                    <table class="students-table">
+                                    <table class="students-table" id="studentsTable">
                                         <thead>
                                             <tr>
                                                 <th>First Name</th>
@@ -136,14 +136,7 @@ if ($projectId > 0) {
                                                 <th>Program</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>John</td>
-                                                <td>Smith</td>
-                                                <td>2021-1234</td>
-                                                <td>Computer Science</td>
-                                            </tr>                                           
-                                        </tbody>
+                                        <tbody id="studentsTbody"></tbody>
                                     </table>
                                 </div>
                             </div>
@@ -153,5 +146,76 @@ if ($projectId > 0) {
             </div>
         </main>
     </div>
+    <script>
+    (function(){
+        const projectId = <?php echo (int)$projectId; ?>;
+    const addBtn = document.querySelector('.add-student-btn');
+        const tbody = document.getElementById('studentsTbody');
+        const fn = document.getElementById('firstName');
+        const ln = document.getElementById('lastName');
+        const sid = document.getElementById('idNumber');
+        const prog = document.getElementById('program');
+
+        function renderRows(rows){
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (!rows || rows.length === 0){
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 4;
+                td.textContent = 'No students added yet.';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+            rows.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${(r.first_name||'')}</td><td>${(r.last_name||'')}</td><td>${(r.school_id||'')}</td><td>${(r.program||'')}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function loadStudents(){
+            if (!projectId) { renderRows([]); return; }
+            fetch(`../controller/studentsController.php?action=list&project_id=${encodeURIComponent(projectId)}`, { credentials: 'same-origin' })
+                .then(r=>r.json())
+                .then(d=>{ if (d?.status==='ok') renderRows(d.students||[]); else renderRows([]); })
+                .catch(()=> renderRows([]));
+        }
+        loadStudents();
+
+        addBtn?.addEventListener('click', ()=>{
+            const payload = {
+                action: 'add',
+                project_id: projectId,
+                first_name: (fn?.value||'').trim(),
+                last_name: (ln?.value||'').trim(),
+                school_id: (sid?.value||'').trim(),
+                program: (prog?.value||'').trim()
+            };
+            if (!payload.first_name || !payload.last_name || !payload.school_id || !payload.program){
+                alert('Please fill all student fields.');
+                return;
+            }
+            fetch('../controller/studentsController.php', {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body: JSON.stringify(payload),
+                credentials:'same-origin'
+            }).then(r=>r.json()).then(d=>{
+                if (d?.status==='ok'){
+                    // Clear inputs and reload table
+                    if (fn) fn.value = '';
+                    if (ln) ln.value = '';
+                    if (sid) sid.value = '';
+                    if (prog) prog.value = '';
+                    loadStudents();
+                } else {
+                    alert(d?.message || 'Failed to add student.');
+                }
+            }).catch(()=> alert('Failed to add student.'));
+        });
+    })();
+    </script>
 </body>
 </html>

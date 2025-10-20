@@ -64,6 +64,7 @@ require_once '../controller/config.php';
                     </div>
                 </div>
                  
+                <div class="placement-table-container">
                 <table class="placement-table">
                     <thead>
                         <tr>
@@ -112,6 +113,7 @@ require_once '../controller/config.php';
                         ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </main>
     </div>

@@ -307,13 +307,20 @@ body {
 .placement-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 16px;
+    margin-top: 0;
     background: #ffffff;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    flex: 1;
-    min-height: 400px;
+    flex: none;
+}
+
+.placement-table-container {
+    margin-top: 16px;
+    border-radius: 8px;
+    overflow: auto;
+    max-height: calc(100vh - 280px);
+    /* tweak 280px if header/controls height changes */
 }
 
 .placement-table thead {
@@ -321,7 +328,7 @@ body {
 }
 
 .placement-table th {
-    padding: 16px 20px;
+    padding: 10px 14px;
     text-align: center;
     font-weight: 600;
     font-size: 1rem;
@@ -343,12 +350,12 @@ body {
 }
 
 .placement-table td {
-    padding: 20px 20px 16px 20px;
+    padding: 8px 14px;
     border-right: 1px solid #35408e;
     font-size: 1rem;
     color: #333;
     text-align: center;
-    vertical-align: top;
+    vertical-align: middle;
     font-weight: 600;
 }
 
