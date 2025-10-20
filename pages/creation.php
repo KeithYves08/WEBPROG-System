@@ -144,7 +144,7 @@ $user = getUserInfo();
                     <span class="nav-icon icon-partnership"></span>
                     <span class="nav-label">Partnership Management</span>
                 </a>
-                <a class="nav-item" href="./placementManagement.php">
+                <a class="nav-item" href="./placementManage.php">
                     <span class="nav-icon icon-placement"></span>
                     <span class="nav-label">Placement Management</span>
                 </a>
@@ -498,8 +498,7 @@ $user = getUserInfo();
                         <div class="card-head"><h2>Deliverables and Tracking</h2></div>
                         <div class="card-accent"></div>
                         <div class="card-body">
-                            <form id="deliverablesTrackingForm" class="deliverables-form">                              
-                                                            
+                            <form id="deliverablesTrackingForm" class="deliverables-form">
                                 <div class="field">
                                     <label for="objectiveInput">Objectives</label>
                                     <div class="list-add-row">
@@ -531,9 +530,9 @@ $user = getUserInfo();
                                     <input type="text" id="customCompanyInput" placeholder="Enter company name">
                                 </div> -->
 
-                                <div>
-                                    <a href="./partnerCreation.php" id="newPartnershipBtn" class="pm-btn">Create Partnerships</a>
-                                </div>
+                                <!-- <div>
+                                    <a href="./partnerCreation.php" id="newPartnershipBtn" class="pm-btn" rel="noopener">Create Partnerships</a>
+                                </div> -->
 
                                 <input type="hidden" name="company_name" id="companyNameFinal">
                             </form>                        
@@ -608,7 +607,7 @@ $user = getUserInfo();
                     <div class="actions-right">
                         <div class="actions-buttons">
                             <a href="./dashboard.php" id="cancelBtn" class="btn btn-cancel">Cancel</a>
-                            <a href="#" id="submitAllBtn" class="btn btn-submit">Submit</a>
+                            <button type="button" id="submitAllBtn" class="btn btn-submit">Submit</button>
                         </div>
                         <div id="submitMessage" class="submit-message"></div>
                     </div>
@@ -651,16 +650,10 @@ $user = getUserInfo();
                             return items;
                         }
 
-                        // Before submit, sync deliverables hidden inputs from current UI state
+                        // Before submit, sync deliverables hidden inputs from current UI state (Objectives only)
                         function updateDeliverablesHidden(){
-                            const exp = collectListValues('expectedOutputsList', 'expectedOutputInput');
-                            const kpi = collectListValues('kpisList', 'kpiInput');
                             const obj = collectListValues('objectivesList', 'objectiveInput');
-                            const expH = document.getElementById('expectedOutputsHidden');
-                            const kpiH = document.getElementById('kpisHidden');
                             const objH = document.getElementById('objectivesHidden');
-                            if (expH) expH.value = JSON.stringify(exp);
-                            if (kpiH) kpiH.value = JSON.stringify(kpi);
                             if (objH) objH.value = JSON.stringify(obj);
                         }
 
@@ -686,10 +679,8 @@ $user = getUserInfo();
                                 private_sponsor: document.getElementById('privateSponsor')?.value.trim() || '',
                                 budget: document.getElementById('projectBudget')?.value || ''
                             };
-                            // Deliverables
+                            // Deliverables (Objectives only)
                             const deliverables = {
-                                expected_outputs: collectListValues('expectedOutputsList', 'expectedOutputInput'),
-                                kpis: collectListValues('kpisList', 'kpiInput'),
                                 objectives: collectListValues('objectivesList', 'objectiveInput')
                             };
                             // Industry partner selection (optional)
@@ -714,8 +705,13 @@ $user = getUserInfo();
                             return req.some(v => !v || (typeof v === 'string' && v.trim() === ''));
                         }
 
+                        // Prevent native form submissions (we submit via fetch)
+                        ['projectInfoForm','academeInfoForm','agreementResourcesForm','deliverablesTrackingForm','industryPartnerForm']
+                            .forEach(function(fid){ const f = document.getElementById(fid); if (f){ f.addEventListener('submit', function(ev){ ev.preventDefault(); }); }});
+
                         submitBtn.addEventListener('click', function(e){
                             e.preventDefault();
+                            e.stopPropagation();
                             // ensure deliverables hidden fields reflect current visible inputs/lists
                             updateDeliverablesHidden();
                             const payload = collectSectionValues();

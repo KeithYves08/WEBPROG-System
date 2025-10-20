@@ -100,6 +100,78 @@ try {
         exit;
     }
 
+    // Append a single expected output to deliverables for this project
+    if ($action === 'add_expected_output') {
+        $item = trim((string)($data['item'] ?? ''));
+        if ($item === '') { throw new Exception('Empty expected output'); }
+
+        // Find or create deliverables row
+        $stmt = $conn->prepare('SELECT deliverable_id FROM projects WHERE id = :id');
+        $stmt->execute([':id' => $projectId]);
+        $deliverableId = (int)($stmt->fetchColumn() ?: 0);
+
+        if ($deliverableId > 0) {
+            // Append to existing expected_outputs
+            $stmt = $conn->prepare('SELECT expected_outputs FROM deliverables WHERE id = :did');
+            $stmt->execute([':did' => $deliverableId]);
+            $existing = (string)($stmt->fetchColumn() ?? '');
+            $newText = $existing !== '' ? ($existing . "\n" . $item) : $item;
+            $stmt = $conn->prepare('UPDATE deliverables SET expected_outputs = :exp WHERE id = :did');
+            $stmt->execute([':exp' => $newText, ':did' => $deliverableId]);
+        } else {
+            // Create new row
+            $stmt = $conn->prepare('INSERT INTO deliverables (expected_outputs, kpi_success_metrics, objectives) VALUES (:exp, :kpi, :obj)');
+            $stmt->execute([':exp' => $item, ':kpi' => '', ':obj' => '']);
+            $deliverableId = (int)$conn->lastInsertId();
+            $stmt = $conn->prepare('UPDATE projects SET deliverable_id = :did WHERE id = :pid');
+            $stmt->execute([':did' => $deliverableId, ':pid' => $projectId]);
+        }
+
+        // Return the updated list split by lines
+        $stmt = $conn->prepare('SELECT expected_outputs FROM deliverables WHERE id = :did');
+        $stmt->execute([':did' => $deliverableId]);
+        $text = (string)($stmt->fetchColumn() ?? '');
+        $list = array_values(array_filter(array_map(function($s){ return trim($s); }, preg_split('/\r?\n+/', $text)), function($s){ return $s !== ''; }));
+        echo json_encode(['status' => 'ok', 'deliverable_id' => $deliverableId, 'expected_outputs' => $list]);
+        exit;
+    }
+
+    // Append a single KPI/success metric to deliverables for this project
+    if ($action === 'add_kpi') {
+        $item = trim((string)($data['item'] ?? ''));
+        if ($item === '') { throw new Exception('Empty KPI'); }
+
+        // Find or create deliverables row
+        $stmt = $conn->prepare('SELECT deliverable_id FROM projects WHERE id = :id');
+        $stmt->execute([':id' => $projectId]);
+        $deliverableId = (int)($stmt->fetchColumn() ?: 0);
+
+        if ($deliverableId > 0) {
+            // Append to existing kpi_success_metrics
+            $stmt = $conn->prepare('SELECT kpi_success_metrics FROM deliverables WHERE id = :did');
+            $stmt->execute([':did' => $deliverableId]);
+            $existing = (string)($stmt->fetchColumn() ?? '');
+            $newText = $existing !== '' ? ($existing . "\n" . $item) : $item;
+            $stmt = $conn->prepare('UPDATE deliverables SET kpi_success_metrics = :kpi WHERE id = :did');
+            $stmt->execute([':kpi' => $newText, ':did' => $deliverableId]);
+        } else {
+            // Create new row
+            $stmt = $conn->prepare('INSERT INTO deliverables (expected_outputs, kpi_success_metrics, objectives) VALUES (:exp, :kpi, :obj)');
+            $stmt->execute([':exp' => '', ':kpi' => $item, ':obj' => '']);
+            $deliverableId = (int)$conn->lastInsertId();
+            $stmt = $conn->prepare('UPDATE projects SET deliverable_id = :did WHERE id = :pid');
+            $stmt->execute([':did' => $deliverableId, ':pid' => $projectId]);
+        }
+
+        // Return updated list
+        $stmt = $conn->prepare('SELECT kpi_success_metrics FROM deliverables WHERE id = :did');
+        $stmt->execute([':did' => $deliverableId]);
+        $text = (string)($stmt->fetchColumn() ?? '');
+        $list = array_values(array_filter(array_map(function($s){ return trim($s); }, preg_split('/\r?\n+/', $text)), function($s){ return $s !== ''; }));
+        echo json_encode(['status' => 'ok', 'deliverable_id' => $deliverableId, 'kpi_success_metrics' => $list]);
+        exit;
+    }
+
     throw new Exception('Unknown action');
 } catch (Exception $e) {
     http_response_code(400);

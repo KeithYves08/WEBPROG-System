@@ -44,7 +44,7 @@ require_once '../controller/partnershipManager.php';
                     <span class="nav-icon icon-partnership"></span>
                     <span class="nav-label">Partnership Management</span>
                 </a>
-                <a class="nav-item" href="#">
+                <a class="nav-item" href="./placementManage.php">
                     <span class="nav-icon icon-placement"></span>
                     <span class="nav-label">Placement Management</span>
                 </a>

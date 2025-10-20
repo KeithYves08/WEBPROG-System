@@ -105,7 +105,7 @@ function field($arr, $key, $default = '') {
                     <span class="nav-icon icon-partnership"></span>
                     <span class="nav-label">Partnership Management</span>
                 </a>
-                <a class="nav-item" href="./placementManagement.php">
+                <a class="nav-item" href="./placementManage.php">
                     <span class="nav-icon icon-placement"></span>
                     <span class="nav-label">Placement Management</span>
                 </a>
@@ -258,17 +258,54 @@ function field($arr, $key, $default = '') {
     const expUl = document.getElementById('dt-expected-list');
     const expIn = document.getElementById('dt-expected-input');
     const expAdd = document.getElementById('dt-expected-add');
-    expAdd?.addEventListener('click', ()=>{ const v = (expIn?.value||'').trim(); if (v){ addListItem(expUl, v); expIn.value=''; }});
+    expAdd?.addEventListener('click', ()=>{
+        const v = (expIn?.value||'').trim();
+        if (!v) return;
+        // Post to backend to persist and then refresh list from response
+        fetch('../controller/updateProjectDetails.php', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({ action: 'add_expected_output', project_id: projectId, item: v }),
+            credentials: 'same-origin'
+        }).then(r=>r.json()).then(d=>{
+            if (d?.status === 'ok' && Array.isArray(d.expected_outputs)){
+                // Re-render list from server truth
+                expUl.innerHTML = '';
+                d.expected_outputs.forEach(t => addListItem(expUl, t));
+                if (expIn) expIn.value = '';
+            } else {
+                alert('Failed to add expected output.');
+            }
+        }).catch(()=> alert('Failed to add expected output.'));
+    });
 
     const kpiUl = document.getElementById('dt-kpi-list');
     const kpiIn = document.getElementById('dt-kpi-input');
     const kpiAdd = document.getElementById('dt-kpi-add');
-    kpiAdd?.addEventListener('click', ()=>{ const v = (kpiIn?.value||'').trim(); if (v){ addListItem(kpiUl, v); kpiIn.value=''; }});
+    kpiAdd?.addEventListener('click', ()=>{
+        const v = (kpiIn?.value||'').trim();
+        if (!v) return;
+        fetch('../controller/updateProjectDetails.php', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({ action: 'add_kpi', project_id: projectId, item: v }),
+            credentials: 'same-origin'
+        }).then(r=>r.json()).then(d=>{
+            if (d?.status === 'ok' && Array.isArray(d.kpi_success_metrics)){
+                kpiUl.innerHTML = '';
+                d.kpi_success_metrics.forEach(t => addListItem(kpiUl, t));
+                if (kpiIn) kpiIn.value = '';
+            } else {
+                alert('Failed to add KPI.');
+            }
+        }).catch(()=> alert('Failed to add KPI.'));
+    });
 
     function collectList(ul){
         return Array.from(ul?.querySelectorAll('li')||[]).map(li=>li.textContent.trim()).filter(Boolean);
     }
 
+    // Optional bulk save button kept but now reads current list and persists via save_deliverables
     document.getElementById('dt-save-btn')?.addEventListener('click', ()=>{
         const payload = {
             action: 'save_deliverables',
