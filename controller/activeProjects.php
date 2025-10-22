@@ -3,19 +3,31 @@ require_once __DIR__ . '/config.php';
 header('Content-Type: application/json');
 
 try {
-    $today = date('Y-m-d');
+    // Window parameter: '30','60','90','all' (default '30')
+    $window = isset($_GET['window']) ? strtolower(trim((string)$_GET['window'])) : '30';
+    $allowed = ['30','60','90','all'];
+    if (!in_array($window, $allowed, true)) { $window = '30'; }
+
+    $ongoingCond = "(p.end_date IS NULL OR DATE(p.end_date) >= CURDATE()) AND (p.start_date IS NULL OR DATE(p.start_date) <= CURDATE())";
+    if ($window === 'all') {
+        $futureCond = "p.start_date IS NOT NULL AND DATE(p.start_date) > CURDATE()";
+    } else {
+        $days = (int)$window; // 30, 60 or 90
+        $futureCond = "p.start_date IS NOT NULL AND DATE(p.start_date) > CURDATE() AND DATE(p.start_date) <= DATE_ADD(CURDATE(), INTERVAL $days DAY)";
+    }
+
     $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
             FROM projects p
             LEFT JOIN companies c ON c.id = p.industry_partner_id
             WHERE (
-                (p.end_date IS NULL OR p.end_date >= :today) AND (p.start_date IS NULL OR p.start_date <= :today)
+                $ongoingCond
             )
             OR (
-                p.start_date IS NOT NULL AND p.start_date > :today AND p.start_date <= DATE_ADD(:today, INTERVAL 30 DAY)
+                $futureCond
             )
             ORDER BY p.created_at DESC";
     $stmt = $conn->prepare($sql);
-    $stmt->execute([':today' => $today]);
+    $stmt->execute();
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     $projects = array_map(function($proj) {
@@ -26,12 +38,15 @@ try {
         $ed = $proj['end_date'] ?? null;
         $todayStr = date('Y-m-d');
         $status = 'Ongoing';
-        if (!empty($sd) && $sd > $todayStr) {
+        // Normalize to date-only for comparisons to avoid time-of-day issues
+        $sdDate = !empty($sd) ? date('Y-m-d', strtotime($sd)) : null;
+        $edDate = !empty($ed) ? date('Y-m-d', strtotime($ed)) : null;
+        if (!empty($sdDate) && $sdDate > $todayStr) {
             // Upcoming within 30 days, differentiate starting soon (<=7 days)
-            $days = (int)floor((strtotime($sd) - strtotime($todayStr)) / 86400);
+            $days = (int)floor((strtotime($sdDate) - strtotime($todayStr)) / 86400);
             $status = ($days <= 7 ? 'Starting Soon' : 'Upcoming');
-        } else if (!empty($ed)) {
-            $status = ($ed === $todayStr) ? 'Ending Today' : 'Ongoing';
+        } else if (!empty($edDate)) {
+            $status = ($edDate === $todayStr) ? 'Ending Today' : 'Ongoing';
         }
         return [
             'id' => $id,

@@ -311,6 +311,41 @@ body {
     margin-bottom: 10px;
 }
 
+/* Align label and filter nicely in the pill header */
+.active-projects-section .active-proj-label { justify-content: space-between; padding-right: 12px; }
+
+/* Active Projects filter dropdown styles */
+.ap-filter { display: flex; align-items: center; gap: 8px; }
+.ap-filter label { color: #fff; font-weight: 600; opacity: .95; }
+.ap-select-wrap { position: relative; display: inline-flex; align-items: center; }
+.ap-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: #ffd41c;
+    color: #35408e;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 28px 6px 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    cursor: pointer;
+}
+.ap-select:focus { outline: 2px solid rgba(255, 212, 28, 0.65); outline-offset: 2px; }
+.ap-select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #35408e;
+    pointer-events: none;
+}
+
 .projects-content {
     border: 1px solid #E0E0E0;
     background: white;

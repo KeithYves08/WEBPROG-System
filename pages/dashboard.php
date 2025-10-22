@@ -142,20 +142,33 @@ try {
                     <div class="content-layout">
                         <div class="left-section">
                             <div class="active-projects-section">
-                                <div class="active-proj-label">Active Projects</div>
+                                <div class="active-proj-label">
+                                    <span>All Projects</span>
+                                    <div class="ap-filter">
+                                        <label for="ap-window">Show:</label>
+                                        <div class="ap-select-wrap">
+                                            <select id="ap-window" class="ap-select">
+                                                <option value="30" selected>Next 30 days</option>
+                                                <option value="60">Next 60 days</option>
+                                                <option value="90">Next 90 days</option>
+                                                <option value="all">All upcoming</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="projects-content">
                                     <div id="active-projects-container">
                                     <?php
                                         try {
-                                            $today = date('Y-m-d');
-                                                                                        $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
-                                                                                                                                                    FROM projects p
-                                                                                                                                                    LEFT JOIN companies c ON c.id = p.industry_partner_id
-                                                                                                                                                    WHERE ((p.end_date IS NULL OR p.end_date >= :today) AND (p.start_date IS NULL OR p.start_date <= :today))
-                                                                                                                                                       OR (p.start_date IS NOT NULL AND p.start_date > :today AND p.start_date <= DATE_ADD(:today, INTERVAL 30 DAY))
-                                                                                                                                                    ORDER BY p.created_at DESC";
-                                            $stmt = $conn->prepare($sql);
-                                            $stmt->execute([':today' => $today]);
+                                                                             // Default initial view: next 30 days window
+                                                                             $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
+                                                                                            FROM projects p
+                                                                                            LEFT JOIN companies c ON c.id = p.industry_partner_id
+                                                                                            WHERE ((p.end_date IS NULL OR DATE(p.end_date) >= CURDATE()) AND (p.start_date IS NULL OR DATE(p.start_date) <= CURDATE()))
+                                                                                                OR (p.start_date IS NOT NULL AND DATE(p.start_date) > CURDATE() AND DATE(p.start_date) <= DATE_ADD(CURDATE(), INTERVAL 30 DAY))
+                                                                                            ORDER BY p.created_at DESC";
+                                                          $stmt = $conn->prepare($sql);
+                                                          $stmt->execute();
                                             $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                                             if ($projects && count($projects) > 0) {
@@ -169,11 +182,15 @@ try {
                                                     // Status determination for active list
                                                     $todayStr = date('Y-m-d');
                                                     $status = 'Ongoing';
-                                                    if (!empty($proj['start_date']) && $proj['start_date'] > $todayStr) {
-                                                        $days = (int)floor((strtotime($proj['start_date']) - strtotime($todayStr)) / 86400);
+                                                    $sdRaw = $proj['start_date'] ?? null;
+                                                    $edRaw = $proj['end_date'] ?? null;
+                                                    $sdDate = !empty($sdRaw) ? date('Y-m-d', strtotime($sdRaw)) : null;
+                                                    $edDate = !empty($edRaw) ? date('Y-m-d', strtotime($edRaw)) : null;
+                                                    if (!empty($sdDate) && $sdDate > $todayStr) {
+                                                        $days = (int)floor((strtotime($sdDate) - strtotime($todayStr)) / 86400);
                                                         $status = ($days <= 7 ? 'Starting Soon' : 'Upcoming');
-                                                    } elseif (!empty($proj['end_date'])) {
-                                                        $status = ($proj['end_date'] === $todayStr) ? 'Ending Today' : 'Ongoing';
+                                                    } elseif (!empty($edDate)) {
+                                                        $status = ($edDate === $todayStr) ? 'Ending Today' : 'Ongoing';
                                                     }
 
                                                     echo '<div class="project-card">';
@@ -189,7 +206,9 @@ try {
                                                     echo '      <span class="project-deadline"><strong>Deadline:</strong> ' . $ed . '</span>';
                                                     echo '    </div>';
                                                     echo '    <div class="project-status">';
-                                                    echo '      <span><strong>Status:</strong> ' . htmlspecialchars($status) . '</span>';
+                                                    $sdAttr = htmlspecialchars($proj['start_date'] ?? '', ENT_QUOTES);
+                                                    $edAttr = htmlspecialchars($proj['end_date'] ?? '', ENT_QUOTES);
+                                                    echo '      <span><strong>Status:</strong> <span class="project-status-text" data-start="' . $sdAttr . '" data-end="' . $edAttr . '">' . htmlspecialchars($status) . '</span></span>';
                                                     echo '      <button class="view-details-btn" type="button" onclick="location.href=\'created.php?id=' . $pid . '\'">View Details</button>';
                                                     echo '    </div>';
                                                     echo '  </div>';
@@ -283,7 +302,25 @@ try {
             const partner = esc(p.company_name || '—');
             const sd = fmtDate(p.start_date);
             const ed = fmtDate(p.end_date);
-            const status = esc(p.status || 'Ongoing');
+            // Compute status client-side from dates to keep it live
+            const today = new Date();
+            function toYMD(d){
+                const mm = String(d.getMonth()+1).padStart(2,'0');
+                const dd = String(d.getDate()).padStart(2,'0');
+                return `${d.getFullYear()}-${mm}-${dd}`;
+            }
+            const todayYMD = toYMD(today);
+            function parseYMD(s){ if(!s) return null; const d = new Date(s); return isNaN(d) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+            const sdDate = parseYMD(p.start_date);
+            const edDate = parseYMD(p.end_date);
+            let status = 'Ongoing';
+            if (sdDate && toYMD(sdDate) > todayYMD){
+                const diff = Math.floor((sdDate - new Date(today.getFullYear(), today.getMonth(), today.getDate()))/86400000);
+                status = (diff <= 7 ? 'Starting Soon' : 'Upcoming');
+            } else if (edDate) {
+                status = (toYMD(edDate) === todayYMD) ? 'Ending Today' : 'Ongoing';
+            }
+            const statusEsc = esc(status);
             html.push(
                 '<div class="project-card">' +
                     '<div class="project-title-line">' +
@@ -298,7 +335,7 @@ try {
                             '<span class="project-deadline"><strong>Deadline:</strong> ' + ed + '</span>' +
                         '</div>' +
                         '<div class="project-status">' +
-                            '<span><strong>Status:</strong> ' + status + '</span>' +
+                            '<span><strong>Status:</strong> <span class="project-status-text" data-start="' + esc(p.start_date||'') + '" data-end="' + esc(p.end_date||'') + '">' + statusEsc + '</span></span>' +
                             '<button class="view-details-btn" type="button" onclick="location.href=\'created.php?id=' + pid + '\'">View Details</button>' +
                         '</div>' +
                     '</div>' +
@@ -307,6 +344,8 @@ try {
         });
         html.push('</div>');
         container.innerHTML = html.join('');
+        // Immediately refresh status text in case of any clock edge cases
+        try { updateStatuses(); } catch(e){}
     }
 
     let inflight = false;
@@ -314,7 +353,10 @@ try {
         if (inflight) return; // avoid overlaps
         inflight = true;
         try {
-            const resp = await fetch('../controller/activeProjects.php', { credentials: 'same-origin' });
+            const sel = document.getElementById('ap-window');
+            const win = sel ? sel.value : '30';
+            try { localStorage.setItem('ap-window', win); } catch(e){}
+            const resp = await fetch('../controller/activeProjects.php?window=' + encodeURIComponent(win), { credentials: 'same-origin' });
             if (!resp.ok) throw new Error('Network');
             const data = await resp.json();
             if (data && data.status === 'ok') {
@@ -327,9 +369,48 @@ try {
         }
     }
 
+    // Helper to update all status texts from data attributes without refetch
+    function updateStatuses(){
+        const today = new Date();
+        function toYMD(d){
+            const mm = String(d.getMonth()+1).padStart(2,'0');
+            const dd = String(d.getDate()).padStart(2,'0');
+            return `${d.getFullYear()}-${mm}-${dd}`;
+        }
+        const todayYMD = toYMD(today);
+        function parseYMD(s){ if(!s) return null; const d = new Date(s); return isNaN(d) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+        document.querySelectorAll('.project-status-text').forEach(function(el){
+            const sdDate = parseYMD(el.getAttribute('data-start'));
+            const edDate = parseYMD(el.getAttribute('data-end'));
+            let status = 'Ongoing';
+            if (sdDate && toYMD(sdDate) > todayYMD){
+                const diff = Math.floor((sdDate - new Date(today.getFullYear(), today.getMonth(), today.getDate()))/86400000);
+                status = (diff <= 7 ? 'Starting Soon' : 'Upcoming');
+            } else if (edDate) {
+                status = (toYMD(edDate) === todayYMD) ? 'Ending Today' : 'Ongoing';
+            }
+            el.textContent = status;
+        });
+    }
+
+    // Restore saved window selection if present
+    (function(){
+        const sel = document.getElementById('ap-window');
+        if (!sel) return;
+        try {
+            const saved = localStorage.getItem('ap-window');
+            if (saved && Array.from(sel.options).some(o => o.value === saved)) {
+                sel.value = saved;
+            }
+        } catch(e){}
+        sel.addEventListener('change', function(){ refresh(); });
+    })();
+
     // Initial and periodic refresh
     refresh();
     setInterval(refresh, 15000); // 15s polling
+    // Also recalc statuses locally every minute to keep labels live
+    setInterval(function(){ try{ updateStatuses(); } catch(e){} }, 60000);
 })();
 </script>
 <script>

@@ -75,18 +75,17 @@ require_once '../controller/config.php';
                             <th>Details</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="placement-table-body">
                         <?php
-                        try {
-                            $today = date('Y-m-d');
-                            $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
-                                    FROM projects p
-                                    LEFT JOIN companies c ON c.id = p.industry_partner_id
-                                    WHERE (p.end_date IS NULL OR p.end_date >= :today)
-                                      AND (p.start_date IS NULL OR p.start_date <= :today)
-                                    ORDER BY p.created_at DESC";
-                            $stmt = $conn->prepare($sql);
-                            $stmt->execute([':today' => $today]);
+                                                try {
+                                                        $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
+                                                                        FROM projects p
+                                                                        LEFT JOIN companies c ON c.id = p.industry_partner_id
+                                                                        WHERE (p.end_date IS NULL OR DATE(p.end_date) >= CURDATE())
+                                                                            AND (p.start_date IS NULL OR DATE(p.start_date) <= CURDATE())
+                                                                        ORDER BY p.created_at DESC";
+                                                        $stmt = $conn->prepare($sql);
+                                                        $stmt->execute();
                             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
                             if (count($rows) === 0) {
@@ -117,5 +116,77 @@ require_once '../controller/config.php';
             </div>
         </main>
     </div>
+    <script>
+// Live refresh Placement Management table
+(function(){
+    const tbody = document.getElementById('placement-table-body');
+    if (!tbody) return;
+
+    function esc(s){
+        return String(s == null ? '' : s)
+            .replace(/&/g,'&amp;')
+            .replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;')
+            .replace(/'/g,'&#039;');
+    }
+    function fmtDate(iso){
+        if (!iso) return '—';
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return '—';
+        const mm = String(d.getMonth()+1).padStart(2,'0');
+        const dd = String(d.getDate()).padStart(2,'0');
+        const yyyy = d.getFullYear();
+        return `${mm}/${dd}/${yyyy}`;
+    }
+
+    function render(rows){
+        if (!rows || rows.length === 0){
+            tbody.innerHTML = '<tr><td colspan="5">No active projects.</td></tr>';
+            return;
+        }
+        const html = [];
+        rows.forEach(r => {
+            const pid = Number(r.id || 0) || 0;
+            const title = esc(r.title || 'Untitled Project');
+            const partner = esc(r.company_name || '—');
+            const sd = fmtDate(r.start_date);
+            const ed = fmtDate(r.end_date);
+            html.push(
+                '<tr>'+
+                    '<td>'+title+'</td>'+
+                    '<td>'+partner+'</td>'+
+                    '<td>'+sd+'</td>'+
+                    '<td>'+ed+'</td>'+
+                    '<td><a class="details-btn" href="./placementdetails.php?id='+pid+'"><img src="../view/assets/right-arrow.png" alt="Details"></a></td>'+
+                '</tr>'
+            );
+        });
+        tbody.innerHTML = html.join('');
+    }
+
+    let inflight = false;
+    async function refresh(){
+        if (inflight) return;
+        inflight = true;
+        try {
+            const resp = await fetch('../controller/placementProjects.php?ts=' + Date.now(), { credentials: 'same-origin', cache: 'no-store' });
+            if (!resp.ok) throw new Error('Network');
+            const data = await resp.json();
+            if (data && data.status === 'ok') {
+                render(Array.isArray(data.projects) ? data.projects : []);
+            }
+        } catch(e) {
+            // keep existing rows
+        } finally {
+            inflight = false;
+        }
+    }
+
+    // Initial and periodic refresh
+    refresh();
+    setInterval(refresh, 15000);
+})();
+    </script>
 </body>
 </html>
