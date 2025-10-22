@@ -143,6 +143,7 @@ try {
                             <div class="active-projects-section">
                                 <div class="active-proj-label">Active Projects</div>
                                 <div class="projects-content">
+                                    <div id="active-projects-container">
                                     <?php
                                         try {
                                             $today = date('Y-m-d');
@@ -157,7 +158,7 @@ try {
                                             $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                                             if ($projects && count($projects) > 0) {
-                                                echo '<div class="projects-list">';
+                                                echo '<div class="projects-list" id="active-projects-list">';
                                                 foreach ($projects as $proj) {
                                                     $title = htmlspecialchars($proj['title'] ?? 'Untitled Project');
                                                     $pid = (int)($proj['id'] ?? 0);
@@ -198,6 +199,7 @@ try {
                                             echo '<div class="no-projects">Unable to load projects.</div>';
                                         }
                                     ?>
+                                    </div>
                                 </div>
                             </div>
                             <!-- <div class="view-all-container">
@@ -223,7 +225,7 @@ try {
 
                                 <div class="action-buttons">
                                     <button class="view-calendar-btn">VIEW CALENDAR</button>
-                                    <button class="add-project-btn">+ ADD PROJECT</button>
+                                    <button class="add-project-btn" onclick="location.href='./creation.php'">+ ADD PROJECT</button>
                                 </div>
                             </div>
                         </div>
@@ -233,4 +235,90 @@ try {
         </main>
     </div>
 </body>
+<script>
+// Auto-refresh Active Projects list via polling
+(function(){
+    const container = document.getElementById('active-projects-container');
+    if (!container) return;
+
+    function esc(s){
+        return String(s == null ? '' : s)
+            .replace(/&/g,'&amp;')
+            .replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;')
+            .replace(/'/g,'&#039;');
+    }
+
+    function fmtDate(iso){
+        if (!iso) return '—';
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return '—';
+        const mm = String(d.getMonth()+1).padStart(2,'0');
+        const dd = String(d.getDate()).padStart(2,'0');
+        const yyyy = d.getFullYear();
+        return `${mm}/${dd}/${yyyy}`;
+    }
+
+    function render(projects){
+        if (!projects || projects.length === 0){
+            container.innerHTML = '<div class="no-projects">No active projects.</div>';
+            return;
+        }
+        const html = ['<div class="projects-list" id="active-projects-list">'];
+        projects.forEach(p => {
+            const title = esc(p.title || 'Untitled Project');
+            const pid = Number(p.id || 0) || 0;
+            const partner = esc(p.company_name || '—');
+            const sd = fmtDate(p.start_date);
+            const ed = fmtDate(p.end_date);
+            const status = esc(p.status || 'Ongoing');
+            html.push(
+                '<div class="project-card">' +
+                    '<div class="project-title-line">' +
+                        '<span class="project-title">' + title + '</span>' +
+                    '</div>' +
+                    '<div class="project-block">' +
+                        '<div class="project-meta-row">' +
+                            '<span class="project-partner"><strong>Partner:</strong> ' + partner + '</span>' +
+                        '</div>' +
+                        '<div class="project-meta-row">' +
+                            '<span class="project-placement"><strong>Placement:</strong> ' + sd + '</span>' +
+                            '<span class="project-deadline"><strong>Deadline:</strong> ' + ed + '</span>' +
+                        '</div>' +
+                        '<div class="project-status">' +
+                            '<span><strong>Status:</strong> ' + status + '</span>' +
+                            '<button class="view-details-btn" type="button" onclick="location.href=\'created.php?id=' + pid + '\'">View Details</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>'
+            );
+        });
+        html.push('</div>');
+        container.innerHTML = html.join('');
+    }
+
+    let inflight = false;
+    async function refresh(){
+        if (inflight) return; // avoid overlaps
+        inflight = true;
+        try {
+            const resp = await fetch('../controller/activeProjects.php', { credentials: 'same-origin' });
+            if (!resp.ok) throw new Error('Network');
+            const data = await resp.json();
+            if (data && data.status === 'ok') {
+                render(Array.isArray(data.projects) ? data.projects : []);
+            }
+        } catch(e) {
+            // silent fail; keep current render
+        } finally {
+            inflight = false;
+        }
+    }
+
+    // Initial and periodic refresh
+    refresh();
+    setInterval(refresh, 15000); // 15s polling
+})();
+</script>
 </html>

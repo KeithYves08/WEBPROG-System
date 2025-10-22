@@ -118,7 +118,6 @@ $user = getUserInfo();
         <div class="header-inner">
             <h1 class="app-title">AILPO</h1>
             <div class="user-info">
-                <span>Welcome, <?php echo htmlspecialchars($user['username']); ?>!</span>
                 <a href="../controller/logout.php" class="logout-btn">Logout</a>
             </div>
         </div>

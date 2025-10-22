@@ -51,7 +51,50 @@ if (isset($data['industry_partner_id']) && is_numeric($data['industry_partner_id
 	$industryPartnerId = (int)$data['industry_partner_id'];
 }
 
+// Server-side sanity check for date range
 try {
+	$sd = new DateTime($project['start_date']);
+	$ed = new DateTime($project['end_date']);
+	if ($ed <= $sd) {
+		http_response_code(400);
+		echo json_encode(['status' => 'error', 'message' => 'End date must be after start date']);
+		exit;
+	}
+} catch (Throwable $e) {
+	http_response_code(400);
+	echo json_encode(['status' => 'error', 'message' => 'Invalid date format']);
+	exit;
+}
+
+// Ensure core tables exist (non-destructive; uses IF NOT EXISTS)
+function ensureCoreTables(PDO $conn) {
+	$ddl = [];
+	$ddl[] = "CREATE TABLE IF NOT EXISTS agreements (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        funding_source VARCHAR(100),\n        budget_amount DECIMAL(12,2),\n        document_path VARCHAR(255),\n        contract_type VARCHAR(50)\n    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+	$ddl[] = "CREATE TABLE IF NOT EXISTS academe_information (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        department_program VARCHAR(255),\n        faculty_coordinator VARCHAR(100),\n        contact_number VARCHAR(50),\n        email_academe VARCHAR(100),\n        students_involved INT,\n        unit_attach_document VARCHAR(255)\n    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+	$ddl[] = "CREATE TABLE IF NOT EXISTS deliverables (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        expected_outputs TEXT,\n        kpi_success_metrics TEXT,\n        objectives TEXT\n    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+	$ddl[] = "CREATE TABLE IF NOT EXISTS projects (\n        id INT AUTO_INCREMENT PRIMARY KEY,\n        title VARCHAR(255) NOT NULL,\n        description TEXT,\n        project_type VARCHAR(50),\n        start_date DATE,\n        end_date DATE,\n        agreement_id INT,\n        academe_id INT,\n        industry_partner_id INT,\n        deliverable_id INT,\n        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n        FOREIGN KEY (agreement_id) REFERENCES agreements(id),\n        FOREIGN KEY (academe_id) REFERENCES academe_information(id),\n        FOREIGN KEY (industry_partner_id) REFERENCES companies(id),\n        FOREIGN KEY (deliverable_id) REFERENCES deliverables(id)\n    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+	foreach ($ddl as $sql) {
+		$conn->exec($sql);
+	}
+}
+
+try {
+	// Ensure tables exist so inserts won't fail on missing schema
+	ensureCoreTables($conn);
+
+	// Upgrade schema non-destructively if older table is missing expected columns
+	$ensureAcademeColumns = function(PDO $conn) {
+		$cols = [];
+		$stmt = $conn->query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'academe_information'");
+		foreach ($stmt->fetchAll(PDO::FETCH_COLUMN, 0) as $c) { $cols[$c] = true; }
+		if (!isset($cols['students_involved'])) {
+			$conn->exec("ALTER TABLE academe_information ADD COLUMN students_involved INT NULL");
+		}
+		if (!isset($cols['unit_attach_document'])) {
+			$conn->exec("ALTER TABLE academe_information ADD COLUMN unit_attach_document VARCHAR(255) NULL");
+		}
+	};
+	$ensureAcademeColumns($conn);
 	$conn->beginTransaction();
 
 	// Insert into agreements
@@ -103,7 +146,7 @@ try {
 		':ed' => $project['end_date'],
 		':aid' => $agreementId,
 		':acad' => $academeId,
-		':ip' => $industryPartnerId,
+		':ip' => ($industryPartnerId !== null ? $industryPartnerId : null),
 		':deliv' => $deliverableId,
 	]);
 	$projectId = (int)$conn->lastInsertId();
@@ -114,7 +157,8 @@ try {
 } catch (Throwable $e) {
 	if ($conn->inTransaction()) { $conn->rollBack(); }
 	error_log('submitProject failed: ' . $e->getMessage());
+	// Surface the underlying message to aid troubleshooting in this environment
 	http_response_code(500);
-	echo json_encode(['status' => 'error', 'message' => 'Server error while creating project']);
+	echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
 ?>

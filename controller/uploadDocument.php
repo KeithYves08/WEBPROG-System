@@ -40,13 +40,9 @@ if ($action === 'clear_all') {
 
 // Finalize uploads: move files from session folder to a permanent project folder
 if ($action === 'finalize') {
-	$projectId = isset($_POST['project_id']) ? preg_replace('/[^0-9]/', '', (string)$_POST['project_id']) : '';
+	// Save finalized files directly under controller/{target}
+	// as requested, not in a per-project subfolder; filenames are uniqued to avoid collisions
 	$destDir = $base . DIRECTORY_SEPARATOR . $target;
-	if ($projectId !== '') {
-		$destDir .= DIRECTORY_SEPARATOR . 'project_' . $projectId;
-	} else {
-		$destDir .= DIRECTORY_SEPARATOR . 'final_' . date('Ymd_His') . '_' . substr($sessionId, 0, 6);
-	}
 	if (!ensure_dir($destDir)) {
 		response(['status' => 'error', 'message' => 'Unable to create destination']);
 	}
