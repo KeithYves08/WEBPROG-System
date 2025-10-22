@@ -310,17 +310,26 @@ body {
     flex: 1;
     border-radius: 12px;
     display: flex;
-    padding-top: 1em;
-    justify-content: center;
+    flex-direction: column; /* stack title and list vertically */
+    align-items: flex-start; /* left align content */
+    padding: 14px 16px;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: white;
-    text-align: center;
+    text-align: left;
 }
 
 .partnership-box span {
     height: fit-content;
 }
+
+/* bullet list spacing inside partnership boxes */
+.partnership-box ul {
+    margin: 8px 0 0 0;
+    padding-left: 18px;
+    list-style: disc;
+}
+.partnership-box li { line-height: 1.4; }
 
 
 .thriving-box {

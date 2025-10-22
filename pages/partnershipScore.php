@@ -64,9 +64,17 @@
                     <div class="dashboard-row top-section">
                         <div class="card engagement-card">
                             <h3>Engagement</h3>
+                            <div id="engagement-content" style="padding:8px 6px; font-size:.95rem; color:#333;">
+                                <div>Pick a company to see engagement.</div>
+                            </div>
                         </div>
                         <div class="card score-card">
                             <h3>Score</h3>
+                            <div id="score-content" style="padding:10px; text-align:center;">
+                                <div style="font-size:2.2rem; font-weight:800; color:#35408e;" id="score-number">--</div>
+                                <div id="score-change" style="margin-top:6px; color:#555; font-weight:600;">Current vs previous: --</div>
+                                <div id="score-status" style="margin-top:4px; font-weight:700;">Status: --</div>
+                            </div>
                         </div>
                         <div class="filters-feedback-container">
                             <div class="card filters-card">
@@ -103,14 +111,17 @@
                                         <th>Status</th>
                                     </tr>
                                 </thead>
+                                <tbody id="comparison-body"></tbody>
                             </table>
                         </div>
                         <div class="partnership-boxes">
                             <div class="partnership-box thriving-box">
                                 <span>Thriving Partnerships</span>
+                                <ul id="thriving-list" style="margin:8px 0 0 0; padding-left:18px;"></ul>
                             </div>
                             <div class="partnership-box nurturing-box">
                                 <span>Nurturing Partnerships</span>
+                                <ul id="nurturing-list" style="margin:8px 0 0 0; padding-left:18px;"></ul>
                             </div>
                         </div>
                     </div>
@@ -168,11 +179,12 @@
             suggBox.style.display = 'block';
         }
 
-        function selectCompany(item){
+        async function selectCompany(item){
             if (!item) return;
             input.value = item.name;
             if (selectedEl){ selectedEl.textContent = 'Company Name: ' + item.name; }
             clearSuggestions();
+            try { await loadScores(item.id); } catch(e) {}
         }
 
         let debounceTimer = null;
@@ -201,11 +213,69 @@
             setTimeout(clearSuggestions, 120);
         }
 
+        async function loadScores(companyId){
+            const url = companyId ? ('../controller/partnershipScoreData.php?company_id='+encodeURIComponent(companyId)) : '../controller/partnershipScoreData.php';
+            const r = await fetch(url, { credentials: 'same-origin' });
+            if (!r.ok) return;
+            const d = await r.json();
+            if (!d || d.status !== 'ok') return;
+
+            // Render selected
+            const sel = d.selected;
+            const scoreNum = document.getElementById('score-number');
+            const scoreChg = document.getElementById('score-change');
+            const scoreStat = document.getElementById('score-status');
+            const eng = document.getElementById('engagement-content');
+            if (sel && sel.score && sel.metrics){
+                scoreNum.textContent = String(sel.score.current);
+                const ch = sel.score.change;
+                const sign = ch>0? '+' : '';
+                scoreChg.textContent = 'Current vs previous: ' + sign + ch;
+                scoreStat.textContent = 'Status: ' + sel.score.status;
+                eng.innerHTML = ''+
+                  '<div><strong>Active projects:</strong> ' + sel.metrics.active_projects + '</div>'+
+                  '<div><strong>Recent (≤180d) starts:</strong> ' + sel.metrics.recent_projects + '</div>'+
+                  '<div><strong>Total projects:</strong> ' + sel.metrics.total_projects + '</div>'+
+                  '<div><strong>Active partnership:</strong> ' + (sel.metrics.has_active_partnership ? 'Yes' : 'No') + '</div>';
+            } else {
+                scoreNum.textContent = '--';
+                scoreChg.textContent = 'Current vs previous: --';
+                scoreStat.textContent = 'Status: --';
+                eng.innerHTML = '<div>Pick a company to see engagement.</div>';
+            }
+
+            // Comparison
+            const tbody = document.getElementById('comparison-body');
+            if (tbody){
+                tbody.innerHTML = '';
+                const comp = Array.isArray(d.comparison) ? d.comparison : [];
+                comp.slice(0, 10).forEach(row => {
+                    const tr = document.createElement('tr');
+                    const td = (t)=>{ const e=document.createElement('td'); e.textContent=t; return e; };
+                    tr.appendChild(td(row.company?.name || ''));
+                    tr.appendChild(td(String(row.current ?? '')));
+                    tr.appendChild(td(String(row.previous ?? '')));
+                    const ch = row.change || 0; const sign = ch>0? '+' : '';
+                    tr.appendChild(td(sign + ch));
+                    tr.appendChild(td(row.status || ''));
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Lists
+            const ulT = document.getElementById('thriving-list');
+            const ulN = document.getElementById('nurturing-list');
+            if (ulT) { ulT.innerHTML = ''; (d.thriving||[]).forEach(n=>{ const li=document.createElement('li'); li.textContent=n; ulT.appendChild(li); }); }
+            if (ulN) { ulN.innerHTML = ''; (d.nurturing||[]).forEach(n=>{ const li=document.createElement('li'); li.textContent=n; ulN.appendChild(li); }); }
+        }
+
         if (input){
             input.addEventListener('input', onInput);
             input.addEventListener('keydown', onKeyDown);
             input.addEventListener('blur', onBlur);
             fetchCompanies();
+            // Load baseline lists
+            loadScores(null).catch(()=>{});
         }
     })();
     </script>
