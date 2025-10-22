@@ -44,6 +44,7 @@ try {
   	<meta name="viewport" content="initial-scale=1, width=device-width"> 	
   	<title>AILPO - Dashboard</title>
     <link rel="stylesheet" href="../view/styles/dboard.css"> 	
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         .user-info {
             display: flex;
@@ -210,8 +211,8 @@ try {
                         <div class="right-section">
                             <div class="monthly-projs-container">
                                 <div class="chart-header">Monthly Projects</div>
-                                <div class="chart-content">
-                                    <!-- Chart content goes here -->
+                                <div class="chart-content" style="height: 260px;">
+                                    <canvas id="monthly-projects-chart"></canvas>
                                 </div>
                             </div>
 
@@ -319,6 +320,57 @@ try {
     // Initial and periodic refresh
     refresh();
     setInterval(refresh, 15000); // 15s polling
+})();
+</script>
+<script>
+// Render Monthly Projects bar chart
+(function(){
+    const canvas = document.getElementById('monthly-projects-chart');
+    if (!canvas || !window.Chart) return;
+    let chart;
+
+    function render(labels, counts){
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Projects',
+                data: counts,
+                backgroundColor: 'rgba(255, 212, 28, 0.6)',
+                borderColor: 'rgba(255, 212, 28, 1)',
+                borderWidth: 1,
+                borderRadius: 6,
+                maxBarThickness: 24
+            }]
+        };
+        const options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(0,0,0,0.08)' } }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: { mode: 'index', intersect: false }
+            }
+        };
+        if (chart) { chart.destroy(); }
+        chart = new Chart(canvas.getContext('2d'), { type: 'bar', data, options });
+    }
+
+    async function load(){
+        try {
+            const resp = await fetch('../controller/monthlyProjects.php', { credentials: 'same-origin' });
+            if (!resp.ok) throw new Error('Network');
+            const json = await resp.json();
+            if (json && json.status === 'ok' && Array.isArray(json.labels) && Array.isArray(json.counts)) {
+                render(json.labels, json.counts);
+            }
+        } catch (e) {
+            // Silent fail; keep area empty
+        }
+    }
+    load();
 })();
 </script>
 </html>
