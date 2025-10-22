@@ -149,11 +149,11 @@ try {
                                         try {
                                             $today = date('Y-m-d');
                                                                                         $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
-                                                                                                        FROM projects p
-                                                                                                        LEFT JOIN companies c ON c.id = p.industry_partner_id
-                                                                                                        WHERE (p.end_date IS NULL OR p.end_date >= :today)
-                                                                                                            AND (p.start_date IS NULL OR p.start_date <= :today)
-                                                                                                        ORDER BY p.created_at DESC";
+                                                                                                                                                    FROM projects p
+                                                                                                                                                    LEFT JOIN companies c ON c.id = p.industry_partner_id
+                                                                                                                                                    WHERE ((p.end_date IS NULL OR p.end_date >= :today) AND (p.start_date IS NULL OR p.start_date <= :today))
+                                                                                                                                                       OR (p.start_date IS NOT NULL AND p.start_date > :today AND p.start_date <= DATE_ADD(:today, INTERVAL 30 DAY))
+                                                                                                                                                    ORDER BY p.created_at DESC";
                                             $stmt = $conn->prepare($sql);
                                             $stmt->execute([':today' => $today]);
                                             $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -169,7 +169,10 @@ try {
                                                     // Status determination for active list
                                                     $todayStr = date('Y-m-d');
                                                     $status = 'Ongoing';
-                                                    if (!empty($proj['end_date'])) {
+                                                    if (!empty($proj['start_date']) && $proj['start_date'] > $todayStr) {
+                                                        $days = (int)floor((strtotime($proj['start_date']) - strtotime($todayStr)) / 86400);
+                                                        $status = ($days <= 7 ? 'Starting Soon' : 'Upcoming');
+                                                    } elseif (!empty($proj['end_date'])) {
                                                         $status = ($proj['end_date'] === $todayStr) ? 'Ending Today' : 'Ongoing';
                                                     }
 
@@ -219,8 +222,15 @@ try {
                             <div class="bottom-row">
                                 <div class="progress-chart-container">
                                     <div class="chart-header">Project Progress Overview</div>
-                                    <div class="chart-content">
-                                        <!-- Chart content goes here -->
+                                    <div class="chart-content" style="display:flex; gap:16px; align-items:stretch; min-height:100px;">
+                                        <div style="flex:1; position:relative;">
+                                            <canvas id="progress-status-chart"></canvas>
+                                            <div id="progress-avg" style="position:absolute; bottom:-15px; left:12px; font-weight:600; font-size:0.9rem;"></div>
+                                        </div>
+                                        <div style="flex:1; overflow:auto;">
+                                            <div style="font-weight:600; margin-bottom:8px;">Top At-Risk Projects</div>
+                                            <div id="at-risk-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -368,6 +378,87 @@ try {
             }
         } catch (e) {
             // Silent fail; keep area empty
+        }
+    }
+    load();
+})();
+</script>
+<script>
+// Render Project Progress Overview: status donut + at-risk list
+(function(){
+    const donutCanvas = document.getElementById('progress-status-chart');
+    const avgEl = document.getElementById('progress-avg');
+    const listEl = document.getElementById('at-risk-list');
+    if (!donutCanvas || !window.Chart) return;
+    let donut;
+
+    function renderDonut(counts){
+        const labels = ['Completed','On Track','At Risk','Delayed','Not Started'];
+        const dataArr = labels.map(l => counts && typeof counts[l] === 'number' ? counts[l] : 0);
+        const data = { labels, datasets: [{
+            data: dataArr,
+            backgroundColor: [
+                'rgba(46, 204, 113, 0.9)',   // Completed - green
+                'rgba(52, 152, 219, 0.9)',   // On Track - blue
+                'rgba(241, 196, 15, 0.9)',   // At Risk - yellow
+                'rgba(231, 76, 60, 0.9)',    // Delayed - red
+                'rgba(149, 165, 166, 0.9)'   // Not Started - gray
+            ],
+            borderWidth: 0
+        }]};
+        const options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+        };
+        if (donut) donut.destroy();
+        donut = new Chart(donutCanvas.getContext('2d'), { type:'doughnut', data, options });
+    }
+
+    function renderAtRisk(items){
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        if (!items || items.length === 0){
+            const empty = document.createElement('div');
+            empty.textContent = 'No at-risk projects.';
+            empty.style.color = '#666';
+            listEl.appendChild(empty);
+            return;
+        }
+        items.forEach(it => {
+            const row = document.createElement('div');
+            row.style.display = 'grid';
+            row.style.gridTemplateColumns = '1fr auto';
+            row.style.gap = '6px';
+            row.style.padding = '8px 10px';
+            row.style.border = '1px solid #eee';
+            row.style.borderRadius = '8px';
+            const left = document.createElement('div');
+            left.innerHTML = `<div style="font-weight:600;">${(it.title||'Untitled Project').replace(/[&<>"']/g,'')}</div>
+                              <div style="font-size:0.85rem; color:#666;">${(it.company||'').replace(/[&<>"']/g,'')}</div>`;
+            const right = document.createElement('div');
+            right.style.textAlign = 'right';
+            const dueText = (it.days_to_deadline==null) ? '—' : (it.days_to_deadline<0 ? `${Math.abs(it.days_to_deadline)}d overdue` : `${it.days_to_deadline}d left`);
+            right.innerHTML = `<div style="font-weight:600;">${it.completion||0}%</div>
+                               <div style="font-size:0.85rem; color:#666;">${dueText}</div>`;
+            row.append(left, right);
+            listEl.appendChild(row);
+        });
+    }
+
+    async function load(){
+        try {
+            const resp = await fetch('../controller/projectProgress.php', { credentials: 'same-origin' });
+            if (!resp.ok) throw new Error('Network');
+            const json = await resp.json();
+            if (json && json.status === 'ok'){
+                renderDonut(json.statusCounts || {});
+                renderAtRisk(json.atRisk || []);
+                if (avgEl) avgEl.textContent = `Avg completion: ${parseInt(json.avgCompletion||0,10)}%`;
+            }
+        } catch (e) {
+            // keep card empty on error
         }
     }
     load();

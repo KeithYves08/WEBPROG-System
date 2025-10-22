@@ -7,8 +7,12 @@ try {
     $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
             FROM projects p
             LEFT JOIN companies c ON c.id = p.industry_partner_id
-            WHERE (p.end_date IS NULL OR p.end_date >= :today)
-              AND (p.start_date IS NULL OR p.start_date <= :today)
+            WHERE (
+                (p.end_date IS NULL OR p.end_date >= :today) AND (p.start_date IS NULL OR p.start_date <= :today)
+            )
+            OR (
+                p.start_date IS NOT NULL AND p.start_date > :today AND p.start_date <= DATE_ADD(:today, INTERVAL 30 DAY)
+            )
             ORDER BY p.created_at DESC";
     $stmt = $conn->prepare($sql);
     $stmt->execute([':today' => $today]);
@@ -22,7 +26,11 @@ try {
         $ed = $proj['end_date'] ?? null;
         $todayStr = date('Y-m-d');
         $status = 'Ongoing';
-        if (!empty($ed)) {
+        if (!empty($sd) && $sd > $todayStr) {
+            // Upcoming within 30 days, differentiate starting soon (<=7 days)
+            $days = (int)floor((strtotime($sd) - strtotime($todayStr)) / 86400);
+            $status = ($days <= 7 ? 'Starting Soon' : 'Upcoming');
+        } else if (!empty($ed)) {
             $status = ($ed === $todayStr) ? 'Ending Today' : 'Ongoing';
         }
         return [
