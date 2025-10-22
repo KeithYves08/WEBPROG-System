@@ -14,6 +14,7 @@ class PartnershipController {
             $sql = "
                 SELECT 
                     p.id as partnership_id,
+                    c.id as company_id,
                     c.name as company_name,
                     c.industry_sector,
                     p.agreement_start_date,
@@ -70,7 +71,7 @@ class PartnershipController {
                 $sql .= " WHERE " . implode(" AND ", $whereConditions);
             }
             
-            $sql .= " GROUP BY p.id, c.name, c.industry_sector, p.agreement_start_date, p.agreement_end_date, p.mou_contract, p.created_at";
+            $sql .= " GROUP BY p.id, c.id, c.name, c.industry_sector, p.agreement_start_date, p.agreement_end_date, p.mou_contract, p.created_at";
             $sql .= " ORDER BY c.name ASC";
             
             $stmt = $this->conn->prepare($sql);

@@ -155,7 +155,7 @@ require_once '../controller/partnershipManager.php';
                                 <?php else: ?>
                                     <?php foreach ($partnerships as $partnership): ?>
                                         <?php 
-                                            $score = $partnershipController->calculatePartnershipScore($partnership['partnership_id']);
+                                            // Score will be populated from partnershipScoreData API using company_id; avoid legacy computation here
                                             $expiryDate = $partnership['agreement_end_date'] ? date('m/d/Y', strtotime($partnership['agreement_end_date'])) : 'N/A';
                                             
                                             // Use consistent status from database query (now enhanced)
@@ -171,7 +171,7 @@ require_once '../controller/partnershipManager.php';
                                                 $partnership['custom_scope'] ?? null
                                             );
                                         ?>
-                                        <tr class="table-row" data-partnership-id="<?php echo $partnership['partnership_id']; ?>">
+                                        <tr class="table-row" data-partnership-id="<?php echo $partnership['partnership_id']; ?>" data-company-id="<?php echo isset($partnership['company_id']) ? (int)$partnership['company_id'] : 0; ?>">
                                             <td class="cell-CompName">
                                                 <div class="company-info">
                                                     <?php echo htmlspecialchars($companyInfo['display_name']); ?>
@@ -185,9 +185,7 @@ require_once '../controller/partnershipManager.php';
                                             </td>
                                             <td class="cell-expiry"><?php echo htmlspecialchars($expiryDate); ?></td>
                                             <td class="cell-Partscore">
-                                                <span class="score-badge score-<?php echo $score >= 80 ? 'high' : ($score >= 60 ? 'medium' : 'low'); ?>">
-                                                    <?php echo $score; ?>
-                                                </span>
+                                                <span class="score-badge score-low" title="Live score fetched from partnership activity">…</span>
                                             </td>
                                             <td class="cell-details">
                                                 <form method="GET" action="partnerDetails.php" style="display: inline;">
@@ -216,6 +214,67 @@ require_once '../controller/partnershipManager.php';
             </div>   
         </main>
     </div>
+    <script>
+    // Fetch and update partnership scores per company using the scoring API
+    document.addEventListener('DOMContentLoaded', function () {
+        const rows = Array.from(document.querySelectorAll('tr.table-row[data-company-id]'));
+        // Track original order for stable sorting
+        rows.forEach(function(row, idx){ row.setAttribute('data-index', String(idx)); });
+        const tbody = document.querySelector('table.table tbody');
+        const isAllStatus = <?php echo json_encode($statusFilter === 'All'); ?>;
+
+        const fetches = rows.map(function(row){
+            const companyId = row.getAttribute('data-company-id');
+            const scoreEl = row.querySelector('.cell-Partscore .score-badge');
+            if (!companyId || companyId === '0' || !scoreEl) {
+                row.setAttribute('data-score', '-1');
+                return Promise.resolve({ row: row, score: -1, status: null });
+            }
+            return fetch('../controller/partnershipScoreData.php?company_id=' + encodeURIComponent(companyId))
+                .then(function(res){ return res.ok ? res.json() : Promise.reject(new Error('HTTP ' + res.status)); })
+                .then(function(data){
+                    const selected = data && data.selected ? data.selected : null;
+                    const score = selected && selected.score && typeof selected.score.current === 'number' ? selected.score.current : -1;
+                    const status = selected && selected.score ? selected.score.status : null;
+                    // Update UI
+                    if (score >= 0) {
+                        scoreEl.textContent = String(score);
+                        scoreEl.classList.remove('score-high','score-medium','score-low');
+                        if (score >= 80) scoreEl.classList.add('score-high');
+                        else if (score >= 60) scoreEl.classList.add('score-medium');
+                        else scoreEl.classList.add('score-low');
+                    }
+                    if (status === 'Terminated') {
+                        const statusBadge = row.querySelector('.cell-status .status-badge');
+                        if (statusBadge) statusBadge.textContent = 'Terminated';
+                    }
+                    row.setAttribute('data-score', String(score));
+                    return { row: row, score: score, status: status };
+                })
+                .catch(function(){
+                    row.setAttribute('data-score', '-1');
+                    return { row: row, score: -1, status: null };
+                });
+        });
+
+        Promise.allSettled(fetches).then(function(){
+            if (!isAllStatus || !tbody) return; // Only sort by score when filter is All
+            // Sort rows by numeric score desc; tie-breaker by original index asc
+            const sorted = rows.slice().sort(function(a, b){
+                const sa = parseInt(a.getAttribute('data-score') || '-1', 10);
+                const sb = parseInt(b.getAttribute('data-score') || '-1', 10);
+                if (sb !== sa) return sb - sa;
+                const ia = parseInt(a.getAttribute('data-index') || '0', 10);
+                const ib = parseInt(b.getAttribute('data-index') || '0', 10);
+                return ia - ib;
+            });
+            // Reattach in new order
+            const frag = document.createDocumentFragment();
+            sorted.forEach(function(row){ frag.appendChild(row); });
+            tbody.appendChild(frag);
+        });
+    });
+    </script>
 </body>
 </html>
 
