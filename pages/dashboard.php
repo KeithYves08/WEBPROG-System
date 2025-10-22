@@ -127,8 +127,8 @@ try {
                         </div>
                         <div class="stat-item">
                             <div class="stat-content">
-                                <div class="placement-stat-number">--</div>
-                                <div class="stat-label">Placement Rate</div>
+                                <div class="placement-stat-number" id="avg-partnership-score">--</div>
+                                <div class="stat-label">Average Partnership Score</div>
                             </div>
                         </div>
                         <div class="stat-item">
@@ -381,6 +381,26 @@ try {
         }
     }
     load();
+})();
+</script>
+<script>
+// Compute and display Average Partnership Score in the stats tile
+(function(){
+    const el = document.getElementById('avg-partnership-score');
+    if (!el) return;
+    fetch('../controller/partnershipScoreData.php', { credentials: 'same-origin' })
+        .then(function(res){ return res.ok ? res.json() : null; })
+        .then(function(data){
+            if (!data || !Array.isArray(data.comparison)) return;
+            // Prefer averaging non-terminated partners; fallback to all if none
+            var active = data.comparison.filter(function(it){ return it && typeof it.current === 'number' && it.status !== 'Terminated'; });
+            var arr = active.length ? active : data.comparison.filter(function(it){ return it && typeof it.current === 'number'; });
+            if (!arr.length) return;
+            var sum = arr.reduce(function(acc, it){ return acc + (it.current || 0); }, 0);
+            var avg = Math.round(sum / arr.length);
+            el.textContent = String(avg);
+        })
+        .catch(function(){});
 })();
 </script>
 <script>
