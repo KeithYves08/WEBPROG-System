@@ -51,6 +51,7 @@ body {
 
 .app-title {
     margin: 0;
+    
     font-weight: 700;
     font-size: 1.9rem;
     letter-spacing: .5px;
@@ -152,7 +153,12 @@ body {
 .icon-creation {
     background-image: url('../assets/project_image.webp');
 }
-
+.icon-allprojects {
+    background-image: url('../assets/allproj.webp');
+}
+.icon-logs {
+    background-image: url('../assets/logs.webp');
+}
 .nav-label {
     font-weight: 600;
     font-size: 0.98rem;
@@ -308,7 +314,7 @@ body {
     width: 100%;
     border-collapse: collapse;
     margin-top: 0;
-    background: #ffffff;
+    background: #f8f9fa;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -332,7 +338,7 @@ body {
     text-align: center;
     font-weight: 600;
     font-size: 1rem;
-    color: #ffffff;
+    color: #f8f9fa;
     border-right: 1px solid #35408e;
 }
 

@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AILPO - Partnership Creation</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" href="../view/styles/dboard.css">
     <link rel="stylesheet" href="../view/styles/partCreation.css">
+    
 </head>
 <body>
 
@@ -39,7 +40,7 @@
                     <span class="nav-icon icon-partnership"></span>
                     <span class="nav-label">Partnership Management</span>
                 </a>
-                <a class="nav-item" href="#">
+                <a class="nav-item" href="./placementManage.php">
                     <span class="nav-icon icon-placement"></span>
                     <span class="nav-label">Placement Management</span>
                 </a>
@@ -48,11 +49,11 @@
                     <span class="nav-label">Project Creation</span>
                 </a>
                 <a class="nav-item" href="./allProjects.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-allprojects"></span>
                     <span class="nav-label">All Projects</span>
                 </a>
                 <a class="nav-item" href="./activityLog.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-logs"></span>
                     <span class="nav-label">Activity Log</span>
                 </a>
             </nav>
@@ -139,6 +140,30 @@
                         </div>
                     </div>
 
+                    <h2 class="section-heading">Assigned Academe Liaison</h2>                 
+                    <div class="contact-grid">
+                        <div class="mb-3">
+                            <label for="academeName" class="form-label">Academe Liaison Name:</label>
+                            <input type="text" id="academeName" name="academe_name" class="form-control" placeholder="Full name"
+                                   value="<?php echo isset($_SESSION['form_data']['academe_name']) ? htmlspecialchars($_SESSION['form_data']['academe_name']) : ''; ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="academePosition" class="form-label">Position:</label>
+                            <input type="text" id="academePosition" name="academe_position" class="form-control" placeholder="Job title"
+                                   value="<?php echo isset($_SESSION['form_data']['academe_position']) ? htmlspecialchars($_SESSION['form_data']['academe_position']) : ''; ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="academeEmail" class="form-label">Email:</label>
+                            <input type="email" id="academeEmail" name="academe_email" class="form-control" placeholder="name@example.com"
+                                   value="<?php echo isset($_SESSION['form_data']['academe_email']) ? htmlspecialchars($_SESSION['form_data']['academe_email']) : ''; ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="academePhone" class="form-label">Phone:</label>
+                            <input type="tel" id="academePhone" name="academe_phone" class="form-control" placeholder="+63 900 000 0000"
+                                   value="<?php echo isset($_SESSION['form_data']['academe_phone']) ? htmlspecialchars($_SESSION['form_data']['academe_phone']) : ''; ?>">
+                        </div>
+                    </div>
+
                     <h2 class="section-heading">Agreement Details</h2>                   
                     <div class="agreement-grid">
                         <div class="mb-3">
@@ -170,10 +195,10 @@
                                 <label class="form-check others-check">
                                     <input class="form-check-input" type="checkbox" name="scope[]" value="Others" id="othersCheckbox" <?php echo in_array('Others', $savedScopes) ? 'checked' : ''; ?>>
                                     <span class="form-check-label">Others:</span>
-                                </label>
-                                <input type="text" id="othersInput" name="others_specify" class="form-control others-input" 
+                                    <input type="text" id="othersInput" name="others_specify" class="form-control others-input" 
                                        placeholder="Please specify..." 
                                        value="<?php echo isset($_SESSION['form_data']['others_specify']) ? htmlspecialchars($_SESSION['form_data']['others_specify']) : ''; ?>">
+                                </label>                 
                             </div>
                         </div>
                     </div>
@@ -193,30 +218,6 @@
                         <?php if (isset($_SESSION['uploaded_file'])): ?>
                             <small class="text-success">Previously uploaded: <?php echo htmlspecialchars($_SESSION['uploaded_file']); ?></small>
                         <?php endif; ?>
-                    </div>
-
-                    <h2 class="section-heading">Assigned Academe Liaison</h2>                 
-                    <div class="contact-grid">
-                        <div class="mb-3">
-                            <label for="academeName" class="form-label">Academe Liaison Name:</label>
-                            <input type="text" id="academeName" name="academe_name" class="form-control" placeholder="Full name"
-                                   value="<?php echo isset($_SESSION['form_data']['academe_name']) ? htmlspecialchars($_SESSION['form_data']['academe_name']) : ''; ?>">
-                        </div>
-                        <div class="mb-3">
-                            <label for="academePosition" class="form-label">Position:</label>
-                            <input type="text" id="academePosition" name="academe_position" class="form-control" placeholder="Job title"
-                                   value="<?php echo isset($_SESSION['form_data']['academe_position']) ? htmlspecialchars($_SESSION['form_data']['academe_position']) : ''; ?>">
-                        </div>
-                        <div class="mb-3">
-                            <label for="academeEmail" class="form-label">Email:</label>
-                            <input type="email" id="academeEmail" name="academe_email" class="form-control" placeholder="name@example.com"
-                                   value="<?php echo isset($_SESSION['form_data']['academe_email']) ? htmlspecialchars($_SESSION['form_data']['academe_email']) : ''; ?>">
-                        </div>
-                        <div class="mb-3">
-                            <label for="academePhone" class="form-label">Phone:</label>
-                            <input type="tel" id="academePhone" name="academe_phone" class="form-control" placeholder="+63 900 000 0000"
-                                   value="<?php echo isset($_SESSION['form_data']['academe_phone']) ? htmlspecialchars($_SESSION['form_data']['academe_phone']) : ''; ?>">
-                        </div>
                     </div>
                 </section>
                 </form>

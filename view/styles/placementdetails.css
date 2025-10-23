@@ -152,7 +152,12 @@ body {
 .icon-creation {
     background-image: url('../assets/project_image.webp');
 }
-
+.icon-allprojects {
+    background-image: url('../assets/allproj.webp');
+}
+.icon-logs {
+    background-image: url('../assets/logs.webp');
+}
 .nav-label {
     font-weight: 600;
     font-size: 0.98rem;

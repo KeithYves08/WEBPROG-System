@@ -1,4 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nata+Sans:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+body, .partner-card_title, .page-title-btn, .p-btn, .agr-btn {
+    font-family: 'Montserrat', sans-serif;
+}
+        
+.partner-card_body, .partner-card__body {
+    padding: 8px !important;
+    min-height: auto !important;
+    height: auto !important;
+}
+        
+.partner-card {
+    height: fit-content !important;
+    min-height: auto !important;
+}
+        
+.partner-grid {
+    align-items: stretch;
+}
 body {    
     margin: 0;
     height: 100vh;
@@ -119,6 +137,12 @@ body {
 .icon-partnership{background-image:url('../assets/partnership_image.webp'); }
 .icon-placement{  background-image:url('../assets/placement_image.webp'); }
 .icon-creation{   background-image:url('../assets/project_image.webp'); }
+.icon-allprojects {
+    background-image: url('../assets/allproj.webp');
+}
+.icon-logs {
+    background-image: url('../assets/logs.webp');
+}
 .nav-label{
     font-weight:600;
     font-size:0.98rem;

@@ -70,168 +70,7 @@ body {
     width: 100%;
 }
 
-/* Dashboard layout - Nav Bar Section */
-.dash-layout {
-    display: flex;
-    gap: 0;
-    height: calc(100dvh - var(--header-h) - var(--accent-h));
-    min-height: calc(100vh - 120px);
-}
 
-.sidebar {
-    width: 260px;
-    background: #ffffff;
-    border-right: 1px solid #e9e9e9;
-    padding: 16px 12px;
-    box-sizing: border-box;
-    position: sticky;
-    top: 0;
-    height: 100%;
-    max-height: calc(100dvh - var(--header-h) - var(--accent-h));
-    overflow: auto;
-    align-self: stretch;
-}
-
-.nav {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    text-decoration: none;
-    color: #222;
-    transition: background .2s;
-    min-height: 46px;
-}
-
-.nav-item:hover {
-    background: #f3f3f3;
-}
-
-.nav-item.is-active {
-    background: #bbbbbb;
-    border-radius: 12px;
-}
-
-.nav-icon {
-    width: 22px;
-    height: 22px;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
-    flex: 0 0 22px;
-}
-
-.icon-dashboard {
-    background-image: url('../assets/dashboard_image.webp');
-}
-
-.icon-archived {
-    background-image: url('../assets/archive_image.webp');
-}
-
-.icon-score {
-    background-image: url('../assets/partnership_image.webp');
-}
-
-.icon-partnership {
-    background-image: url('../assets/partnership_image.webp');
-}
-
-.icon-placement {
-    background-image: url('../assets/placement_image.webp');
-}
-
-.icon-creation {
-    background-image: url('../assets/project_image.webp');
-}
-.icon-allprojects {
-    background-image: url('../assets/allproj.webp');
-}
-.icon-logs {
-    background-image: url('../assets/logs.webp');
-}
-.icon-logs {
-    background-image: url('../assets/logs.webp');
-}
-.nav-label {
-    font-weight: 600;
-    font-size: 0.98rem;
-    line-height: 1.3;
-    word-wrap: break-word;
-    flex: 1;
-}
-
-/* Responsive Nav Bar */
-@media (max-width:1024px) {
-    .sidebar {
-        width: 220px;
-    }
-
-    .nav-label {
-        font-size: 0.95rem;
-    }
-}
-
-@media (max-width:880px) {
-    .sidebar {
-        width: 72px;
-        padding: 12px 8px;
-    }
-
-    .nav-item {
-        justify-content: center;
-    }
-
-    .nav-label {
-        display: none;
-    }
-
-    .dash-content {
-        padding: 24px 16px;
-    }
-}
-
-@media (max-width:640px) {
-    .dash-layout {
-        flex-direction: column;
-        height: auto;
-        min-height: calc(100dvh - var(--header-h) - var(--accent-h));
-    }
-
-    .sidebar {
-        position: static;
-        width: 100%;
-        height: auto;
-        max-height: none;
-        display: flex;
-        overflow: auto;
-        padding: 10px 8px;
-        border-right: none;
-        border-bottom: 1px solid #e9e9e9;
-    }
-
-    .nav {
-        flex-direction: row;
-        gap: 8px;
-        overflow-x: auto;
-    }
-
-    .nav-item {
-        flex: 0 0 auto;
-    }
-
-    .nav-label {
-        display: inline;
-        font-size: .9rem;
-    }
-}
 
 
 /* Main Dashboard */
@@ -251,17 +90,14 @@ body {
     border-radius: 20px;
     box-shadow: 0 10px 28px -10px rgba(0, 0, 0, 0.25);
     padding: 24px;
-    padding-bottom: 60px;
     box-sizing: border-box;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 .dashboard-content {
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-height: 100%;
+    height: 100%;
 }
 
 .yellow-stats {
@@ -428,12 +264,11 @@ body {
     transform: translateY(-2px);
 }
 
-/* View All button under Active Projects */
 .view-all-container {
     display: flex;
     justify-content: flex-end;
-    margin-top: 0px;
-    margin-bottom: 15px;
+    margin-top: 20px;
+    margin-bottom: 70px;
 }
 
 .view-all-btn {
@@ -446,7 +281,6 @@ body {
     cursor: pointer;
     font-size: 1rem;
     transition: all 0.3s ease;
-    
 }
 
 .view-all-btn:hover {
@@ -457,32 +291,21 @@ body {
     border: 1px solid #E0E0E0;
     background: white;
     border-radius: 18px;
-    min-height: 300px;
-    max-height: 380px;
+    height: 40%;
     padding: 20px;
     padding-top: 5px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-}
-
-.monthly-projs-container canvas {
-    max-width: 100% !important;
-    max-height: 320px !important;
-    width: 100% !important;
-    height: auto !important;
 }
 
 .bottom-row {
     display: flex;
     gap: 20px;
     align-items: stretch;
-    min-height: 350px;
+    height: 40%;
     margin-top: -30px;
-    margin-bottom: 40px;
 }
 
 .progress-chart-container {
@@ -490,12 +313,10 @@ body {
     background: white;
     border-radius: 10px;
     flex: 1;
-    min-height: 300px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    position: relative;
 }
 
 .chart-header {
@@ -516,19 +337,6 @@ body {
     flex: 1;
     background: #f8f9fa;
     border-radius: 12px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
-    overflow: hidden;
-}
-
-.chart-content canvas {
-    max-width: 90% !important;
-    max-height: 240px !important;
-    width: auto !important;
-    height: auto !important;
 }
 
 .action-buttons {
@@ -558,24 +366,6 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
-    .main-content {
-        padding: 20px;
-    }
-
-    .main-white-container {
-        padding: 20px;
-    }
-
-    .yellow-stats {
-        gap: 15px;
-    }
-
-    .stat-item {
-        width: 24%;
-    }
-}
-
 @media (max-width: 1024px) {
     .content-layout {
         flex-direction: column;
@@ -584,212 +374,47 @@ body {
     .bottom-row {
         flex-direction: column;
         height: auto;
-        margin-top: 0;
     }
 
     .action-buttons {
         flex-direction: row;
         justify-content: center;
         margin-top: 20px;
-        gap: 15px;
-    }
-
-    .monthly-projs-container {
-        margin-bottom: 20px;
-        max-height: none;
-        min-height: 350px;
-    }
-
-    .progress-chart-container {
-        margin-bottom: 20px;
     }
 }
 
 @media (max-width: 768px) {
-    .main-content {
-        padding: 16px;
-    }
-
-    .main-white-container {
-        padding: 16px;
-        border-radius: 15px;
-    }
-
     .right-section {
         gap: 15px;
     }
 
     .action-buttons {
         flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
+        align-items: center;
     }
 
     .view-calendar-btn,
     .add-project-btn {
-        width: 100%;
-        padding: 14px 20px;
+        width: 150px;
     }
 
     .yellow-stats {
         flex-wrap: wrap;
         height: auto;
-        gap: 12px;
     }
 
     .stat-item {
         width: 48%;
-        margin-bottom: 0;
-    }
-
-    .stat-label {
-        font-size: 0.9rem;
-    }
-
-    .totalproj-stat-number, 
-    .partners-stat-number, 
-    .placement-stat-number, 
-    .studentsplaced-stat-number {
-        font-size: 2rem;
-    }
-
-    .active-proj-label {
-        font-size: 0.95rem;
-        padding-left: 16px;
-    }
-
-    .chart-header {
-        font-size: 1rem;
-        padding: 12px;
-    }
-
-    .projects-content {
-        padding: 16px;
+        margin-bottom: 15px;
     }
 }
 
 @media (max-width: 640px) {
-    .main-content {
-        padding: 12px;
-    }
-
-    .main-white-container {
-        padding: 12px;
-        padding-bottom: 40px;
-    }
-
     .stat-item {
         width: 100%;
-        height: 100px;
-    }
-
-    .totalproj-stat-number, 
-    .partners-stat-number, 
-    .placement-stat-number, 
-    .studentsplaced-stat-number {
-        font-size: 1.8rem;
     }
 
     .content-layout {
         gap: 15px;
-    }
-
-    .yellow-stats {
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-
-    .active-proj-label {
-        height: 36px;
-        font-size: 0.9rem;
-        padding-left: 14px;
-    }
-
-    .ap-filter {
-        gap: 6px;
-    }
-
-    .ap-select {
-        font-size: 0.85rem;
-        padding: 5px 24px 5px 8px;
-    }
-
-    .projects-content {
-        padding: 12px;
-    }
-
-    .active-projects-section .project-card {
-        padding: 10px 12px;
-    }
-
-    .active-projects-section .project-title {
-        font-size: 1rem;
-    }
-
-    .active-projects-section .project-meta-row {
-        font-size: 0.85rem;
-        gap: 12px;
-    }
-
-    .view-all-btn {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-    }
-
-    .monthly-projs-container,
-    .progress-chart-container {
-        padding: 15px;
-        min-height: 280px;
-    }
-
-    .chart-header {
-        font-size: 0.95rem;
-        padding: 10px;
-    }
-
-    .action-buttons {
-        gap: 10px;
-    }
-
-    .view-calendar-btn,
-    .add-project-btn {
-        padding: 12px 18px;
-        font-size: 0.85rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .main-white-container {
-        padding: 10px;
-        padding-bottom: 30px;
-        border-radius: 12px;
-    }
-
-    .stat-item {
-        height: 90px;
-    }
-
-    .totalproj-stat-number, 
-    .partners-stat-number, 
-    .placement-stat-number, 
-    .studentsplaced-stat-number {
-        font-size: 1.5rem;
-    }
-
-    .stat-label {
-        font-size: 0.85rem;
-    }
-
-    .active-projects-section .project-title {
-        font-size: 0.95rem;
-    }
-
-    .active-projects-section .project-meta-row {
-        font-size: 0.8rem;
-    }
-
-    .view-details-btn {
-        padding: 3px 10px;
-        font-size: 0.8rem;
     }
 }

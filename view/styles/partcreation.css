@@ -119,6 +119,12 @@ body {
 .icon-partnership{background-image:url('../assets/partnership_image.webp'); }
 .icon-placement{  background-image:url('../assets/placement_image.webp'); }
 .icon-creation{   background-image:url('../assets/project_image.webp'); }
+.icon-allprojects {
+    background-image: url('../assets/allproj.webp');
+}
+.icon-logs {
+    background-image: url('../assets/logs.webp');
+}
 .nav-label{
     font-weight:600;
     font-size:0.98rem;
@@ -179,6 +185,7 @@ body {
     padding:24px;
     box-sizing:border-box;
     overflow:auto; 
+    overflow-x: hidden
 }
 .page-title-btn {
     background: #35408E;
@@ -196,6 +203,68 @@ body {
     box-shadow: 0 2px 4px rgba(93, 107, 179, 0.3);
 }
 
+/* Alert Messages */
+.alert {
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border-left: 4px solid #28a745;
+    color: #155724;
+}
+
+.alert-success::before {
+    content: "✓ ";
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-right: 8px;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    border-left: 4px solid #dc3545;
+    color: #721c24;
+}
+
+.alert-danger::before {
+    content: "⚠ ";
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-right: 8px;
+}
+
+.alert p {
+    margin: 0;
+    padding: 3px 0;
+}
+
+.alert p:first-child {
+    padding-top: 0;
+}
+
+.alert p:last-child {
+    padding-bottom: 0;
+}
+
 .company-details .section-heading {
     color: #35408e;
     font-weight: 600;
@@ -204,7 +273,9 @@ body {
 }
 .company-details label {
     color: #000;
-    font-weight: 600;                       
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
 }
 .company-details .grid {
     display: grid;
@@ -216,11 +287,44 @@ body {
 .company-details .form-select {
     height: 42px;
 }
-@media (max-width: 768px) {
-    .company-details .grid {
-        grid-template-columns: 1fr;
-    }
+
+/* Form inputs styling */
+.form-control,
+.form-select {
+    width: 70%;
+    padding: 2px 14px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    background-color: #cccccc;
+    font-family: "Montserrat", sans-serif;
+    font-size: 0.95rem;
+    color: #000;
+    outline: none;
+    transition: border-color 0.2s, background-color 0.2s;
 }
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #35408e;
+    background-color: #e0e0e0;
+}
+
+.form-control::placeholder {
+    color: #666;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 6px;
+    color: #000;
+    font-weight: 600;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
 .company-details .contact-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -228,11 +332,7 @@ body {
     width: 80%;
 }
 
-@media (max-width: 992px) {
-    .company-details .contact-grid {
-        grid-template-columns: 1fr;
-    }
-}
+
 .agreement-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -332,32 +432,7 @@ body {
     background-color: #f8f9fa;
     opacity: 0.6;
 }
-@media (max-width: 992px) {
-    .agreement-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .checkbox-inline {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    
-    .checkbox-inline .others-input {
-        width: 150px;
-        margin-top: 5px;
-    }
-    
-    .upload-box .upload-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-    
-    .upload-box .file-info-inline {
-        min-width: auto;
-        width: 100%;
-    }
-}
+
 
 .main-white-container { position: relative; }
 
@@ -474,4 +549,328 @@ body {
 .upload-box .file-name {
     font-weight: 500;
     color: #28a745;
+}
+
+/* Responsive Design for Laptops - Prevent Scrolling */
+@media (max-width: 1800px) and (min-width: 1025px) {
+    .main-white-container {
+        padding: 20px;
+        padding-bottom: 10px;
+        
+    }
+
+    .company-details .section-heading {
+        font-size: 1.25rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .company-details .grid {
+        gap: 10px;
+        width: 65%;
+    }
+
+    .company-details .contact-grid {
+        gap: 10px;
+        width: 85%;
+    }
+
+    .agreement-grid {
+        gap: 10px;
+        width: 100%;
+    }
+
+    .form-label {
+        margin-bottom: 4px;
+        font-size: 0.92rem;
+    }
+
+    .form-control,
+    .form-select {
+        width: 75%;
+        height: 38px;
+        font-size: 0.92rem;
+        padding: 2px 12px;
+    }
+
+    .company-details .form-control,
+    .company-details .form-select {
+        height: 38px;
+    }
+
+    .checkbox-inline {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px 12px;
+        padding: 8px 0;
+    }
+
+    .checkbox-inline .form-check {
+        font-size: 0.92rem;
+    }
+
+    .checkbox-inline .others-check {
+        font-size: 0.92rem;
+    }
+
+    .checkbox-inline .others-input {
+        grid-column: span 3;
+        width: 100%;
+        max-width: 280px;
+        height: 34px;
+        font-size: 0.82rem;
+    }
+
+    .btn-actions {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .cancel-btn,
+    .create-btn {
+        padding: 8px 12px;
+        font-size: 0.84rem;
+        
+    }
+
+    .upload-box .upload-btn {
+        
+        width: 22%;
+        height: 2.2rem;
+        font-size: 0.78rem;
+    }
+
+    .page-title-btn {
+        font-size: 0.88rem;
+        padding: 9px 20px;
+        margin-bottom: 6px;
+    }
+}
+
+@media (max-width: 1366px) and (min-width: 1025px) {
+    .main-content {
+        padding: 18px;
+    }
+
+    .main-white-container {
+        padding: 18px;
+        padding-bottom: 85px;
+    }
+
+    .company-details .section-heading {
+        font-size: 1.2rem;
+        margin-bottom: 0.65rem;
+        margin-top: 0.8rem;
+    }
+
+    .company-details .grid {
+        gap: 9px;
+        width: 70%;
+    }
+
+    .company-details .contact-grid {
+        gap: 9px;
+        width: 88%;
+    }
+
+    .form-label {
+        margin-bottom: 3px;
+        font-size: 0.9rem;
+    }
+
+    .form-control,
+    .form-select {
+        width: 78%;
+        height: 36px;
+        font-size: 0.9rem;
+        padding: 2px 11px;
+    }
+
+    .company-details .form-control,
+    .company-details .form-select {
+        height: 36px;
+    }
+
+    .checkbox-inline {
+        gap: 7px 11px;
+        padding: 7px 0;
+    }
+
+    .checkbox-inline .form-check,
+    .checkbox-inline .others-check {
+        font-size: 0.9rem;
+    }
+
+    .checkbox-inline .others-input {
+        max-width: 270px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 1280px) and (min-width: 1025px) {
+    .main-white-container {
+        padding: 16px;
+        padding-bottom: 82px;
+    }
+
+    .company-details .section-heading {
+        font-size: 1.18rem;
+        margin-bottom: 0.6rem;
+        margin-top: 0.75rem;
+    }
+
+    .company-details .grid {
+        gap: 8px;
+        width: 75%;
+    }
+
+    .company-details .contact-grid {
+        gap: 8px;
+        width: 92%;
+    }
+
+    .form-label {
+        font-size: 0.88rem;
+    }
+
+    .form-control,
+    .form-select {
+        width: 82%;
+        height: 35px;
+        font-size: 0.88rem;
+        padding: 2px 10px;
+    }
+
+    .company-details .form-control,
+    .company-details .form-select {
+        height: 35px;
+    }
+
+    .checkbox-inline {
+        gap: 6px 10px;
+        padding: 6px 0;
+    }
+
+    .checkbox-inline .form-check,
+    .checkbox-inline .others-check {
+        font-size: 0.88rem;
+    }
+
+    .checkbox-inline .others-input {
+        max-width: 260px;
+        height: 31px;
+        font-size: 0.78rem;
+    }
+
+    .btn-actions {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .cancel-btn,
+    .create-btn {
+        padding: 6px 12px;
+        font-size: 0.88rem;   
+    }
+
+    .upload-box .upload-btn {
+        width: 24%;
+        height: 2.1rem;
+        font-size: 0.76rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .main-content {
+        padding: 16px;
+    }
+
+    .main-white-container {
+        padding: 15px;
+        padding-bottom: 80px;
+    }
+
+    .company-details .section-heading {
+        font-size: 1.15rem;
+        margin-bottom: 0.6rem;
+        margin-top: 0.7rem;
+    }
+
+    .company-details .grid {
+        gap: 8px;
+        width: 80%;
+    }
+
+    .company-details .contact-grid {
+        gap: 8px;
+        width: 95%;
+    }
+
+    .agreement-grid {
+        gap: 8px;
+    }
+
+    .form-label {
+        font-size: 0.87rem;
+        margin-bottom: 3px;
+    }
+
+    .form-control,
+    .form-select {
+        width: 88%;
+        height: 34px;
+        font-size: 0.87rem;
+        padding: 2px 10px;
+    }
+
+    .company-details .form-control,
+    .company-details .form-select {
+        height: 34px;
+    }
+
+    .checkbox-inline {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px 10px;
+        padding: 6px 0;
+    }
+
+    .checkbox-inline .form-check,
+    .checkbox-inline .others-check {
+        font-size: 0.87rem;
+    }
+
+    .checkbox-inline .others-input {
+        grid-column: span 3;
+        max-width: 250px;
+        height: 30px;
+        font-size: 0.77rem;
+    }
+
+    .btn-actions {
+        bottom: 15px;
+        right: 15px;
+    }
+
+    .cancel-btn,
+    .create-btn {
+        padding: 6px 12px;
+        font-size: 0.86rem;
+    }
+
+    .upload-box .upload-btn {
+        width: 26%;
+        height: 2rem;
+        font-size: 0.75rem;
+    }
+
+    .page-title-btn {
+        font-size: 0.85rem;
+        padding: 8px 18px;
+    }
+
+    .alert {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+    }
 }

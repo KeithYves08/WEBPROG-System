@@ -23,33 +23,14 @@ try {
   	<meta charset="utf-8">
   	<meta name="viewport" content="initial-scale=1, width=device-width"> 	
   	<title>AILPO - Archived Projects</title>
-    <link rel="stylesheet" href="../view/styles/archived.css">
-    <style>
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 0.9rem;
-        }
-        .logout-btn {
-            background: #ffd41c;
-            color: #111;
-            padding: 8px 16px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-        .logout-btn:hover {
-            background: #f2c500;
-        }
-    </style> 	
+    <link rel="stylesheet" href="../view/styles/archived.css">  	
 </head>
 <body>
 	<header class="site-header">
         <div class="header-inner">
             <h1 class="app-title">AILPO</h1>
             <div class="user-info">
+              
                 <a href="../controller/logout.php" class="logout-btn">Logout</a>
             </div>
         </div>
@@ -84,11 +65,11 @@ try {
                     <span class="nav-label">Project Creation</span>
                 </a>
                 <a class="nav-item" href="./allProjects.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-allprojects"></span>
                     <span class="nav-label">All Projects</span>
                 </a>
                 <a class="nav-item" href="./activityLog.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-logs"></span>
                     <span class="nav-label">Activity Log</span>
                 </a>
             </nav>

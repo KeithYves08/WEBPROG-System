@@ -52,11 +52,11 @@ require_once '../controller/config.php';
                     <span class="nav-label">Project Creation</span>
                 </a>
                 <a class="nav-item is-active" href="./allProjects.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-allprojects"></span>
                     <span class="nav-label">All Projects</span>
                 </a>
                 <a class="nav-item" href="./activityLog.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-logs"></span>
                     <span class="nav-label">Activity Log</span>
                 </a>
             </nav>

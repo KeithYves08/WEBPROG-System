@@ -5,27 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, width=device-width">
     <title>AILPO - Partnership Score</title>
+    <link rel="stylesheet" href="../view/styles/dboard.css">
     <link rel="stylesheet" href="../view/styles/partScore.css">
-    <style>
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 0.9rem;
-        }
-        .logout-btn {
-            background: #ffd41c;
-            color: #111;
-            padding: 8px 16px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-        .logout-btn:hover {
-            background: #f2c500;
-        }
-    </style>
+  
 </head>
 
 <body>
@@ -68,11 +50,11 @@
                     <span class="nav-label">Project Creation</span>
                 </a>
                 <a class="nav-item" href="./allProjects.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-allprojects"></span>
                     <span class="nav-label">All Projects</span>
                 </a>
                 <a class="nav-item" href="./activityLog.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-logs"></span>
                     <span class="nav-label">Activity Log</span>
                 </a>
             </nav>

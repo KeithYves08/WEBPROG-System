@@ -10,7 +10,9 @@ require_once '../controller/config.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AILPO - Placement Management</title>
+    <link rel="stylesheet" href="../view/styles/dboard.css">
     <link rel="stylesheet" href="../view/styles/placementManage.css">
+    
 </head>
 <body>
     <header class="site-header">
@@ -51,11 +53,11 @@ require_once '../controller/config.php';
                     <span class="nav-label">Project Creation</span>
                 </a>
                 <a class="nav-item" href="./allProjects.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-allprojects"></span>
                     <span class="nav-label">All Projects</span>
                 </a>
                 <a class="nav-item" href="./activityLog.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-logs"></span>
                     <span class="nav-label">Activity Log</span>
                 </a>
             </nav>

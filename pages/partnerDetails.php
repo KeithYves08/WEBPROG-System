@@ -40,29 +40,8 @@ $statusColor = $partnerDetailsController->getStatusBadgeColor($status);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AILPO - Partner Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../view/styles/partnerDetails.css">
-    <style>
-        /* Apply Montserrat font for design cohesion */
-        body, .partner-card_title, .page-title-btn, .p-btn, .agr-btn {
-            font-family: 'Montserrat', sans-serif;
-        }
-        
-        /* Compact card styling */
-        .partner-card_body, .partner-card__body {
-            padding: 8px !important;
-            min-height: auto !important;
-            height: auto !important;
-        }
-        
-        .partner-card {
-            height: fit-content !important;
-            min-height: auto !important;
-        }
-        
-        .partner-grid {
-            align-items: stretch;
-        }
-    </style>
+    <link rel="stylesheet" href="../view/styles/dboard.css">
+    <link rel="stylesheet" href="../view/styles/partnerDetails.css"> 
 </head>
 <body>
     <!-- Flash Messages -->
@@ -135,11 +114,11 @@ $statusColor = $partnerDetailsController->getStatusBadgeColor($status);
                     <span class="nav-label">Project Creation</span>
                 </a>
                 <a class="nav-item" href="./allProjects.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-allprojects"></span>
                     <span class="nav-label">All Projects</span>
                 </a>
                 <a class="nav-item" href="./activityLog.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-logs"></span>
                     <span class="nav-label">Activity Log</span>
                 </a>
             </nav>

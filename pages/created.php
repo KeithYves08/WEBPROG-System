@@ -70,6 +70,7 @@ function field($arr, $key, $default = '') {
   	<meta charset="utf-8">
   	<meta name="viewport" content="initial-scale=1, width=device-width"> 	
   	<title>AILPO - Project Details</title>
+    <link rel="stylesheet" href="../view/styles/dboard.css">
     <link rel="stylesheet" href="../view/styles/created.css"> 	
     
 </head>
@@ -114,11 +115,11 @@ function field($arr, $key, $default = '') {
                     <span class="nav-label">Project Creation</span>
                 </a>
                 <a class="nav-item" href="./allProjects.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-allprojects"></span>
                     <span class="nav-label">All Projects</span>
                 </a>
                 <a class="nav-item" href="./activityLog.php">
-                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-icon icon-logs"></span>
                     <span class="nav-label">Activity Log</span>
                 </a>
             </nav>
