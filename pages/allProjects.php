@@ -51,6 +51,10 @@ require_once '../controller/config.php';
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Project Creation</span>
                 </a>
+                <a class="nav-item" href="./allProjects.php">
+                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-label">All Projects</span>
+                </a>
                 <a class="nav-item" href="./activityLog.php">
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Activity Log</span>
@@ -76,6 +80,7 @@ require_once '../controller/config.php';
                                                 <option value="Starting Soon">Starting Soon</option>
                                                 <option value="Upcoming">Upcoming</option>
                                                 <option value="Ending Today">Ending Today</option>
+                                                <option value="Accomplished">Accomplished</option>
                                             </select>
                                         </div>
                                         <label for="ap-window">Show:</label>
@@ -92,16 +97,14 @@ require_once '../controller/config.php';
                                 <div class="projects-content">
                                     <div id="projects-container">
                                         <?php
-                                        try {
-                                            // Default initial view: next 30 days window
-                                            $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
-                                                    FROM projects p
-                                                    LEFT JOIN companies c ON c.id = p.industry_partner_id
-                                                    WHERE ((p.end_date IS NULL OR DATE(p.end_date) >= CURDATE()) AND (p.start_date IS NULL OR DATE(p.start_date) <= CURDATE()))
-                                                       OR (p.start_date IS NOT NULL AND DATE(p.start_date) > CURDATE() AND DATE(p.start_date) <= DATE_ADD(CURDATE(), INTERVAL 30 DAY))
-                                                    ORDER BY p.created_at DESC";
-                                            $stmt = $conn->prepare($sql);
-                                            $stmt->execute();
+                    try {
+                        // Show ALL projects (including accomplished and future/upcoming)
+                        $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
+                            FROM projects p
+                            LEFT JOIN companies c ON c.id = p.industry_partner_id
+                            ORDER BY p.created_at DESC";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute();
                                             $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                                             if ($projects && count($projects) > 0) {
@@ -122,7 +125,7 @@ require_once '../controller/config.php';
                                                         $days = (int)floor((strtotime($sdDate) - strtotime($todayStr)) / 86400);
                                                         $status = ($days <= 7 ? 'Starting Soon' : 'Upcoming');
                                                     } elseif (!empty($edDate)) {
-                                                        $status = ($edDate === $todayStr) ? 'Ending Today' : 'Ongoing';
+                                                        $status = ($edDate <= $todayStr) ? 'Accomplished' : 'Ongoing';
                                                     }
 
                                                     $sdAttr = htmlspecialchars($proj['start_date'] ?? '', ENT_QUOTES);
@@ -205,7 +208,7 @@ require_once '../controller/config.php';
                 const diff = Math.floor((sdDate - new Date(today.getFullYear(), today.getMonth(), today.getDate()))/86400000);
                 return (diff <= 7 ? 'Starting Soon' : 'Upcoming');
             } else if (edDate) {
-                return (toYMD(edDate) === todayYMD) ? 'Ending Today' : 'Ongoing';
+                return (toYMD(edDate) <= todayYMD) ? 'Accomplished' : 'Ongoing';
             }
             return 'Ongoing';
         }
@@ -253,11 +256,24 @@ require_once '../controller/config.php';
             const q = (document.getElementById('ap-search')?.value || '').toLowerCase().trim();
             const statusSel = document.getElementById('ap-status');
             const statusFilter = statusSel ? statusSel.value : 'All';
+            const winSel = document.getElementById('ap-window');
+            const win = (winSel ? winSel.value : '30') || '30';
+            const days = (win === 'all') ? Infinity : parseInt(win, 10) || 30;
+
             const filtered = fullList.filter(p => {
                 const hay = ((p.title||'') + ' ' + (p.company_name||'')).toLowerCase();
                 if (q && hay.indexOf(q) === -1) return false;
                 const st = computeStatus(p);
                 if (statusFilter && statusFilter !== 'All' && st !== statusFilter) return false;
+                // Apply upcoming window only to upcoming items; keep ongoing/accomplished always
+                if (st === 'Starting Soon' || st === 'Upcoming') {
+                    const sd = parseYMD(p.start_date);
+                    if (!sd) return true; // if no date, leave it
+                    const today = new Date();
+                    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    const diff = Math.floor((sd - startOfToday)/86400000);
+                    if (days !== Infinity && diff > days) return false;
+                }
                 return true;
             });
             render(filtered);
@@ -267,10 +283,11 @@ require_once '../controller/config.php';
         async function refresh(){
             if (inflight) return; inflight = true;
             try {
+                // Persist window selection locally (used client-side only now)
                 const winSel = document.getElementById('ap-window');
                 const win = winSel ? winSel.value : '30';
                 try { localStorage.setItem('ap-window', win); } catch(e){}
-                const resp = await fetch('../controller/activeProjects.php?window=' + encodeURIComponent(win) + '&ts=' + Date.now(), { credentials: 'same-origin', cache: 'no-store' });
+                const resp = await fetch('../controller/allProjectsData.php?ts=' + Date.now(), { credentials: 'same-origin', cache: 'no-store' });
                 if (!resp.ok) throw new Error('Network');
                 const data = await resp.json();
                 if (data && data.status === 'ok') {
@@ -322,7 +339,7 @@ require_once '../controller/config.php';
                         const diff = Math.floor((sd - new Date(today.getFullYear(), today.getMonth(), today.getDate()))/86400000);
                         st = (diff <= 7 ? 'Starting Soon' : 'Upcoming');
                     } else if (ed) {
-                        st = (toYMD(ed) === todayYMD) ? 'Ending Today' : 'Ongoing';
+                        st = (toYMD(ed) <= todayYMD) ? 'Accomplished' : 'Ongoing';
                     }
                     el.textContent = st;
                 });

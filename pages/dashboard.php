@@ -107,6 +107,10 @@ try {
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Project Creation</span>
                 </a>
+                <a class="nav-item" href="./allProjects.php">
+                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-label">All Projects</span>
+                </a>
                 <a class="nav-item" href="./activityLog.php">
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Activity Log</span>
@@ -148,32 +152,22 @@ try {
                         <div class="left-section">
                             <div class="active-projects-section">
                                 <div class="active-proj-label">
-                                    <span>All Projects</span>
-                                    <div class="ap-filter">
-                                        <label for="ap-window">Show:</label>
-                                        <div class="ap-select-wrap">
-                                            <select id="ap-window" class="ap-select">
-                                                <option value="30" selected>Next 30 days</option>
-                                                <option value="60">Next 60 days</option>
-                                                <option value="90">Next 90 days</option>
-                                                <option value="all">All upcoming</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                    <span>Active Projects</span>
+                                    
                                 </div>
                                 <div class="projects-content">
                                     <div id="active-projects-container">
                                     <?php
                                         try {
-                                                                             // Default initial view: next 30 days window
-                                                                             $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
-                                                                                            FROM projects p
-                                                                                            LEFT JOIN companies c ON c.id = p.industry_partner_id
-                                                                                            WHERE ((p.end_date IS NULL OR DATE(p.end_date) >= CURDATE()) AND (p.start_date IS NULL OR DATE(p.start_date) <= CURDATE()))
-                                                                                                OR (p.start_date IS NOT NULL AND DATE(p.start_date) > CURDATE() AND DATE(p.start_date) <= DATE_ADD(CURDATE(), INTERVAL 30 DAY))
-                                                                                            ORDER BY p.created_at DESC";
-                                                          $stmt = $conn->prepare($sql);
-                                                          $stmt->execute();
+                                            // Dashboard: show only ongoing projects (exclude future start dates)
+                                                                                        $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
+                                                                                                                FROM projects p
+                                                                                                                LEFT JOIN companies c ON c.id = p.industry_partner_id
+                                                                                                                WHERE (p.end_date IS NULL OR DATE(p.end_date) > CURDATE())
+                                                                                                                    AND (p.start_date IS NULL OR DATE(p.start_date) <= CURDATE())
+                                                                                                                ORDER BY p.created_at DESC";
+                                            $stmt = $conn->prepare($sql);
+                                            $stmt->execute();
                                             $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                                             if ($projects && count($projects) > 0) {
@@ -191,10 +185,8 @@ try {
                                                     $edRaw = $proj['end_date'] ?? null;
                                                     $sdDate = !empty($sdRaw) ? date('Y-m-d', strtotime($sdRaw)) : null;
                                                     $edDate = !empty($edRaw) ? date('Y-m-d', strtotime($edRaw)) : null;
-                                                    if (!empty($sdDate) && $sdDate > $todayStr) {
-                                                        $days = (int)floor((strtotime($sdDate) - strtotime($todayStr)) / 86400);
-                                                        $status = ($days <= 7 ? 'Starting Soon' : 'Upcoming');
-                                                    } elseif (!empty($edDate)) {
+                                                    // Only ongoing are shown here; label 'Ending Today' if end_date is today
+                                                    if (!empty($edDate)) {
                                                         $status = ($edDate === $todayStr) ? 'Ending Today' : 'Ongoing';
                                                     }
 
@@ -358,10 +350,8 @@ try {
         if (inflight) return; // avoid overlaps
         inflight = true;
         try {
-            const sel = document.getElementById('ap-window');
-            const win = sel ? sel.value : '30';
-            try { localStorage.setItem('ap-window', win); } catch(e){}
-            const resp = await fetch('../controller/activeProjects.php?window=' + encodeURIComponent(win), { credentials: 'same-origin' });
+            // Dashboard should show only ongoing projects; request mode=ongoing
+            const resp = await fetch('../controller/activeProjects.php?mode=ongoing', { credentials: 'same-origin' });
             if (!resp.ok) throw new Error('Network');
             const data = await resp.json();
             if (data && data.status === 'ok') {
@@ -398,18 +388,7 @@ try {
         });
     }
 
-    // Restore saved window selection if present
-    (function(){
-        const sel = document.getElementById('ap-window');
-        if (!sel) return;
-        try {
-            const saved = localStorage.getItem('ap-window');
-            if (saved && Array.from(sel.options).some(o => o.value === saved)) {
-                sel.value = saved;
-            }
-        } catch(e){}
-        sel.addEventListener('change', function(){ refresh(); });
-    })();
+    // Removed dropdown window selector; always fetching only ongoing projects
 
     // Initial and periodic refresh
     refresh();

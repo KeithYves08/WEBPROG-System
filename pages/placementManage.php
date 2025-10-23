@@ -50,6 +50,10 @@ require_once '../controller/config.php';
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Project Creation</span>
                 </a>
+                <a class="nav-item" href="./allProjects.php">
+                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-label">All Projects</span>
+                </a>
                 <a class="nav-item" href="./activityLog.php">
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Activity Log</span>
@@ -84,7 +88,7 @@ require_once '../controller/config.php';
                                                         $sql = "SELECT p.id, p.title, p.start_date, p.end_date, c.name AS company_name
                                                                         FROM projects p
                                                                         LEFT JOIN companies c ON c.id = p.industry_partner_id
-                                                                        WHERE (p.end_date IS NULL OR DATE(p.end_date) >= CURDATE())
+                                                                        WHERE (p.end_date IS NULL OR DATE(p.end_date) > CURDATE())
                                                                             AND (p.start_date IS NULL OR DATE(p.start_date) <= CURDATE())
                                                                         ORDER BY p.created_at DESC";
                                                         $stmt = $conn->prepare($sql);

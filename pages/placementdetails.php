@@ -39,7 +39,6 @@ if ($projectId > 0) {
         <div class="header-inner">
             <h1 class="app-title">AILPO</h1>
             <div class="user-info">
-                <span>Welcome, <?php echo htmlspecialchars(is_array($user) ? (string)($user['username'] ?? 'User') : (string)($user ?? 'User')); ?>!</span>
                 <a href="../controller/logout.php" class="logout-btn">Logout</a>
             </div>
         </div>
@@ -72,6 +71,10 @@ if ($projectId > 0) {
                 <a class="nav-item" href="./creation.php">
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Project Creation</span>
+                </a>
+                <a class="nav-item" href="./allProjects.php">
+                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-label">All Projects</span>
                 </a>
                 <a class="nav-item" href="./activityLog.php">
                     <span class="nav-icon icon-creation"></span>

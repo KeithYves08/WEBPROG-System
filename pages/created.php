@@ -113,10 +113,14 @@ function field($arr, $key, $default = '') {
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Project Creation</span>
                 </a>
-                    <a class="nav-item" href="./activityLog.php">
-                        <span class="nav-icon icon-creation"></span>
-                        <span class="nav-label">Activity Log</span>
-                    </a>
+                <a class="nav-item" href="./allProjects.php">
+                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-label">All Projects</span>
+                </a>
+                <a class="nav-item" href="./activityLog.php">
+                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-label">Activity Log</span>
+                </a>
             </nav>
         </aside>
 
@@ -237,7 +241,7 @@ function field($arr, $key, $default = '') {
                     </div>
 
                     <div class="box-actions">
-                        <button class="btn btn-secondary" type="button">Add Feedback</button>
+                        <!-- <button class="btn btn-secondary" type="button">Add Feedback</button> -->
                         <button class="btn btn-primary" type="button" id="accomplish-btn">Accomplish</button>
                     </div>
                 </section>
