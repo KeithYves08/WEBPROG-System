@@ -51,7 +51,7 @@ require_once '../controller/config.php';
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Project Creation</span>
                 </a>
-                <a class="nav-item" href="./allProjects.php">
+                <a class="nav-item is-active" href="./allProjects.php">
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">All Projects</span>
                 </a>

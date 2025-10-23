@@ -400,6 +400,7 @@ body {
     display: flex;
     justify-content: flex-end;
     margin-top: 20px;
+    margin-bottom: 70px;
 }
 
 .view-all-btn {
@@ -424,6 +425,7 @@ body {
     border-radius: 18px;
     height: 40%;
     padding: 20px;
+    padding-top: 5px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -435,6 +437,7 @@ body {
     gap: 20px;
     align-items: stretch;
     height: 40%;
+    margin-top: -30px;
 }
 
 .progress-chart-container {
@@ -459,7 +462,7 @@ body {
 
 .progress-chart-container .chart-header {
     font-size: 1em;
-    margin-bottom: 15px;
+    margin-bottom: 15px
 }
 
 .chart-content {
