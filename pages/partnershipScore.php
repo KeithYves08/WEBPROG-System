@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, width=device-width">
-    <title>AILPO</title>
+    <title>AILPO - Partnership Score</title>
     <link rel="stylesheet" href="../view/styles/partScore.css">
 </head>
 

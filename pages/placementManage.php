@@ -17,7 +17,6 @@ require_once '../controller/config.php';
         <div class="header-inner">
             <h1 class="app-title">AILPO</h1>
             <div class="user-info">
-                <span>Welcome, <?php echo htmlspecialchars(is_array($user) ? (string)($user['username'] ?? 'User') : (string)($user ?? 'User')); ?>!</span>
                 <a href="../controller/logout.php" class="logout-btn">Logout</a>
             </div>
         </div>

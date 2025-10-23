@@ -1,0 +1,28 @@
+/* Minimal overrides for All Projects page; reuse dboard.css for base styles */
+
+/* Controls layout inside the blue header pill */
+.ap-filter { display: flex; align-items: center; gap: 10px; }
+
+.ap-search {
+    background: #ffffff;
+    color: #333;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 12px;
+    min-width: 240px;
+    font-size: 0.95rem;
+}
+.ap-search::placeholder { color: #888; }
+
+/* Reuse .ap-select from dboard.css for both selects; add small tweaks if needed */
+.ap-select { font-size: 0.9rem; }
+
+/* On narrow screens, wrap controls nicely */
+@media (max-width: 860px) {
+    .ap-filter { flex-wrap: wrap; justify-content: flex-end; }
+    .ap-search { flex: 1 1 100%; min-width: 0; }
+}
+
+/* Increase the vertical space for the list on All Projects only */
+.page-all-projects .active-projects-section { min-height: 70vh; }
+.page-all-projects .active-projects-section .projects-content { max-height: 65vh; }

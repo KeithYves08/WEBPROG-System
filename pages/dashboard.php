@@ -73,6 +73,7 @@ try {
         <div class="header-inner">
             <h1 class="app-title">AILPO</h1>
             <div class="user-info">
+                <span>Welcome, admin!</span>
                 <a href="../controller/logout.php" class="logout-btn">Logout</a>
             </div>
         </div>
@@ -225,9 +226,9 @@ try {
                                     </div>
                                 </div>
                             </div>
-                            <!-- <div class="view-all-container">
-                                <button class="view-all-btn">VIEW ALL</button>
-                            </div> -->
+                            <div class="view-all-container">
+                                <button class="view-all-btn" onclick="location.href='./allProjects.php'">VIEW ALL</button>
+                            </div>
                         </div>
 
                         <div class="right-section">
