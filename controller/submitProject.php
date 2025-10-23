@@ -1,6 +1,7 @@
 <?php
 // Handles project creation from creation.php via JSON POST
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/activityLogger.php';
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 header('Content-Type: application/json');
@@ -152,6 +153,22 @@ try {
 	$projectId = (int)$conn->lastInsertId();
 
 	$conn->commit();
+
+	// Log project creation (best-effort)
+	try {
+		log_activity($conn, [
+			'action' => 'project_create',
+			'entity_type' => 'project',
+			'entity_id' => $projectId,
+			'description' => 'Created project: ' . ($project['project_title'] ?? ('ID ' . $projectId)),
+			'meta' => [
+				'project_type' => $project['project_type'] ?? null,
+				'start_date' => $project['start_date'] ?? null,
+				'end_date' => $project['end_date'] ?? null,
+				'industry_partner_id' => $industryPartnerId,
+			],
+		]);
+	} catch (Throwable $e) { /* no-op */ }
 
 	echo json_encode(['status' => 'ok', 'project_id' => $projectId]);
 } catch (Throwable $e) {

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'config.php';
+require_once __DIR__ . '/activityLogger.php';
 
 //input sanitization
 function sanitizeInput($data) {
@@ -36,6 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['admin_username'] = $admin['username'];
             $_SESSION['is_logged_in'] = true;
             $_SESSION['last_activity'] = time();
+            // log activity (best-effort)
+            try {
+                log_activity($conn, [
+                    'action' => 'login',
+                    'description' => 'User logged in',
+                ]);
+            } catch (Throwable $e) { /* no-op */ }
             
             //redirect to dashboard
             header("Location: ../pages/dashboard.php");

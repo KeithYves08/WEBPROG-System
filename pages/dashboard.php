@@ -107,6 +107,10 @@ try {
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Project Creation</span>
                 </a>
+                <a class="nav-item" href="./activityLog.php">
+                    <span class="nav-icon icon-creation"></span>
+                    <span class="nav-label">Activity Log</span>
+                </a>
             </nav>
         </aside>
 
@@ -255,7 +259,7 @@ try {
                                 </div>
 
                                 <div class="action-buttons">
-                                    <button class="view-calendar-btn">VIEW CALENDAR</button>
+                                    <!-- <button class="view-calendar-btn">VIEW CALENDAR</button> -->
                                     <button class="add-project-btn" onclick="location.href='./creation.php'">+ ADD PROJECT</button>
                                 </div>
                             </div>

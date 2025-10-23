@@ -1,0 +1,70 @@
+/* Activity Log Page */
+.activitylog-page .al-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0 16px;
+}
+.activitylog-page .al-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.activitylog-page .al-filters {
+  display: flex;
+  gap: 8px;
+}
+.activitylog-page .al-filters input[type="text"] {
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  min-width: 320px;
+}
+.activitylog-page .al-filters button {
+  padding: 8px 14px;
+  background: #ffd41c;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.activitylog-page .al-filters button:hover {
+  background: #f2c500;
+}
+.activitylog-page .al-table-wrap {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.activitylog-page .al-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.activitylog-page .al-table thead th {
+  text-align: left;
+  font-weight: 700;
+  background: #fafafa;
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+}
+.activitylog-page .al-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f1f1;
+  font-size: 0.95rem;
+}
+.activitylog-page .al-table tbody tr:hover td {
+  background: #fffef2;
+}
+.activitylog-page .al-empty {
+  text-align: center;
+  color: #666;
+  padding: 18px 0;
+}
+.activitylog-page .al-badge {
+  background: #111;
+  color: #ffd41c;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+}

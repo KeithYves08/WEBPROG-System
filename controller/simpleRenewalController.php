@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/activityLogger.php';
 
 class SimplePartnershipRenewalController {
     private $conn;
@@ -73,6 +74,20 @@ class SimplePartnershipRenewalController {
             
             if ($result) {
                 error_log("Partnership updated successfully");
+                // Log renewal
+                try {
+                    log_activity($this->conn, [
+                        'action' => 'partnership_renew',
+                        'entity_type' => 'partnership',
+                        'entity_id' => $partnershipId,
+                        'description' => 'Renewed partnership ID ' . $partnershipId,
+                        'meta' => [
+                            'new_start_date' => $newStartDate,
+                            'new_end_date' => $newEndDate,
+                            'mou_updated' => (bool)$newMouPath,
+                        ],
+                    ]);
+                } catch (Throwable $e) { /* best-effort */ }
                 return [
                     'success' => true,
                     'message' => 'Partnership renewed successfully!',

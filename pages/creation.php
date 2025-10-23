@@ -151,6 +151,10 @@ $user = getUserInfo();
                     <span class="nav-icon icon-creation"></span>
                     <span class="nav-label">Project Creation</span>
                 </a>
+                    <a class="nav-item" href="./activityLog.php">
+                        <span class="nav-icon icon-creation"></span>
+                        <span class="nav-label">Activity Log</span>
+                    </a>
             </nav>
         </aside>
 

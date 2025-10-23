@@ -43,6 +43,7 @@ body {
 }
 .app-title {
     margin:0;
+    margin-left: -12px;
     font-weight:700;
     font-size:1.9rem;
     letter-spacing:.5px;

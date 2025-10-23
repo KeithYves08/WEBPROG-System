@@ -203,6 +203,28 @@ try {
     $pdo->exec($sql);
     echo "Milestones table created successfully.<br>";
 
+    // Create activity_log table
+    $sql = "
+    CREATE TABLE IF NOT EXISTS `activity_log` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `occurred_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        `user_id` INT NULL,
+        `username` VARCHAR(100) NULL,
+        `action` VARCHAR(50) NOT NULL,
+        `entity_type` VARCHAR(50) NULL,
+        `entity_id` INT NULL,
+        `description` VARCHAR(255) NULL,
+        `details` TEXT NULL,
+        `ip_address` VARCHAR(45) NULL,
+        `user_agent` VARCHAR(255) NULL,
+        INDEX `idx_occurred_at` (`occurred_at`),
+        INDEX `idx_action` (`action`),
+        INDEX `idx_user` (`user_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ";
+    $pdo->exec($sql);
+    echo "Activity log table created successfully.<br>";
+
     // Insert default scopes
     $defaultScopes = [
         'Research and Development',

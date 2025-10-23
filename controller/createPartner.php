@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "config.php";
+require_once __DIR__ . '/activityLogger.php';
 require_once "FormValidator.php";
 
 // Alias the connection variable for consistency
@@ -160,6 +161,25 @@ try {
         }
 
         $pdo->commit();
+
+        // Log partner + partnership creation (best-effort)
+        try {
+            log_activity($pdo, [
+                'action' => 'partner_create',
+                'entity_type' => 'partnership',
+                'entity_id' => (int)$partnershipId,
+                'description' => 'Created partner ' . $companyName . ' (Company ID ' . $companyId . ')',
+                'meta' => [
+                    'company_id' => (int)$companyId,
+                    'academe_liaison_id' => $academeLiaisonId,
+                    'contact_person_id' => $contactPersonId,
+                    'scopes' => $scopes,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                ],
+            ]);
+        } catch (Throwable $e) { /* no-op */ }
+
         $_SESSION['success_message'] = "Partnership record created successfully.";
         header('Location: ../pages/partnershipManage.php');
         exit;
