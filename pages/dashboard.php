@@ -210,7 +210,7 @@ try {
                         <div class="right-section">
                             <div class="monthly-projs-container">
                                 <div class="chart-header">Monthly Projects</div>
-                                <div class="chart-content" style="height: 260px;">
+                                <div class="chart-content">
                                     <canvas id="monthly-projects-chart"></canvas>
                                 </div>
                             </div>
@@ -218,14 +218,14 @@ try {
                             <div class="bottom-row">
                                 <div class="progress-chart-container">
                                     <div class="chart-header">Project Progress Overview</div>
-                                    <div class="chart-content" style="display:flex; gap:16px; align-items:stretch; min-height:100px;">
-                                        <div style="flex:1; position:relative;">
+                                    <div class="chart-content chart-content--progress">
+                                        <div class="chart-col">
                                             <canvas id="progress-status-chart"></canvas>
-                                            <div id="progress-avg" style="position:absolute; bottom:-15px; left:12px; font-weight:600; font-size:0.9rem;"></div>
+                                            <div id="progress-avg" class="progress-avg"></div>
                                         </div>
-                                        <div style="flex:1; overflow:auto;">
-                                            <div style="font-weight:600; margin-bottom:8px;">Top At-Risk Projects</div>
-                                            <div id="at-risk-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                                        <div class="chart-col chart-col--scroll">
+                                            <div class="atrisk-title">Top At-Risk Projects</div>
+                                            <div id="at-risk-list" class="at-risk-list"></div>
                                         </div>
                                     </div>
                                 </div>

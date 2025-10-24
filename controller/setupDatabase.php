@@ -72,9 +72,7 @@ try {
     CREATE TABLE IF NOT EXISTS agreements (
         id INT AUTO_INCREMENT PRIMARY KEY,
         funding_source VARCHAR(100),
-        budget_amount DECIMAL(12,2),
-        document_path VARCHAR(255),
-        contract_type VARCHAR(50)
+        budget_amount DECIMAL(12,2)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ";
     
@@ -88,9 +86,7 @@ try {
         department_program VARCHAR(255),
         faculty_coordinator VARCHAR(100),
         contact_number VARCHAR(50),
-        email_academe VARCHAR(100),
-        students_involved INT,
-        unit_attach_document VARCHAR(255)
+        email_academe VARCHAR(100)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ";
     
@@ -202,6 +198,44 @@ try {
     
     $pdo->exec($sql);
     echo "Milestones table created successfully.<br>";
+
+    // Create students table (used by Dashboard and placement/student features)
+    $sql = "
+    CREATE TABLE IF NOT EXISTS students (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        school_id VARCHAR(50) NOT NULL UNIQUE,
+        first_name VARCHAR(100) NOT NULL,
+        last_name VARCHAR(100) NOT NULL,
+        program VARCHAR(150) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_students_name (last_name, first_name)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ";
+    $pdo->exec($sql);
+    echo "Students table created successfully.<br>";
+
+    // Create student_projects junction table (many-to-many Students <-> Projects)
+    $sql = "
+    CREATE TABLE IF NOT EXISTS student_projects (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        student_id INT NOT NULL,
+        project_id INT NOT NULL,
+        assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_student_project (student_id, project_id),
+        CONSTRAINT fk_sp_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+        CONSTRAINT fk_sp_project FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+        INDEX idx_sp_project (project_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ";
+    $pdo->exec($sql);
+    echo "Student-Projects table created successfully.<br>";
+
+    // Helpful indexes for common queries
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_projects_created_at ON projects(created_at)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_projects_dates ON projects(start_date, end_date)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_partnerships_company ON partnerships(company_id)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_partnerships_status_end ON partnerships(status, agreement_end_date)");
+    echo "Indexes created/ensured successfully.<br>";
 
     // Create activity_log table
     $sql = "

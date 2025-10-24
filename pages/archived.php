@@ -40,6 +40,7 @@ try {
     <div class="dash-layout">
         <aside class="sidebar">
             <nav class="nav">
+                <nav class="nav">
                 <a class="nav-item" href="./dashboard.php">
                     <span class="nav-icon icon-dashboard"></span>
                     <span class="nav-label">Dashboard</span>
