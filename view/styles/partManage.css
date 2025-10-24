@@ -394,12 +394,19 @@ body {
 .main-white-container { position: relative; }
 
 .export-actions {
-    position: absolute;
+    position: fixed;
     right: 24px;
     bottom: 24px;
     display: flex;
     gap: 12px;
-    z-index: 1;
+    z-index: 1000;
+}
+@media (max-width: 640px) {
+    .export-actions {
+        right: 16px;
+        bottom: 16px;
+        gap: 10px;
+    }
 }
 /* Filter Form Styles */
 .filter-form {
