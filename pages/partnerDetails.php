@@ -204,16 +204,15 @@ $statusColor = $partnerDetailsController->getStatusBadgeColor($status);
                                 <?php 
                                 $mouUrl = $partnerDetailsController->getMouFileUrl($partnershipDetails['mou_contract']);
                                 ?>
+                                <?php 
+                                // Display the folder path where MOU/Contract files are saved
+                                $mouFolderPath = realpath(__DIR__ . '/../controller/MOUMOA_NewPartnership');
+                                ?>
                                 <div style="margin-bottom: 12px; font-family: 'Montserrat', sans-serif;">
-                                    <strong>Document:</strong> 
-                                    <?php if ($mouUrl): ?>
-                                        <a href="<?php echo htmlspecialchars($mouUrl); ?>" 
-                                           target="_blank" style="color: #35408e; font-family: 'Montserrat', sans-serif;">
-                                            View MOU/Contract
-                                        </a>
-                                    <?php else: ?>
-                                        <span style="color: #666; font-style: italic;">No document available</span>
-                                    <?php endif; ?>
+                                    <strong>Document:</strong>
+                                    <span style="color: #35408e; font-family: 'Montserrat', sans-serif;">
+                                        <?php echo htmlspecialchars($mouFolderPath ?: (__DIR__ . '/../controller/MOUMOA_NewPartnership')); ?>
+                                    </span>
                                 </div>
                             </div>
 
